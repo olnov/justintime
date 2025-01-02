@@ -1,0 +1,126 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String       @id @default(uuid())
+  name          String
+  email         String       @unique
+  password      String
+  birthDate     DateTime?    @map("birth_date")
+  userPhoto     String?      @map("user_photo")
+  phone         String?
+  telegram      String?
+  otherContacts String?      @map("other_contacts")
+  address       String?
+  createdAt     DateTime     @default(now()) @map("created_at")
+  updatedAt     DateTime     @updatedAt @map("updated_at")
+  UserSchools   UserSchool[] // Relationships with schools
+
+  @@index([phone])
+  @@index([email])
+  @@map("users")
+}
+
+model School {
+  id           String        @id @default(uuid())
+  name         String        @unique
+  address      String?
+  phone        String?
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  UserSchools  UserSchool[] // Users belonging to this school
+  Appointments Appointment[] // Appointments in this school
+
+  @@map("schools")
+}
+
+model UserSchool {
+  id       String   @id @default(uuid())
+  userId   String   @map("user_id")
+  schoolId String   @map("school_id")
+  joinedAt DateTime @default(now()) @map("joined_at")
+
+  user    User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  school  School           @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  roles   RoleAssignment[] // Combined roles for the user in the school
+  Teacher Teacher? // Teacher-specific data
+  Student Student? // Student-specific data
+
+  @@unique([userId, schoolId]) // Ensure a user can belong to a school only once
+  @@map("users_schools")
+}
+
+model RoleAssignment {
+  id           String @id @default(uuid())
+  userSchoolId String @map("user_school_id")
+  role         Role
+
+  userSchool UserSchool @relation(fields: [userSchoolId], references: [id], onDelete: Cascade)
+
+  @@map("role_assignments")
+}
+
+enum Role {
+  student
+  teacher
+  admin
+}
+
+model Teacher {
+  id             String  @id @default(uuid())
+  userSchoolId   String  @unique @map("user_school_id")
+  specialization String
+  bio            String?
+  rating         Float   @default(0.0)
+
+  userSchool   UserSchool    @relation(fields: [userSchoolId], references: [id], onDelete: Cascade)
+  Appointments Appointment[] // Appointments associated with this teacher
+
+  @@map("teachers")
+}
+
+model Student {
+  id           String @id @default(uuid())
+  userSchoolId String @unique @map("user_school_id")
+  gradeLevel   String @map("grade_level")
+
+  userSchool   UserSchool    @relation(fields: [userSchoolId], references: [id], onDelete: Cascade)
+  Appointments Appointment[] // Appointments associated with this student
+
+  @@map("students")
+}
+
+model Appointment {
+  id        String            @id @default(uuid())
+  teacherId String            @map("teacher_id")
+  studentId String            @map("student_id")
+  schoolId  String            @map("school_id")
+  startTime DateTime          @map("start_time")
+  endTime   DateTime          @map("end_time")
+  status    AppointmentStatus
+  notes     String?
+
+  teacher Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  school  School  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@map("appointments")
+}
+
+enum AppointmentStatus {
+  scheduled
+  completed
+  cancelled
+}
