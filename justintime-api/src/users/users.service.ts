@@ -1,4 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../prisma/prisma.service';
@@ -21,11 +26,15 @@ export class UsersService {
   }
 
   findAll() {
-    return `This action returns all users`;
+    return this.prismaService.user.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: string) {
+    return this.prismaService.user.findUnique({
+      where: {
+        id: id,
+      },
+    });
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
