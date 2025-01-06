@@ -6,7 +6,9 @@ import {
   Patch,
   Param,
   Delete,
-  UseGuards, HttpException, HttpStatus,
+  UseGuards,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { TeachersService } from './teachers.service';
 import { CreateTeacherDto } from './dto/create-teacher.dto';
