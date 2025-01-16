@@ -7,12 +7,18 @@ import {
   Param,
   Delete,
   HttpException,
-  HttpStatus, UseGuards,
+  HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import {ApiBearerAuth, ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiOkResponse} from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('users')
@@ -27,7 +33,9 @@ export class UsersController {
   }
 
   @ApiOkResponse({ description: 'Retrieved successfully.' })
-  @ApiInternalServerErrorResponse({ description: 'Error while retrieving users.' })
+  @ApiInternalServerErrorResponse({
+    description: 'Error while retrieving users.',
+  })
   @ApiBearerAuth('JWT-auth')
   @UseGuards(JwtAuthGuard)
   @Get()
@@ -37,7 +45,9 @@ export class UsersController {
 
   @ApiOkResponse({ description: 'The user has been successfully retrieved.' })
   @ApiNotFoundResponse({ description: 'User not found.' })
-  @ApiInternalServerErrorResponse({ description: 'Error while retrieving the user.' })
+  @ApiInternalServerErrorResponse({
+    description: 'Error while retrieving the user.',
+  })
   @ApiBearerAuth('JWT-auth')
   @UseGuards(JwtAuthGuard)
   @Get(':id')

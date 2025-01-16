@@ -1,0 +1,57 @@
+import { Link } from "@chakra-ui/react";
+import { NavLink } from "react-router-dom";
+import { FaUsers, FaSchool, FaChalkboardTeacher } from "react-icons/fa";
+import { CgUser } from "react-icons/cg";
+
+const MenuItems = () => {
+  return (
+    <>
+    <Link 
+        as={NavLink} 
+        to="/users"
+        display="flex"
+        alignItems="center"
+        p={2}
+        gap={2}
+        color="#b9babf"
+        _hover={{ bg: "#161b2c", color: "#FFF" }}
+        _active={{ bg: "#DEE5D4", color: "#8EACCD" }}
+        _focus={{ bg: "#161b2c", color: "#FFF" }}
+      >
+        Users
+      </Link>
+      <Link 
+        as={NavLink} 
+        to="/schools"
+        display="flex"
+        alignItems="center"
+        p={2}
+        gap={2}
+        color="#b9babf"
+        _hover={{ bg: "#161b2c", color: "#FFF" }}
+        _active={{ bg: "#DEE5D4", color: "#8EACCD" }}
+        _focus={{ bg: "#161b2c", color: "#FFF" }}
+        leftIcon={<FaSchool />}
+      >
+        Schools
+      </Link>
+      <Link 
+        as={NavLink} 
+        to="/teachers"
+        display="flex"
+        alignItems="center"
+        p={2}
+        gap={2}
+        color="#b9babf"
+        _hover={{ bg: "#161b2c", color: "#FFF" }}
+        _active={{ bg: "#DEE5D4", color: "#8EACCD" }}
+        _focus={{ bg: "#161b2c", color: "#FFF" }}
+        leftIcon={<FaChalkboardTeacher />}
+      >
+        Teachers
+      </Link>
+    </>
+  );
+};
+
+export default MenuItems;

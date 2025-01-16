@@ -10,6 +10,7 @@ import { StudentsModule } from './students/students.module';
 import { TeachersModule } from './teachers/teachers.module';
 import { SchoolsModule } from './schools/schools.module';
 import { UserSchoolModule } from './user-school/user-school.module';
+import { RoleAssignmentModule } from './role-assignment/role-assignment.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { UserSchoolModule } from './user-school/user-school.module';
     StudentsModule,
     AppointmentsModule,
     UserSchoolModule,
+    RoleAssignmentModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
