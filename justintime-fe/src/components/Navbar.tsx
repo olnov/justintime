@@ -16,6 +16,7 @@ const Navbar = () => {
   const handleLogout = () => {
     localStorage.removeItem("userName");
     localStorage.removeItem("userRole");
+    localStorage.removeItem("token");
     navigate("/login");
   };
 
@@ -23,7 +24,7 @@ const Navbar = () => {
     <Flex
       as="nav"
       p="4"
-      bg="gray.800"
+      bg="#1a2035"
       color="white"
       justifyContent="space-between"
       alignItems="center"

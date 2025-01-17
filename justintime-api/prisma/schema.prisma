@@ -18,6 +18,7 @@ model User {
   name          String
   email         String       @unique
   password      String
+  isGlobalAdmin Boolean      @default(false)
   birthDate     DateTime?    @map("birth_date")
   userPhoto     String?      @map("user_photo")
   phone         String?

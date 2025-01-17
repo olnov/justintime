@@ -39,8 +39,9 @@ export class UsersController {
   @ApiBearerAuth('JWT-auth')
   @UseGuards(JwtAuthGuard)
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  async findAll() {
+    const users = await this.usersService.findAll();
+    return users.map(({ password, ...result }) => result);
   }
 
   @ApiOkResponse({ description: 'The user has been successfully retrieved.' })

@@ -2,6 +2,7 @@ import { Link } from "@chakra-ui/react";
 import { NavLink } from "react-router-dom";
 import { FaUsers, FaSchool, FaChalkboardTeacher, FaUserGraduate } from "react-icons/fa";
 import { CgUser } from "react-icons/cg";
+import { parseToken } from "@/services/AuthService";
 
 const menuItemsByRole = {
   global_admin: [
@@ -24,7 +25,7 @@ const menuItemsByRole = {
 
 const MenuItems = () => {
   const userRole = localStorage.getItem("userRole");
-
+  
   const menuItems = menuItemsByRole[userRole] || [];
 
   return (

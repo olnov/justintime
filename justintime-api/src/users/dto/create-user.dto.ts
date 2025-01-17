@@ -4,6 +4,7 @@ import {
   IsEmail,
   MinLength,
   MaxLength,
+  IsBoolean,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -21,4 +22,8 @@ export class CreateUserDto {
   @MinLength(5, { message: 'Password must be at least 5 characters long.' })
   @MaxLength(16, { message: 'Password cannot exceed 16 characters.' })
   password: string;
+
+  @ApiProperty({ description: "Global admin indicator", example: 'true or false' })
+  @IsBoolean()
+  isGlobalAdmin: boolean;
 }

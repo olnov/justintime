@@ -7,7 +7,7 @@ const AdminPanel = () => {
   return (
     <Flex direction="column" minH="100vh">
       <Navbar />
-      <Flex flex="1" mt="64px"> {/* Adjusted to account for the fixed navbar height */}
+      <Flex flex="1" mt="74px"> {/* Adjusted to account for the fixed navbar height */}
         <Sidebar />
         <Box as="main" flex="1" p={4} ml="200px">
           <Outlet />

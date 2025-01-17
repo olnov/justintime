@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { JwtService } from '@nestjs/jwt';
-import {AuthDto} from "./dto/auth.dto";
+import { AuthDto } from './dto/auth.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -28,9 +28,22 @@ export class AuthController {
   @UseGuards(AuthGuard('local'))
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  login(@Body() authPayload: AuthDto ) {
+  async login(@Request() req, @Body() authPayload: AuthDto ) {
+    const user = req.user;
+    const payload = {
+      username: user.name,
+      id: user.id,
+      globalAdmin: user.isGlobalAdmin,
+    };
+
     return {
-      accessToken: this.jwtService.sign(authPayload),
+      accessToken: this.jwtService.sign(payload),
+      user: {
+        id: user.id,
+        username: user.name,
+        email: user.email,
+        roles: user.roles,
+      },
     };
   }
 }

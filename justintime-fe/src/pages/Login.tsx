@@ -2,35 +2,38 @@ import { Box, Button, Flex, Heading, Input, VStack, Text } from "@chakra-ui/reac
 import { PasswordInput } from "@/components/ui/password-input";
 import { toaster } from "@/components/ui/toaster"
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { login, parseToken, isAuthenticated } from "@/services/AuthService";
 
 const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
 
-    const mockUser = {
-        fullName: "Oleg Novikov",
-        email: "o.novikov@ymail.com",
-        password: "password!1",
-        role: "global_admin",
-    }
 
-    const handleLogin = () => {
-        if (email === mockUser.email && password === mockUser.password) {
-            localStorage.setItem("userName", mockUser.fullName);
-            localStorage.setItem("userRole", mockUser.role);
+    useEffect(() => {
+        if (isAuthenticated()) {
             navigate("/dashboard");
-            console.log("Logged in!");
-        } else {
-            toaster.create({
-                title: "Invalid credentials!",
-                description: "Please check your email and password and try again.",
-                type: "error",
-              });
-            console.log("Invalid credentials!");
         }
-    };
+    }, []);
+
+    const handleLogin = async () => {
+        try {
+            const loggedInUser = await login(email, password);
+            localStorage.setItem("userName", loggedInUser.user.username);
+            localStorage.setItem("token", loggedInUser.accessToken);
+            if (parseToken(loggedInUser.accessToken).globalAdmin) {
+                localStorage.setItem("userRole", "global_admin");
+            }
+            navigate("/dashboard");
+        } catch (error) {
+            toaster.create({
+                title: "Authentication error",
+                description: error instanceof Error ? error.message : "An unknown error occurred",   
+                type: "error",
+            });
+        }
+    }
 
     return (
         <Flex

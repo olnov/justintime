@@ -1,5 +1,6 @@
-import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, Outlet, Navigate } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
+import { isAuthenticated } from "./services/AuthService";
 import AdminPanel from './components/AdminPanel';
 import Login from './pages/Login';
 import Users from './pages/Users';
@@ -7,6 +8,10 @@ import Schools from './pages/Schools';
 import Teachers from './pages/Teachers';
 import Dashboard from './pages/Dashboard';
 import './App.css';
+
+const ProtectedRoute = ({ element }) => {
+  return isAuthenticated() ? element : <Navigate to="/login" />;
+};
 
 const LayoutWithoutNavbar = () => (
   <>
@@ -35,19 +40,19 @@ const router = createBrowserRouter([
     children: [
       {
         path: "dashboard",
-        element: <Dashboard />,
+        element: <ProtectedRoute element={<Dashboard />} />,
       },
       {
         path: "users",
-        element: <Users />,
+        element: <ProtectedRoute element={<Users />} />,
       },
       {
         path: "schools",
-        element: <Schools />,
+        element: <ProtectedRoute element={<Schools />} />,
       },
       {
         path: "teachers",
-        element: <Teachers />,
+        element: <ProtectedRoute element={<Teachers />} />,
       },
     ],
   },
