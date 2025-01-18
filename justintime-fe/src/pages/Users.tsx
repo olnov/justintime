@@ -5,14 +5,14 @@ import { Heading, Button } from "@chakra-ui/react";
 import GeneralizedForm from "@/components/NewForm";
 
 const userFields = [
-  { label: "First Name", name: "firstName", placeholder: "Enter first name" },
-  { label: "Last Name", name: "lastName", placeholder: "Enter last name" },
+  { label: "Full Name", name: "fullName", placeholder: "John Johnson" },
   { label: "Email", name: "email", type: "email", placeholder: "Enter email" },
+  { label: "Password", name: "password", placeholder: "Enter password" },
 ];
 
 const Users = () => {
   const [users, setUsers] = useState<unknown[]>([]);
-  const [isFormOpen, setIsFormOpen] = useState(false); // State to manage form visibility
+  const [isFormOpen, setIsFormOpen] = useState(false); // Manage form visibility
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -29,19 +29,10 @@ const Users = () => {
     }
   };
 
-  const handleAddUser = () => {
-    setIsFormOpen(true); // Show the form when "Add User" is clicked
-  };
-
   const handleFormSubmit = (data: Record<string, any>) => {
     console.log("User Data:", data);
-    setIsFormOpen(false); // Close the form after submission
-    // Optionally, add the new user to the `users` list
-    setUsers((prev) => [...prev, data]);
-  };
-
-  const handleFormCancel = () => {
-    setIsFormOpen(false); // Close the form when canceled
+    setUsers((prev) => [...prev, data]); // Add new user to the table
+    setIsFormOpen(false); // Close the form
   };
 
   return (
@@ -55,7 +46,7 @@ const Users = () => {
           { key: "email", label: "Email", sortable: true },
           { key: "role", label: "Role", sortable: true },
         ]}
-        onAdd={handleAddUser} // Trigger the form display
+        onAdd={() => setIsFormOpen(true)} // Open the form
         actions={
           <>
             <Button variant={"outline"}>Delete</Button>
@@ -63,14 +54,13 @@ const Users = () => {
           </>
         }
       />
-      {isFormOpen && (
-        <GeneralizedForm
-          title="Add New User"
-          fields={userFields}
-          onSubmit={handleFormSubmit}
-          onCancel={handleFormCancel}
-        />
-      )}
+      <GeneralizedForm
+        title="Add New User"
+        fields={userFields}
+        isOpen={isFormOpen} // Control visibility with state
+        onClose={() => setIsFormOpen(false)} // Close the form
+        onSubmit={handleFormSubmit} // Handle form submission
+      />
     </>
   );
 };

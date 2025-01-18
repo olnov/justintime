@@ -68,7 +68,7 @@ const TableComponent: React.FC<TableProps> = ({ title, data, columns, onAdd, act
 
     return (
         <>
-            <Card.Root>
+            <Card.Root width={"50vw"}>
                 <Card.Body>
                     <Stack spacing="5">
                         <HStack>

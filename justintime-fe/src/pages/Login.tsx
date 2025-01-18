@@ -77,6 +77,11 @@ const Login = () => {
                             <PasswordInput
                                 name="password"
                                 onChange={(e) => setPassword(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        handleLogin();
+                                    }
+                                }}
                             />
                         </Box>
                         <VStack h={10}>
