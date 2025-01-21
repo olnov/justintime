@@ -3,17 +3,14 @@ import { getSchools, createSchool } from "@/services/SchoolService";
 import TableComponent from "@/components/Table";
 import { Heading, Button, Input, Stack } from "@chakra-ui/react";
 import {
-  DialogActionTrigger,
   DialogBody,
-  DialogCloseTrigger,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogRoot,
-  DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog"
 import { withMask } from "use-mask-input";
+import { toaster } from "@/components/ui/toaster"
 
 const Schools = () => {
   const [schools, setSchools] = useState<unknown[]>([]);
@@ -25,12 +22,11 @@ const Schools = () => {
 
   useEffect(() => {
     fetchSchools();
-  }, [schools]);
+  }, [isFormOpen]);
 
   const fetchSchools = async () => {
     if (token) {
       const data = await getSchools(token);
-      console.log(data);
       setSchools(data);
     } else {
       throw new Error("You are not authenticated");
@@ -45,6 +41,14 @@ const Schools = () => {
     console.log("School Data:", { schoolName, address, phone });
     if (!token) {
       throw new Error("You are not authenticated");
+    }
+    if (!schoolName) {
+      toaster.create({
+        title: "Required information missing",
+        description: "School name is required",
+        type: "error",
+      });
+      throw new Error("School name is required");
     }
     createSchool(token, schoolName, address, phone);
     setIsFormOpen(false);
@@ -61,7 +65,7 @@ const Schools = () => {
           { key: "address", label: "Address", sortable: true },
           { key: "phone", label: "Phone", sortable: true },
         ]}
-        onAdd={() => setIsFormOpen(true)} // Open the form
+        onAdd={() => setIsFormOpen(true)}
         actions={
           <>
             <Button variant={"outline"}>Delete</Button>
@@ -73,12 +77,13 @@ const Schools = () => {
         <DialogContent>
           <DialogHeader>Add new school</DialogHeader>
           <DialogBody pb="4">
-            <Stack spacing="4">
+            <Stack>
               <Input
                 type="text"
                 placeholder="School Name"
                 name="name"
                 value={schoolName}
+                required = {true}
                 onChange={(e) => setSchoolName(e.target.value)}
               />
               <Input
@@ -90,7 +95,7 @@ const Schools = () => {
               />
               <Input
                 type="phone"
-                placeholder="9(999)999-9999" 
+                placeholder="9(999)999-9999"
                 ref={withMask("9(999)999-9999")}
                 name="phone"
                 value={phone}

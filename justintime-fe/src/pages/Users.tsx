@@ -1,38 +1,187 @@
-import { getUsers } from "@/services/UserService";
+import { getUsers, createUser } from "@/services/UserService";
+import { getSchools } from "@/services/SchoolService";
+import { createUserSchool } from "@/services/UserSchoolService";
+import { createRoleAssignment } from "@/services/RoleAssignmentService";
+import { createTeacher } from "@/services/TeacherService";
+import { createStudent } from "@/services/StudentService";
 import { useEffect, useState } from "react";
 import TableComponent from "@/components/Table";
-import { Heading, Button } from "@chakra-ui/react";
-import GeneralizedForm from "@/components/NewForm";
+import {
+  Heading,
+  Button,
+  Input,
+  Stack,
+  Portal,
+  createListCollection,
+  Spinner,
+  Box,
+  List,
+  Text,
+} from "@chakra-ui/react";
+import {
+  DialogBody,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogRoot,
+} from "@/components/ui/dialog";
+import {
+  SelectContent,
+  SelectItem,
+  SelectLabel,
+  SelectRoot,
+  SelectTrigger,
+  SelectValueText,
+} from "@/components/ui/select";
+import { toaster } from "@/components/ui/toaster";
 
-const userFields = [
-  { label: "Full Name", name: "fullName", placeholder: "John Johnson" },
-  { label: "Email", name: "email", type: "email", placeholder: "Enter email" },
-  { label: "Password", name: "password", placeholder: "Enter password" },
-];
+const roles = createListCollection({
+  items: [
+    { label: "School Administrator", value: "admin" },
+    { label: "Teacher", value: "teacher" },
+    { label: "Student", value: "student" },
+  ],
+})
 
 const Users = () => {
   const [users, setUsers] = useState<unknown[]>([]);
-  const [isFormOpen, setIsFormOpen] = useState(false); // Manage form visibility
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [schoolId, setSchoolId] = useState("");
+  const [role, setRole] = useState("");
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedSchoolName, setSelectedSchoolName] = useState("");
   const token = localStorage.getItem("token");
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+    if (selectedSchoolName.length >= 3) {
+      fetchSchools();
+    } else {
+      setResults([]);
+    }
+  }, [isFormOpen, selectedSchoolName]);
 
   const fetchUsers = async () => {
     if (token) {
       const data = await getUsers(token);
-      console.log("Here in Users.tsx");
       setUsers(data);
     } else {
       throw new Error("You are not authenticated");
     }
   };
 
-  const handleFormSubmit = (data: Record<string, any>) => {
-    console.log("User Data:", data);
-    setUsers((prev) => [...prev, data]); // Add new user to the table
-    setIsFormOpen(false); // Close the form
+  const fetchSchools = async () => {
+    if (token) {
+      setLoading(true);
+      const data = await getSchools(token);
+      const filteredData = data.filter((school) => school.name.toLowerCase().includes(selectedSchoolName.toLowerCase()));
+      setResults(filteredData);
+      setLoading(false);
+    } else {
+      throw new Error("You are not authenticated");
+    }
+  };
+
+  const handleSelectSchool = (school: any) => {
+    setSchoolId(school.id);
+    setSelectedSchoolName(school.name);
+    setResults([]);
+  };
+
+  const onClose = () => {
+    setIsFormOpen(false);
+  };
+
+  const handleSaveUser = async () => {
+    if (!token) {
+      throw new Error("You are not authenticated");
+    }
+    const responseUser = await createUser(fullName, email, password);
+    if (!responseUser) {
+      toaster.create({
+        title: "Failed to create user",
+        description: responseUser.message,
+        type: "error",
+      });
+      throw new Error(responseUser.message);
+    }
+    console.log("User created:", responseUser.id);
+
+    const responseUserSchool = await createUserSchool(token, responseUser.id, schoolId);
+    if (!responseUserSchool) {
+      toaster.create({
+        title: "Failed to create a user school relation",
+        description: responseUserSchool.message,
+        type: "error",
+      });
+      throw new Error(responseUserSchool.message);
+    }
+    console.log("User school relation created:", responseUserSchool.id);
+
+    if (role === "admin") {
+      const responseAdminRole = await createRoleAssignment(token, responseUserSchool.id, role);
+      if (!responseAdminRole) {
+        toaster.create({
+          title: "Failed to create an admin",
+          description: responseAdminRole.message,
+          type: "error",
+        });
+        throw new Error(responseAdminRole.message);
+      }
+    }
+
+    if (role === "teacher") {
+      const responseTeacherRole = await createRoleAssignment(token, responseUserSchool.id, role);
+      if (!responseTeacherRole) {
+        toaster.create({
+          title: "Failed to create a teacher",
+          description: responseTeacherRole.message,
+          type: "error",
+        });
+        throw new Error(responseTeacherRole.message);
+      } else {
+        const responseTeacher = await createTeacher(token, responseUserSchool.id);
+        if (!responseTeacher) {
+          toaster.create({
+            title: "Failed to create a teacher",
+            description: responseTeacher.message,
+            type: "error",
+          });
+          throw new Error(responseTeacher.message);
+        }
+      }
+    }
+
+    if (role === "student") {
+      const responseStudentRole = await createRoleAssignment(token, responseUserSchool.id, role);
+      console.log("Student role created:", responseStudentRole);
+      if (!responseStudentRole) {
+        toaster.create({
+          title: "Failed to create a student",
+          description: responseStudentRole.message,
+          type: "error",
+        });
+        throw new Error(responseStudentRole.message);
+      } else {
+        const responseStudent = await createStudent(token, responseUserSchool.id);
+        console.log("Student created:", responseStudent);
+        if (!responseStudent) {
+          toaster.create({
+            title: "Failed to create a student",
+            description: responseStudent.message,
+            type: "error",
+          });
+          throw new Error(responseStudent.message);
+        }
+      }
+    }
+
+    setIsFormOpen(false);
   };
 
   return (
@@ -54,13 +203,121 @@ const Users = () => {
           </>
         }
       />
-      <GeneralizedForm
-        title="Add New User"
-        fields={userFields}
-        isOpen={isFormOpen} // Control visibility with state
-        onClose={() => setIsFormOpen(false)} // Close the form
-        onSubmit={handleFormSubmit} // Handle form submission
-      />
+      <DialogRoot open={isFormOpen} onOpenChange={(isOpen) => !isOpen && onClose()}>
+        <DialogContent>
+          <DialogHeader>Add new school</DialogHeader>
+          <DialogBody pb="4">
+            <Stack>
+              <Input
+                type="text"
+                placeholder="Full Name"
+                name="name"
+                value={fullName}
+                required={true}
+                onChange={(e) => setFullName(e.target.value)}
+              />
+              <Input
+                type="email"
+                placeholder="Email"
+                name="email"
+                value={email}
+                required={true}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <Input
+                type="password"
+                placeholder="Password"
+                name="password"
+                value={password}
+                required={true}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <Input
+                type="password"
+                placeholder="Confirm Password"
+                name="confirmPassword"
+                value={confirmPassword}
+                required={true}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+              <Box position="relative" width="100%">
+                <Input
+                  type="text"
+                  placeholder="School ID"
+                  name="schoolId"
+                  value={selectedSchoolName}
+                  onChange={(e) => setSelectedSchoolName(e.target.value)}
+                />
+                {selectedSchoolName.length >= 3 && results.length > 0 && (
+                  <Box
+                    position="absolute"
+                    top="100%"
+                    left="0"
+                    width="100%"
+                    bgColor="white"
+                    border="1px solid"
+                    borderColor="gray.200"
+                    borderRadius={4}
+                    zIndex={1500}
+                  >
+                    {loading ? (
+                      <Box p="4" textAlign="center">
+                        <Spinner size="sm" />
+                        <Text>Loading...</Text>
+                      </Box>
+                    ) : results.length > 0 ? (
+                      <List.Root>
+                        {results.map((result) => (
+                          <List.Item
+                            key={result.id}
+                            p="2"
+                            _hover={{ bg: "gray.100", cursor: "pointer" }}
+                            onClick={() => handleSelectSchool(result)}
+                          >
+                            {result.name}
+                          </List.Item>
+                        ))}
+                      </List.Root>
+                    ) : (
+                      <Box p="4" textAlign="center" color="gray.500">
+                        No results found
+                      </Box>
+                    )}
+                  </Box>
+                )}
+              </Box>
+              <SelectRoot variant={"outline"} collection={roles}>
+                <SelectLabel>Select role</SelectLabel>
+                <SelectTrigger>
+                  <SelectValueText placeholder="Select role" />
+                </SelectTrigger>
+                <Portal>
+                  <SelectContent
+                    style={{
+                      zIndex: 1500,
+                    }}
+                  >
+                    {roles.items.map((roleItem) => (
+                      <SelectItem item={roleItem} key={roleItem.value} onClick={() => setRole(roleItem.value)}>
+                        {roleItem.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Portal>
+              </SelectRoot>
+            </Stack>
+
+          </DialogBody>
+          <DialogFooter>
+            <Button variant={"outline"} bgColor="green.300" onClick={handleSaveUser}>
+              Save
+            </Button>
+            <Button variant="outline" bgColor={"red.300"} onClick={onClose}>
+              Cancel
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </DialogRoot>
     </>
   );
 };

@@ -37,7 +37,9 @@ export class TeachersController {
   }
 
   @ApiOkResponse({ description: 'Teachers successfully retrieved' })
-  @ApiInternalServerErrorResponse({ description: 'Error while retrieving teachers' })
+  @ApiInternalServerErrorResponse({
+    description: 'Error while retrieving teachers',
+  })
   @ApiBearerAuth('JWT-auth')
   @UseGuards(JwtAuthGuard)
   @Get()
@@ -47,7 +49,9 @@ export class TeachersController {
 
   @ApiOkResponse({ description: 'Teacher successfully retrieved' })
   @ApiNotFoundResponse({ description: 'Teacher not found' })
-  @ApiInternalServerErrorResponse({ description: 'Error while getting the teacher' })
+  @ApiInternalServerErrorResponse({
+    description: 'Error while getting the teacher',
+  })
   @ApiBearerAuth('JWT-auth')
   @UseGuards(JwtAuthGuard)
   @Get(':id')
@@ -61,7 +65,9 @@ export class TeachersController {
 
   @ApiOkResponse({ description: 'Teacher successfully updated' })
   @ApiNotFoundResponse({ description: 'Teacher not found' })
-  @ApiInternalServerErrorResponse({ description: 'Error while updating teacher' })
+  @ApiInternalServerErrorResponse({
+    description: 'Error while updating teacher',
+  })
   @ApiBearerAuth('JWT-auth')
   @UseGuards(JwtAuthGuard)
   @Patch(':id')

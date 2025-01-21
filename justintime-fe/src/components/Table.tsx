@@ -33,7 +33,7 @@ interface TableColumn {
 
 interface TableProps {
     title: string;
-    data: any[];
+    data: unknown[];
     columns: TableColumn[];
     onAdd?: () => void;
     actions?: React.ReactNode;
@@ -70,7 +70,7 @@ const TableComponent: React.FC<TableProps> = ({ title, data, columns, onAdd, act
         <>
             <Card.Root width={"50vw"}>
                 <Card.Body>
-                    <Stack spacing="5">
+                    <Stack>
                         <HStack>
                             <Input placeholder={`Filter ${title.toLowerCase()} by name`} />
                             {onAdd && (
@@ -86,7 +86,6 @@ const TableComponent: React.FC<TableProps> = ({ title, data, columns, onAdd, act
                                     <Table.ColumnHeader>
                                         <Checkbox
                                             checked={indeterminate ? undefined : selection.length > 0}
-                                            isIndeterminate={indeterminate}
                                             onChange={(e) => {
                                                 setSelection(
                                                     (e.target as HTMLInputElement).checked ? data.map((item) => item.id) : []

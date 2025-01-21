@@ -12,7 +12,7 @@ export class CreateTeacherDto {
     example: 'Extreme vocal',
   })
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   specialization: string;
 
   @ApiPropertyOptional({
@@ -25,6 +25,6 @@ export class CreateTeacherDto {
 
   @ApiProperty({ description: "Teacher's rating", example: '5,0' })
   @IsNumber()
-  @IsNotEmpty()
+  @IsOptional()
   rating: number;
 }
