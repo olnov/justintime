@@ -7,6 +7,7 @@ import Users from './pages/Users';
 import Schools from './pages/Schools';
 import Teachers from './pages/Teachers';
 import Dashboard from './pages/Dashboard';
+import Students from "./pages/Students";
 import './App.css';
 
 const ProtectedRoute = ({ element }) => {
@@ -53,6 +54,10 @@ const router = createBrowserRouter([
       {
         path: "teachers",
         element: <ProtectedRoute element={<Teachers />} />,
+      },
+      {
+        path: "students",
+        element: <ProtectedRoute element={<Students />} />,
       },
     ],
   },

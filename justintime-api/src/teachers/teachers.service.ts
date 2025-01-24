@@ -30,4 +30,28 @@ export class TeachersService {
   async remove(id: string) {
     return this.prismaService.teacher.delete({ where: { id } });
   }
+
+  async findAllWithSchool() {
+    const result = await this.prismaService.teacher.findMany({
+      include: {
+        userSchool: {
+          include: {
+            user: {
+              select: {
+                name: true,
+                email: true,
+              },
+            },
+            school: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    console.log(result); // Debug log
+    return result;
+  }
 }

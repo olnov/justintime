@@ -2,16 +2,19 @@ import { Box, Heading, Card, Button, HStack, Text } from "@chakra-ui/react";
 import { Avatar } from "@/components/ui/avatar";
 import { getSchools } from "@/services/SchoolService";
 import { getUsers } from "@/services/UserService";
+import { getTeachers } from "@/services/TeacherService";
 import { useState, useEffect } from "react";
 
 const Dashboard = () => {
     const [schools, setSchools] = useState<unknown[]>([]);
     const [users, setUsers] = useState<unknown[]>([]);
+    const [teachers, setTeachers] = useState<unknown[]>([]);
     const token = localStorage.getItem("token");
 
     useEffect(() => {
         fetchSchools();
         fetchUsers();
+        fetchTeachers();
     }, []);
 
     const fetchSchools = async () => {
@@ -31,6 +34,15 @@ const Dashboard = () => {
             throw new Error("You are not authenticated");
         }
     };
+
+    const fetchTeachers = async () => {
+        if (token) {
+            const data = await getTeachers(token);
+            setTeachers(data);
+        } else {
+            throw new Error("You are not authenticated");
+        }
+    }
 
     return (
         <>
@@ -64,7 +76,7 @@ const Dashboard = () => {
                     <Card.Body gap="2">
                         <Card.Title mt="2">Total teachers</Card.Title>
                         <Card.Description>
-                            <Text fontSize="3xl">3</Text>
+                            <Text fontSize="3xl">{teachers.length}</Text>
                         </Card.Description>
                     </Card.Body>
                     <Card.Footer justifyContent="flex-end">

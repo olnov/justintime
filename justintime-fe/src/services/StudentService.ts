@@ -34,3 +34,20 @@ export const createStudent = async (token:string, userSchoolId: string) => {
     const data = await response.json();
     return data;
 }
+
+export const getStudentsWithSchools = async (token:string) => {
+    const requestOptions = {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`, 
+            'Content-Type': 'application/json' 
+        }
+    };
+    const response = await fetch(`${BACKEND_URL}/students/allWithSchool`, requestOptions);
+    if (!response.ok) {
+        throw new Error("Failed to fetch students with schools");
+    }
+
+    const data = await response.json();
+    return data;
+}

@@ -34,3 +34,20 @@ export const getTeachers = async (token:string) => {
     const data = await response.json();
     return data;
 }
+
+export const getTeachersWithSchools = async (token:string) => {
+    const requestOptions = {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`, 
+            'Content-Type': 'application/json' 
+        }
+    };
+    const response = await fetch(`${BACKEND_URL}/teachers/allWithSchool`, requestOptions);
+    if (!response.ok) {
+        throw new Error("Failed to fetch teachers with schools");
+    }
+
+    const data = await response.json();
+    return data;
+}

@@ -47,6 +47,19 @@ export class TeachersController {
     return this.teachersService.findAll();
   }
 
+  @ApiOkResponse({
+    description: 'Teachers with schools retrieved successfully',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Error while removing teacher with school',
+  })
+  @ApiBearerAuth('JWT-auth')
+  @UseGuards(JwtAuthGuard)
+  @Get('/allWithSchool')
+  async allWithSchool() {
+    return this.teachersService.findAllWithSchool();
+  }
+
   @ApiOkResponse({ description: 'Teacher successfully retrieved' })
   @ApiNotFoundResponse({ description: 'Teacher not found' })
   @ApiInternalServerErrorResponse({
@@ -71,7 +84,10 @@ export class TeachersController {
   @ApiBearerAuth('JWT-auth')
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() updateTeacherDto: UpdateTeacherDto) {
+  async update(
+    @Param('id') id: string,
+    @Body() updateTeacherDto: UpdateTeacherDto,
+  ) {
     const teacher = await this.teachersService.findOne(id);
     if (!teacher) {
       throw new HttpException('Teacher not found', HttpStatus.NOT_FOUND);
@@ -81,7 +97,9 @@ export class TeachersController {
 
   @ApiOkResponse({ description: 'Teacher successfully removed' })
   @ApiNotFoundResponse({ description: 'Teacher not found' })
-  @ApiInternalServerErrorResponse({ description: 'Error while removing teacher' })
+  @ApiInternalServerErrorResponse({
+    description: 'Error while removing teacher',
+  })
   @ApiBearerAuth('JWT-auth')
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
