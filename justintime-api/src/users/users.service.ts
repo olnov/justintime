@@ -44,4 +44,29 @@ export class UsersService {
   remove(id: number) {
     return `This action removes a #${id} user`;
   }
+
+  async getAllWithDetails() {
+    return this.prismaService.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        isGlobalAdmin: true,
+        UserSchools: {
+          include: {
+            school: {
+              select: {
+                name: true,
+              },
+            },
+            roles: {
+              select: {
+                role: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
 }

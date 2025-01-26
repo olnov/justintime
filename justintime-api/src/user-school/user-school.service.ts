@@ -33,4 +33,25 @@ export class UserSchoolService {
       where: { id },
     });
   }
+
+  async findAllWithDetails() {
+    return this.prismaService.userSchool.findMany({
+      include: {
+        user: {
+          select: {
+            name: true,
+            email: true,
+            isGlobalAdmin: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
+        school: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+  }
 }

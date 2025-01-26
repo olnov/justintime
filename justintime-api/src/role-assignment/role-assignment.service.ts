@@ -33,4 +33,26 @@ export class RoleAssignmentService {
       where: { id },
     });
   }
+
+  async findAllWithDetails() {
+    return this.prismaService.roleAssignment.findMany({
+      include: {
+        userSchool: {
+          include: {
+            school: {
+              select: {
+                name: true,
+              },
+            },
+            user: {
+              select: {
+                name: true,
+                email: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
 }

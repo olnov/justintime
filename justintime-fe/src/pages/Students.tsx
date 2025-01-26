@@ -13,8 +13,6 @@ const Students = () => {
     fetchStudentsWithSchools();
   }, []);
 
-  console.info("Students", students);
-
 
   const fetchStudentsWithSchools = async () => {
     if (token) {

@@ -34,3 +34,20 @@ export const createUser = async (name: string, email: string, password: string) 
         return data;
     }
 }
+
+export const getUsersWithDetails = async (token:string) => {
+    const requestOptions = {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`, 
+            'Content-Type': 'application/json' 
+        }
+    };
+    const response = await fetch(`${BACKEND_URL}/users/allWithDetails`, requestOptions);
+    if (!response.ok) {
+        throw new Error("Failed to fetch users with details");
+    }
+
+    const data = await response.json();
+    return data;
+}

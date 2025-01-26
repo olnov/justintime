@@ -32,7 +32,7 @@ export class TeachersService {
   }
 
   async findAllWithSchool() {
-    const result = await this.prismaService.teacher.findMany({
+    return this.prismaService.teacher.findMany({
       include: {
         userSchool: {
           include: {
@@ -51,7 +51,5 @@ export class TeachersService {
         },
       },
     });
-    console.log(result); // Debug log
-    return result;
   }
 }

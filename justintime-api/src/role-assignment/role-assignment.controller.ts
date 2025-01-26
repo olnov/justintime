@@ -47,6 +47,13 @@ export class RoleAssignmentController {
     return this.roleAssignmentService.findAll();
   }
 
+  @ApiBearerAuth('JWT-auth')
+  @UseGuards(JwtAuthGuard)
+  @Get('/allWithDetails')
+  findAllWithDetails() {
+    return this.roleAssignmentService.findAllWithDetails();
+  }
+
   @ApiOkResponse({ description: 'Successfully retrieved role assignment.' })
   @ApiNotFoundResponse({ description: 'Role assignment does not exist.' })
   @ApiInternalServerErrorResponse({

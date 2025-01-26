@@ -22,7 +22,7 @@ const Login = () => {
             const loggedInUser = await login(email, password);
             localStorage.setItem("userName", loggedInUser.user.username);
             localStorage.setItem("token", loggedInUser.accessToken);
-            if (parseToken(loggedInUser.accessToken).globalAdmin) {
+            if (parseToken(loggedInUser.accessToken).isGlobalAdmin) {
                 localStorage.setItem("userRole", "global_admin");
             }
             navigate("/dashboard");

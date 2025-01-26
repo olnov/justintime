@@ -29,4 +29,22 @@ export class AuthService {
       return result;
     }
   }
+
+  async getUserWithDetails(id: string): Promise<any> {
+    return this.prismaService.user.findUnique({
+      where: { id },
+      include: {
+        UserSchools: {
+          include: {
+            school: true,
+            roles: {
+              select: {
+                role: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
 }

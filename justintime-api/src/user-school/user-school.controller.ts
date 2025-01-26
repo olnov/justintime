@@ -42,6 +42,13 @@ export class UserSchoolController {
     return this.userSchoolService.findAll();
   }
 
+  @ApiBearerAuth('JWT-auth')
+  @UseGuards(JwtAuthGuard)
+  @Get('/allWithDetails')
+  async findAllWithDetails() {
+    return this.userSchoolService.findAllWithDetails();
+  }
+
   @ApiOkResponse({ description: 'Successfully retrieved the relation' })
   @ApiNotFoundResponse({ description: 'Relation not found' })
   @ApiInternalServerErrorResponse({ description: 'Error while retrieving the relation' })

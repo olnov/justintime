@@ -1,4 +1,4 @@
-import { getUsers, createUser } from "@/services/UserService";
+import { getUsers, createUser, getUsersWithDetails } from "@/services/UserService";
 import { getSchools } from "@/services/SchoolService";
 import { createUserSchool } from "@/services/UserSchoolService";
 import { createRoleAssignment } from "@/services/RoleAssignmentService";
@@ -68,7 +68,7 @@ const Users = () => {
 
   const fetchUsers = async () => {
     if (token) {
-      const data = await getUsers(token);
+      const data = await getUsersWithDetails(token);
       setUsers(data);
     } else {
       throw new Error("You are not authenticated");
@@ -184,15 +184,28 @@ const Users = () => {
     setIsFormOpen(false);
   };
 
+  // Converting users to a table readable format
+  const flattenedUsers = users.map((user) => ({
+    id: user.id,
+    name: user.name || "N/A",
+    email: user.email || "N/A",
+    isGlobalAdmin: user.isGlobalAdmin ? "Yes" : "No", 
+    school: user.UserSchools.map((schoolUser) => schoolUser.school.name).join(", ") || "N/A",
+    role: user.UserSchools.flatMap((schoolUser) => schoolUser.roles.map((schoolRole) => schoolRole.role)).join(", ") || "N/A",
+  }));
+  
+
   return (
     <>
       <Heading>Users</Heading>
       <TableComponent
         title="Users"
-        data={users}
+        data={flattenedUsers}
         columns={[
           { key: "name", label: "Name", sortable: true },
           { key: "email", label: "Email", sortable: true },
+          { key: "isGlobalAdmin", label: "Global Admin", sortable: true },
+          { key: "school", label: "School", sortable: true },
           { key: "role", label: "Role", sortable: true },
         ]}
         onAdd={() => setIsFormOpen(true)} // Open the form

@@ -44,6 +44,13 @@ export class UsersController {
     return users.map(({ password, ...result }) => result);
   }
 
+  @ApiBearerAuth('JWT-auth')
+  @UseGuards(JwtAuthGuard)
+  @Get('/allWithDetails')
+  async findAllWithDetails() {
+    return this.usersService.getAllWithDetails();
+  }
+
   @ApiOkResponse({ description: 'The user has been successfully retrieved.' })
   @ApiNotFoundResponse({ description: 'User not found.' })
   @ApiInternalServerErrorResponse({
