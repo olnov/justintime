@@ -15,7 +15,7 @@ const Login = () => {
         if (isAuthenticated()) {
             navigate("/dashboard");
         }
-    }, []);
+    });
 
     const handleLogin = async () => {
         try {
@@ -25,6 +25,8 @@ const Login = () => {
             if (parseToken(loggedInUser.accessToken).isGlobalAdmin) {
                 localStorage.setItem("userRole", "global_admin");
             }
+            console.log("Users's role:", parseToken(loggedInUser.accessToken).schools.map((schoolRole: { roles: unknown; }) => schoolRole.roles).join(", "));
+            console.log("User's school:", parseToken(loggedInUser.accessToken).schools.map((schoolName: { name: unknown; }) => schoolName.name).join(", "));
             navigate("/dashboard");
         } catch (error) {
             toaster.create({

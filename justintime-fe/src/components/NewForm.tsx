@@ -5,15 +5,15 @@ import {
   } from "@chakra-ui/react";
   import { useState } from "react";
   import {
-    DialogActionTrigger,
+    // DialogActionTrigger,
     DialogBody,
-    DialogCloseTrigger,
+    // DialogCloseTrigger,
     DialogContent,
     DialogFooter,
     DialogHeader,
     DialogRoot,
-    DialogTitle,
-    DialogTrigger,
+    // DialogTitle,
+    // DialogTrigger,
   } from "@/components/ui/dialog"
   
   interface FormField {
@@ -29,7 +29,7 @@ import {
     fields: FormField[];
     isOpen: boolean;
     onClose: () => void;
-    onSubmit: (data: Record<string, any>) => void;
+    onSubmit: (data: Record<string, unknown>) => void;
   }
   
   const GeneralizedForm: React.FC<FormComponentProps> = ({
@@ -39,7 +39,7 @@ import {
     onClose,
     onSubmit,
   }) => {
-    const [formData, setFormData] = useState<Record<string, any>>(
+    const [formData, setFormData] = useState<Record<string, string | number>>(
       fields.reduce((acc, field) => ({ ...acc, [field.name]: field.defaultValue || "" }), {})
     );
   
@@ -57,7 +57,7 @@ import {
         <DialogContent>
           <DialogHeader>{title}</DialogHeader>
           <DialogBody pb="4">
-            <Stack spacing="4">
+            <Stack>
               {fields.map((field) => (
                 <Stack key={field.name}>
                   <label>{field.label}</label>

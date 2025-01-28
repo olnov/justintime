@@ -10,7 +10,7 @@ import Dashboard from './pages/Dashboard';
 import Students from "./pages/Students";
 import './App.css';
 
-const ProtectedRoute = ({ element }) => {
+const ProtectedRoute = ({ element }: { element: React.ReactNode }) => {
   return isAuthenticated() ? element : <Navigate to="/login" />;
 };
 

@@ -13,7 +13,7 @@ const Sidebar = () => {
       left="0"
       height="calc(100vh - 64px)"
     >
-      <VStack spacing="4" align="stretch">
+      <VStack align="stretch">
         <MenuItems />
       </VStack>
     </Box>

@@ -31,6 +31,16 @@ interface TableColumn {
     sortable?: boolean;
 }
 
+interface DataItem {
+    id: string;
+    [key: string]: unknown;
+}
+
+interface Column {
+    key: string;
+    label: string;
+}
+
 interface TableProps {
     title: string;
     data: unknown[];
@@ -49,8 +59,8 @@ const TableComponent: React.FC<TableProps> = ({ title, data, columns, onAdd, act
     const sortedData = [...data].sort((a, b) => {
         if (!sortConfig) return 0;
         const { key, direction } = sortConfig;
-        const aValue = a[key];
-        const bValue = b[key];
+        const aValue = (a as Record<string, unknown>)[key] as string | number;
+        const bValue = (b as Record<string, unknown>)[key] as string | number;
 
         if (aValue < bValue) return direction === "asc" ? -1 : 1;
         if (aValue > bValue) return direction === "asc" ? 1 : -1;
@@ -88,7 +98,7 @@ const TableComponent: React.FC<TableProps> = ({ title, data, columns, onAdd, act
                                             checked={indeterminate ? undefined : selection.length > 0}
                                             onChange={(e) => {
                                                 setSelection(
-                                                    (e.target as HTMLInputElement).checked ? data.map((item) => item.id) : []
+                                                    (e.target as HTMLInputElement).checked ? data.map((item) => (item as DataItem).id) : []
                                                 );
                                             }}
                                         />
@@ -105,25 +115,29 @@ const TableComponent: React.FC<TableProps> = ({ title, data, columns, onAdd, act
                                 </Table.Row>
                             </Table.Header>
                             <Table.Body>
-                                {sortedData.map((item) => (
-                                    <Table.Row key={item.id}>
-                                        <Table.Cell>
-                                            <Checkbox
-                                                checked={selection.includes(item.id)}
-                                                onChange={(e) => {
-                                                    setSelection((prev) =>
-                                                        e.target.checked
-                                                            ? [...prev, item.id]
-                                                            : prev.filter((id) => id !== item.id)
-                                                    );
-                                                }}
-                                            />
-                                        </Table.Cell>
-                                        {columns.map((col) => (
-                                            <Table.Cell key={col.key}>{item[col.key]}</Table.Cell>
-                                        ))}
-                                    </Table.Row>
-                                ))}
+                                {sortedData.map((item: unknown) => {
+                                    const dataItem = item as DataItem;
+                                    return (
+                                        <Table.Row key={dataItem.id}>
+                                            <Table.Cell>
+                                                <Checkbox
+                                                    checked={selection.includes(dataItem.id)}
+                                                    onChange={(e) => {
+                                                        const target = e.target as HTMLInputElement;
+                                                        setSelection((prev) =>
+                                                            target.checked
+                                                                ? [...prev, dataItem.id]
+                                                                : prev.filter((id) => id !== dataItem.id)
+                                                        );
+                                                    }}
+                                                />
+                                            </Table.Cell>
+                                            {columns.map((col: Column) => (
+                                                <Table.Cell key={col.key}>{String(dataItem[col.key])}</Table.Cell>
+                                            ))}
+                                        </Table.Row>
+                                    );
+                                })}
                             </Table.Body>
                         </Table.Root>
 

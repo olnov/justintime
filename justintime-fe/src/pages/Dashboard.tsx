@@ -1,5 +1,5 @@
 import { Box, Heading, Card, Button, HStack, Text } from "@chakra-ui/react";
-import { Avatar } from "@/components/ui/avatar";
+// import { Avatar } from "@/components/ui/avatar";
 import { getSchools } from "@/services/SchoolService";
 import { getUsers } from "@/services/UserService";
 import { getTeachers } from "@/services/TeacherService";
@@ -15,7 +15,7 @@ const Dashboard = () => {
         fetchSchools();
         fetchUsers();
         fetchTeachers();
-    }, []);
+    });
 
     const fetchSchools = async () => {
         if (token) {

@@ -3,15 +3,31 @@ import TableComponent from "@/components/Table";
 import { useState, useEffect } from "react";
 import { getTeachersWithSchools } from "@/services/TeacherService";
 
+interface Teacher {
+  id: number;
+  userSchool?: {
+    user?: {
+      name?: string;
+      email?: string;
+    };
+    school?: {
+      name?: string;
+    };
+  };
+  specialization?: string;
+  bio?: string;
+  rating?: number;
+}
+
 const Teachers = () => {
-  const [teachers, setTeachers] = useState<unknown[]>([]);
+  const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const token = localStorage.getItem("token");
 
 
   useEffect(() => {
     fetchTeachersWithSchools();
-  }, []);
+  }, [isFormOpen]);
 
 
   const fetchTeachersWithSchools = async () => {
@@ -24,7 +40,7 @@ const Teachers = () => {
   }
 
 
-  const flattenedTeachers = teachers.map((teacher) => ({
+  const flattenedTeachers = teachers.map((teacher: Teacher) => ({
     id: teacher.id,
     name: teacher.userSchool?.user?.name || "N/A",
     school: teacher.userSchool?.school?.name || "N/A",

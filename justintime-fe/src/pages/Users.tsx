@@ -1,4 +1,4 @@
-import { getUsers, createUser, getUsersWithDetails } from "@/services/UserService";
+import { createUser, getUsersWithDetails } from "@/services/UserService";
 import { getSchools } from "@/services/SchoolService";
 import { createUserSchool } from "@/services/UserSchoolService";
 import { createRoleAssignment } from "@/services/RoleAssignmentService";
@@ -6,6 +6,20 @@ import { createTeacher } from "@/services/TeacherService";
 import { createStudent } from "@/services/StudentService";
 import { useEffect, useState } from "react";
 import TableComponent from "@/components/Table";
+
+interface UserSchool {
+  school: { name: string };
+  roles: { role: string }[];
+}
+
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  isGlobalAdmin: boolean;
+  UserSchools: UserSchool[];
+}
+
 import {
   Heading,
   Button,
@@ -52,7 +66,7 @@ const Users = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [schoolId, setSchoolId] = useState("");
   const [role, setRole] = useState("");
-  const [results, setResults] = useState([]);
+  const [results, setResults] = useState<{ id: string; name: string; }[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedSchoolName, setSelectedSchoolName] = useState("");
   const token = localStorage.getItem("token");
@@ -79,7 +93,7 @@ const Users = () => {
     if (token) {
       setLoading(true);
       const data = await getSchools(token);
-      const filteredData = data.filter((school) => school.name.toLowerCase().includes(selectedSchoolName.toLowerCase()));
+      const filteredData = data.filter((school: { name: string; }) => school.name.toLowerCase().includes(selectedSchoolName.toLowerCase()));
       setResults(filteredData);
       setLoading(false);
     } else {
@@ -87,7 +101,7 @@ const Users = () => {
     }
   };
 
-  const handleSelectSchool = (school: any) => {
+  const handleSelectSchool = (school: {id: string, name: string;}) => {
     setSchoolId(school.id);
     setSelectedSchoolName(school.name);
     setResults([]);
@@ -185,7 +199,7 @@ const Users = () => {
   };
 
   // Converting users to a table readable format
-  const flattenedUsers = users.map((user) => ({
+  const flattenedUsers = (users as User[]).map((user) => ({
     id: user.id,
     name: user.name || "N/A",
     email: user.email || "N/A",

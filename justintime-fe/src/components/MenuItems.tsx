@@ -1,8 +1,7 @@
-import { Link } from "@chakra-ui/react";
+import { Link as ChakraLink } from "@chakra-ui/react";
 import { NavLink } from "react-router-dom";
 import { FaUsers, FaSchool, FaChalkboardTeacher, FaUserGraduate } from "react-icons/fa";
 import { CgUser } from "react-icons/cg";
-import { parseToken } from "@/services/AuthService";
 
 const menuItemsByRole = {
   global_admin: [
@@ -24,29 +23,31 @@ const menuItemsByRole = {
 };
 
 const MenuItems = () => {
-  const userRole = localStorage.getItem("userRole");
-  
+  const userRole = localStorage.getItem("userRole") as keyof typeof menuItemsByRole;
   const menuItems = menuItemsByRole[userRole] || [];
 
   return (
     <>
       {menuItems.map((item) => (
-        <Link
-          as={NavLink}
-          to={item.to}
-          display="flex"
-          alignItems="center"
-          p={2}
-          gap={2}
-          color="#b9babf"
-          _hover={{ bg: "#161b2c", color: "#FFF" }}
-          _active={{ bg: "#DEE5D4", color: "#8EACCD" }}
-          _focus={{ bg: "#161b2c", color: "#FFF" }}
-          key={item.to}
-        >
-          <item.icon />
-          {item.label}
-        </Link>
+        <ChakraLink asChild key={item.to}>
+          <NavLink
+            to={item.to}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              padding: "8px",
+              gap: "8px",
+              color: "#b9babf",
+              textDecoration: "none",
+            }}
+            className={({ isActive }) =>
+              isActive ? "active-link" : "inactive-link"
+            }
+          >
+            <item.icon />
+            {item.label}
+          </NavLink>
+        </ChakraLink>
       ))}
     </>
   );
