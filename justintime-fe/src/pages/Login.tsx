@@ -3,7 +3,7 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { toaster } from "@/components/ui/toaster"
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { login, parseToken, isAuthenticated } from "@/services/AuthService";
+import { login, isAuthenticated } from "@/services/AuthService";
 
 const Login = () => {
     const [email, setEmail] = useState("");
@@ -22,11 +22,6 @@ const Login = () => {
             const loggedInUser = await login(email, password);
             localStorage.setItem("userName", loggedInUser.user.username);
             localStorage.setItem("token", loggedInUser.accessToken);
-            if (parseToken(loggedInUser.accessToken).isGlobalAdmin) {
-                localStorage.setItem("userRole", "global_admin");
-            }
-            console.log("Users's role:", parseToken(loggedInUser.accessToken).schools.map((schoolRole: { roles: unknown; }) => schoolRole.roles).join(", "));
-            console.log("User's school:", parseToken(loggedInUser.accessToken).schools.map((schoolName: { name: unknown; }) => schoolName.name).join(", "));
             navigate("/dashboard");
         } catch (error) {
             toaster.create({
