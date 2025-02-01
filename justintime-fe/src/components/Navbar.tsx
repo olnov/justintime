@@ -7,11 +7,14 @@ import {
   MenuTrigger,
 } from "@/components/ui/menu";
 import { useNavigate } from "react-router-dom";
+import { parseToken } from "../services/AuthService";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const fullName = localStorage.getItem("userName");
-  const Role = localStorage.getItem("userRole");
+  const userRole = parseToken(localStorage.getItem("token") as string).schools.map((schoolRole: { roles: unknown; }) => schoolRole.roles).join(", ") as keyof typeof menuItemsByRole;
+  const isGlobalAdmin = parseToken(localStorage.getItem("token") as string).isGlobalAdmin;
+  const Role = userRole || (isGlobalAdmin ? "global_admin" : []);
 
   const handleLogout = () => {
     localStorage.removeItem("userName");

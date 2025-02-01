@@ -20,6 +20,7 @@ import {
   ApiOkResponse,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import * as string_decoder from "node:string_decoder";
 
 @Controller('teachers')
 export class TeachersController {
@@ -58,6 +59,13 @@ export class TeachersController {
   @Get('/allWithSchool')
   async allWithSchool() {
     return this.teachersService.findAllWithSchool();
+  }
+
+  @ApiBearerAuth('JWT-auth')
+  @UseGuards(JwtAuthGuard)
+  @Get('/allBySchool/:id')
+  async allBySchool(@Param('id') id: string) {
+    return this.teachersService.findBySchoolId(id);
   }
 
   @ApiOkResponse({ description: 'Teacher successfully retrieved' })

@@ -3,7 +3,7 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { toaster } from "@/components/ui/toaster"
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { login, isAuthenticated } from "@/services/AuthService";
+import { login, isAuthenticated, parseToken } from "@/services/AuthService";
 
 const Login = () => {
     const [email, setEmail] = useState("");
@@ -15,6 +15,7 @@ const Login = () => {
         if (isAuthenticated()) {
             navigate("/dashboard");
         }
+        // handleLogin();
     });
 
     const handleLogin = async () => {
@@ -22,7 +23,19 @@ const Login = () => {
             const loggedInUser = await login(email, password);
             localStorage.setItem("userName", loggedInUser.user.username);
             localStorage.setItem("token", loggedInUser.accessToken);
-            navigate("/dashboard");
+            
+            const userInfo = parseToken(localStorage.getItem("token") as string);
+
+            if (userInfo.isGlobalAdmin) {
+                navigate("/admin/dashboard");
+            } else if (userInfo.schools?.length > 0) {
+                const schoolId = userInfo.schools[0].id;
+                console.log("Here!!!", schoolId);
+                navigate(`/school/${schoolId}/dashboard`);
+            } else {
+                navigate("/dashboard");
+            }
+
         } catch (error) {
             toaster.create({
                 title: "Authentication error",

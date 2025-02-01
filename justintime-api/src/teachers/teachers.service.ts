@@ -31,6 +31,33 @@ export class TeachersService {
     return this.prismaService.teacher.delete({ where: { id } });
   }
 
+  async findBySchoolId(id: string) {
+    return this.prismaService.teacher.findMany({
+      where: {
+        userSchool: {
+          schoolId: id,
+        },
+      },
+      include: {
+        userSchool: {
+          include: {
+            user: {
+              select: {
+                name: true,
+                email: true,
+              },
+            },
+            school: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
   async findAllWithSchool() {
     return this.prismaService.teacher.findMany({
       include: {

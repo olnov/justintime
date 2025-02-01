@@ -1,0 +1,93 @@
+import { createBrowserRouter, RouterProvider, Outlet, Navigate } from "react-router-dom";
+import { Toaster } from "@/components/ui/toaster";
+import { isAuthenticated } from "./services/AuthService";
+import { parseToken } from "@/services/AuthService";
+import AdminPanel from './components/AdminPanel';
+import Login from './pages/Login';
+import Users from './pages/Users';
+import Schools from './pages/Schools';
+import Teachers from './pages/Teachers';
+import Dashboard from './pages/Dashboard';
+import Students from "./pages/Students";
+import './App.css';
+
+
+const ProtectedRoute = ({ element, allowedRoles = [], globalAdminOnly = false }: { element: React.ReactNode, allowedRoles?: string[], globalAdminOnly?: boolean }) => {
+  const token = localStorage.getItem("token");
+  const userRole = token ? parseToken(token).schools.map((schoolRole: { roles: unknown; }) => schoolRole.roles).join(", ") : "";
+  const isGlobalAdmin = token ? parseToken(token).isGlobalAdmin : false;
+
+  if (!isAuthenticated()) {
+    return <Navigate to="/login" />;
+  }
+
+  if (globalAdminOnly && !isGlobalAdmin) {
+    return <Navigate to="/dashboard" />;
+  }
+
+  if (allowedRoles.length > 0 && !allowedRoles.includes(userRole)) {
+    return <Navigate to="/dashboard" />;
+  }
+
+  return element;
+};
+
+const LayoutWithoutNavbar = () => (
+  <>
+    <Outlet />
+  </>
+);
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <LayoutWithoutNavbar />,
+    children: [
+      {
+        path: "/",
+        element: <Login />,
+      },
+      {
+        path: "/login",
+        element: <Login />,
+      },
+    ],
+  },
+  {
+    path: "/",
+    element: <AdminPanel />,
+    children: [
+      {
+        path: "dashboard",
+        element: <ProtectedRoute element={<Dashboard />} />,
+      },
+      {
+        path: "users",
+        element: <ProtectedRoute element={<Users />} globalAdminOnly = {true} />,
+      },
+      {
+        path: "schools",
+        element: <ProtectedRoute element={<Schools />} globalAdminOnly = {true} />,
+      },
+      {
+        path: "teachers",
+        element: <ProtectedRoute element={<Teachers />} allowedRoles={["admin"]} />,
+      },
+      {
+        path: "students",
+        element: <ProtectedRoute element={<Students />} allowedRoles={["admin"]}/>,
+      },
+    ],
+  },
+]);
+
+const App = () => {
+  return (
+    <>
+    <RouterProvider router={router} />;
+    <Toaster />
+    </>
+  )
+};
+
+export default App;
