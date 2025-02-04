@@ -1,7 +1,8 @@
 import { Heading, Button } from "@chakra-ui/react";
 import TableComponent from "@/components/Table";
 import { useState, useEffect } from "react";
-import { getTeachersWithSchools } from "@/services/TeacherService";
+import { getTeachersWithSchools, getTeacherBySchoolId } from "@/services/TeacherService";
+import { parseToken } from "@/services/AuthService";
 
 interface Teacher {
   id: number;
@@ -26,19 +27,29 @@ const Teachers = () => {
 
 
   useEffect(() => {
-    fetchTeachersWithSchools();
+    // fetchTeachersWithSchools();
+    fetchTeachersBySchool();
   }, [isFormOpen]);
 
 
-  const fetchTeachersWithSchools = async () => {
+  // const fetchTeachersWithSchools = async () => {
+  //   if (token) {
+  //     const data = await getTeachersWithSchools(token);
+  //     setTeachers(data);
+  //   } else {
+  //     throw new Error("You are not authenticated");
+  //   }
+  // }
+
+  const fetchTeachersBySchool = async () => {
     if (token) {
-      const data = await getTeachersWithSchools(token);
+      const schoolId = parseToken(token).schools[0].id;
+      const data = await getTeacherBySchoolId(token, schoolId);
       setTeachers(data);
     } else {
       throw new Error("You are not authenticated");
     }
   }
-
 
   const flattenedTeachers = teachers.map((teacher: Teacher) => ({
     id: teacher.id,

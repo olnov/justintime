@@ -1,7 +1,8 @@
 import { Heading, Button } from "@chakra-ui/react";
 import TableComponent from "@/components/Table";
 import { useState, useEffect } from "react";
-import { getStudentsWithSchools } from "@/services/StudentService";
+import { getStudentsWithSchools, getStudentBySchoolId } from "@/services/StudentService";
+import { parseToken } from "@/services/AuthService";
 
 interface Student {
   id: number;
@@ -24,19 +25,30 @@ const Students = () => {
 
 
   useEffect(() => {
-    fetchStudentsWithSchools();
+    // fetchStudentsWithSchools();
+    fetchStudentsBySchool();
   }, [isFormOpen]);
 
 
-  const fetchStudentsWithSchools = async () => {
+  // const fetchStudentsWithSchools = async () => {
+  //   if (token) {
+  //     const data = await getStudentsWithSchools(token);
+  //     setStudents(data);
+  //   } else {
+  //     throw new Error("You are not authenticated");
+  //   }
+  // }
+
+
+  const fetchStudentsBySchool = async () => {
     if (token) {
-      const data = await getStudentsWithSchools(token);
+      const schoolId = parseToken(token).schools[0].id;
+      const data = await getStudentBySchoolId(token, schoolId);
       setStudents(data);
     } else {
       throw new Error("You are not authenticated");
     }
   }
-
 
   const flattenedSudents = students.map((student: Student) => ({
     id: student.id,

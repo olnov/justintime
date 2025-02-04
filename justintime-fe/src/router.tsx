@@ -9,6 +9,7 @@ import Schools from "@/pages/Schools";
 import Teachers from "@/pages/Teachers";
 import Dashboard from "@/pages/Dashboard";
 import Students from "@/pages/Students";
+import Schedule from "./pages/Schedule";
 import "./App.css";
 
 const router = createBrowserRouter([
@@ -41,6 +42,7 @@ const router = createBrowserRouter([
       { path: "dashboard", element: <ProtectedRoute element={<Dashboard />} allowedRoles={["admin", "teacher"]} /> },
       { path: "teachers", element: <ProtectedRoute element={<Teachers />} allowedRoles={["admin", "teacher"]} /> },
       { path: "students", element: <ProtectedRoute element={<Students />} allowedRoles={["admin", "teacher"]} /> },
+      { path: "schedule", element: <ProtectedRoute element={<Schedule />} allowedRoles={["admin","teacher","student"]} />},
     ],
   },
 ]);

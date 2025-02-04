@@ -46,6 +46,13 @@ export class StudentsController {
 
   @ApiBearerAuth('JWT-auth')
   @UseGuards(JwtAuthGuard)
+  @Get('/allBySchool/:id')
+  async allBySchool(@Param('id') id: string) {
+    return this.studentsService.findBySchoolId(id);
+  }
+
+  @ApiBearerAuth('JWT-auth')
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.studentsService.findOne(id);

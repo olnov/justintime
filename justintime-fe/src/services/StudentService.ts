@@ -51,3 +51,20 @@ export const getStudentsWithSchools = async (token:string) => {
     const data = await response.json();
     return data;
 }
+
+export const getStudentBySchoolId = async (token:string, userSchoolId: string) => {
+    const requestOptions = {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`, 
+            'Content-Type': 'application/json' 
+        }
+    };
+    const response = await fetch(`${BACKEND_URL}/students/allBySchool/${userSchoolId}`, requestOptions);
+    if (!response.ok) {
+        throw new Error("Failed to fetch students by school");
+    }
+
+    const data = await response.json();
+    return data;
+}
