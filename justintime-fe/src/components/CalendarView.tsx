@@ -1,14 +1,24 @@
-import React, { useState } from "react";
-import { Box, Text } from "@chakra-ui/react";
+import React, { useState, useEffect } from "react";
+import { Box, Text, createListCollection } from "@chakra-ui/react";
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { EventClickArg, EventDropArg } from "@fullcalendar/core";
+import {
+  SelectContent,
+  SelectItem,
+  SelectLabel,
+  SelectRoot,
+  SelectTrigger,
+  SelectValueText,
+} from "@/components/ui/select";
+import { getTeacherBySchoolId } from "@/services/TeacherService";
+import { parseToken } from "@/services/AuthService";
 
 // Define lesson structure
 interface Lesson {
   id: string;
-  teacher: string;
+  student: string;
   subject: string;
   start: Date;
   end: Date;
@@ -27,12 +37,46 @@ const getDateForThisWeek = (dayIndex: number, hour: number, minute: number = 0):
 
 // Sample lessons (now dynamically aligned to the current week)
 const initialLessons: Lesson[] = [
-  { id: "1", teacher: "Elena Studenkova", subject: "", start: getDateForThisWeek(1, 10), end: getDateForThisWeek(1, 11) }, // Monday
-  { id: "2", teacher: "Oleg Novikov", subject: "", start: getDateForThisWeek(3, 14), end: getDateForThisWeek(3, 15) }, // Wednesday
+  { id: "1", student: "Elena Studenkova", subject: "", start: getDateForThisWeek(1, 10), end: getDateForThisWeek(1, 11) }, // Monday
+  { id: "2", student: "Oleg Novikov", subject: "", start: getDateForThisWeek(3, 14), end: getDateForThisWeek(3, 15) }, // Wednesday
 ];
+
+// Teacher's sample list
+// const teachers = createListCollection({
+//   items: [
+//     { label: "Margarita Abaimova", value: "1" },
+//     { label: "Natalia Neviditsyna", value: "2" },
+//   ],
+// })
 
 const CalendarView: React.FC = () => {
   const [lessons, setLessons] = useState<Lesson[]>(initialLessons);
+  const [teachers, setTeachers] = useState(createListCollection({ items: [] }));
+
+  useEffect(() => {
+    fetchTeachers();
+  }, []);
+
+  console.log("Teachers:",teachers);
+
+  // Getting teachers list by SchoolID
+  const fetchTeachers = async () => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      console.log("Here!!!!");
+      const schoolId = parseToken(token).schools[0].id;
+      const data = await getTeacherBySchoolId(token, schoolId);
+      const teacherList = data.map((teacher: any) => ({
+        label: teacher.userSchool.user.name,
+        value: teacher.id,
+      }));
+
+      setTeachers(createListCollection({ items: teacherList }));
+      console.log("Teachers from Data:",data.map((teacher: any) => ({ label: teacher.userSchool.user.name, value: teacher.id })));
+    } else {
+      throw new Error("You are not authenticated");
+    }
+  };
 
   // Handle event drop (drag & drop functionality)
   const handleEventDrop = (eventDropInfo: EventDropArg) => {
@@ -55,9 +99,22 @@ const CalendarView: React.FC = () => {
       <Text fontSize="lg" fontWeight="bold" mb={4}>
         Teacher's Weekly Schedule
       </Text>
-
+      <SelectRoot collection={teachers} key={teachers.items[0].value} size={"xs"} mb={4}>
+        <SelectTrigger>
+          <SelectValueText placeholder="Select teacher" />
+        </SelectTrigger>
+        <SelectContent>
+          {teachers.items.map((teacher) => (
+            <SelectItem item={teacher} key={teacher.value}>
+              <SelectLabel>{teacher.label}</SelectLabel>
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </SelectRoot>
       <FullCalendar
         plugins={[timeGridPlugin, interactionPlugin]}
+        themeSystem="standard"
+        stickyHeaderDates={true}
         initialView="timeGridWeek"
         editable={true} // Enables drag & drop
         timeZone="local" // Ensures correct local time
@@ -66,7 +123,7 @@ const CalendarView: React.FC = () => {
         weekends={false} // Hide weekends
         events={lessons.map((lesson) => ({
           id: lesson.id,
-          title: `${lesson.subject} (${lesson.teacher})`,
+          title: `${lesson.subject} (${lesson.student})`,
           start: lesson.start.toISOString(), // FullCalendar requires ISO format
           end: lesson.end.toISOString(),
         }))}

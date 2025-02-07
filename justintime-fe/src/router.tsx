@@ -39,7 +39,7 @@ const router = createBrowserRouter([
     path: "/school/:schoolId",
     element: <SchoolPanel />, // ✅ Wraps School Pages
     children: [
-      { path: "dashboard", element: <ProtectedRoute element={<Dashboard />} allowedRoles={["admin", "teacher"]} /> },
+      { path: "dashboard", element: <ProtectedRoute element={<Dashboard />} allowedRoles={["admin", "teacher", "student"]} /> },
       { path: "teachers", element: <ProtectedRoute element={<Teachers />} allowedRoles={["admin", "teacher"]} /> },
       { path: "students", element: <ProtectedRoute element={<Students />} allowedRoles={["admin", "teacher"]} /> },
       { path: "schedule", element: <ProtectedRoute element={<Schedule />} allowedRoles={["admin","teacher","student"]} />},
