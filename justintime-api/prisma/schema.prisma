@@ -121,7 +121,8 @@ model Appointment {
 }
 
 enum AppointmentStatus {
-  scheduled
+  planned // planned, but not confirmed
+  scheduled // planned and confirmed
   completed
   cancelled
 }

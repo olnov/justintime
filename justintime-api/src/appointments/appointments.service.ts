@@ -1,26 +1,55 @@
 import { Injectable } from '@nestjs/common';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class AppointmentsService {
-  create(createAppointmentDto: CreateAppointmentDto) {
-    return 'This action adds a new appointment';
+  constructor(private readonly prismaService: PrismaService) {}
+
+  async create(createAppointmentDto: CreateAppointmentDto) {
+    const { teacherId, studentId, schoolId, startTime, endTime, status } =
+      createAppointmentDto;
+    return this.prismaService.appointment.create({
+      data: { teacherId, studentId, schoolId, startTime, endTime, status },
+    });
   }
 
-  findAll() {
-    return `This action returns all appointments`;
+  async findAll() {
+    return this.prismaService.appointment.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} appointment`;
+  async findOne(id: string) {
+    return this.prismaService.appointment.findUnique({
+      where: { id },
+    });
   }
 
-  update(id: number, updateAppointmentDto: UpdateAppointmentDto) {
+  async update(id: string, updateAppointmentDto: UpdateAppointmentDto) {
     return `This action updates a #${id} appointment`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} appointment`;
+  async remove(id: string) {
+    return this.prismaService.appointment.deleteMany({
+      where: { id },
+    });
+  }
+
+  async findBySchoolId(schoolId: string) {
+    return this.prismaService.appointment.findMany({
+      where: { schoolId },
+    });
+  }
+
+  async findByStudentId(studentId: string) {
+    return this.prismaService.appointment.findMany({
+      where: { studentId },
+    });
+  }
+
+  async findByTeacherId(teacherId: string) {
+    return this.prismaService.appointment.findMany({
+      where: { teacherId },
+    });
   }
 }
