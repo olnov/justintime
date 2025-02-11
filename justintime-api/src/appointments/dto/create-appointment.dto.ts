@@ -31,13 +31,13 @@ export class CreateAppointmentDto {
   @IsString()
   schoolId: string;
 
-  @ApiProperty({ description: 'Start time and date', example: 'DateTime' })
+  @ApiProperty({ description: 'Start time and date in ISO 8601 format', example: '2024-02-20T09:00:00Z' })
   @IsNotEmpty()
   @IsISO8601()
   @Type(() => Date)
   startTime: Date;
 
-  @ApiProperty({ description: 'End time', example: 'DateTime' })
+  @ApiProperty({ description: 'End time and date in ISO 8601 format', example: '2024-02-20T10:00:00Z' })
   @IsNotEmpty()
   @IsISO8601()
   @Type(() => Date)
@@ -45,7 +45,7 @@ export class CreateAppointmentDto {
 
   @ApiProperty({
     description: 'Status',
-    example: 'Planned, Scheduled, Completed, Cancelled',
+    example: 'planned, scheduled, completed or cancelled',
   })
   @IsNotEmpty()
   @IsEnum(AppointmentStatus)

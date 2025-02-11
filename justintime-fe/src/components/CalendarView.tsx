@@ -27,7 +27,7 @@ import {
     DialogFooter,
 } from "@/components/ui/dialog";
 import { getTeacherBySchoolId } from "@/services/TeacherService";
-import { parseToken } from "@/services/AuthService";
+import { getScheduleBySchoolId } from "@/services/ScheduleService";
 
 // Define lesson structure
 interface Lesson {
@@ -54,23 +54,24 @@ const initialLessons: Lesson[] = [
     {
         id: "1",
         student: "Elena Studenkova",
-        subject: "Math",
+        subject: "Jazz Vocal",
         start: getDateForThisWeek(1, 10),
         end: getDateForThisWeek(1, 11),
     }, // Monday
     {
         id: "2",
         student: "Oleg Novikov",
-        subject: "Science",
+        subject: "Pop vocal",
         start: getDateForThisWeek(3, 14),
         end: getDateForThisWeek(3, 15),
     }, // Wednesday
 ];
 
-const CalendarView: React.FC = () => {
+const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
     const [lessons, setLessons] = useState<Lesson[]>(initialLessons); // State for lessons
     const [teachers, setTeachers] = useState(createListCollection<{ label: string; value: string }>({ items: [] })); // State for teachers
     const [selectedTeacher, setSelectedTeacher] = useState<string>("");
+    const [appointments, setAppointments] = useState<Lesson[]>([]); // State for appointments
     const contentRef = useRef<HTMLDivElement>(null)
 
     const [formData, setFormData] = useState({
@@ -84,11 +85,10 @@ const CalendarView: React.FC = () => {
     // A custom state for the dialog
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-    // Fetch teachers list by SchoolID
+    // Fetch teachers list by SchoolID. SchoolID is passed as a prop
     const fetchTeachers = async () => {
         const token = localStorage.getItem("token");
         if (token) {
-            const schoolId = parseToken(token).schools[0].id;
             const data = await getTeacherBySchoolId(token, schoolId);
             const teacherList = data.map((teacher: any) => ({
                 label: teacher.userSchool.user.name,
@@ -101,8 +101,29 @@ const CalendarView: React.FC = () => {
         }
     };
 
+    // Fetching all appointments for the School
+    const fetchAppointments = async () => {
+        const token = localStorage.getItem("token");
+        if (token) {
+            const data = await getScheduleBySchoolId(token, schoolId);
+            const appointmentsList = data.map((appointment: any) => ({
+                id: appointment.id,
+                student: appointment.student,
+                teacher: appointment.teacher,
+                subject: appointment.subject,
+                start: new Date(appointment.startTime),
+                end: new Date(appointment.endTime),
+            }));
+            console.log("Appointments list:", appointmentsList);
+            console.log("Appointments list raw:", data);
+        } else {
+            throw new Error("You are not authenticated");
+        }
+    }
+
     useEffect(() => {
         fetchTeachers();
+        fetchAppointments();
     }, []);
 
 

@@ -38,6 +38,48 @@ export class AppointmentsService {
   async findBySchoolId(schoolId: string) {
     return this.prismaService.appointment.findMany({
       where: { schoolId },
+      select: {
+        id: true,
+        startTime: true,
+        endTime: true,
+        status: true,
+        notes: true,
+        school: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        student: {
+          select: {
+            id: true,
+            userSchool: {
+              select: {
+                user: {
+                  select: {
+                    name: true,
+                    email: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        teacher: {
+          select: {
+            id: true,
+            userSchool: {
+              select: {
+                user: {
+                  select: {
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     });
   }
 
