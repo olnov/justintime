@@ -270,7 +270,7 @@ const Users = () => {
               <Box position="relative" width="100%">
                 <Input
                   type="text"
-                  placeholder="School ID"
+                  placeholder="School name"
                   name="schoolId"
                   value={selectedSchoolName}
                   onChange={(e) => setSelectedSchoolName(e.target.value)}
