@@ -83,15 +83,105 @@ export class AppointmentsService {
     });
   }
 
-  async findByStudentId(studentId: string) {
+  async findBySchoolIdAndStudentId(schoolId: string, studentId: string) {
     return this.prismaService.appointment.findMany({
-      where: { studentId },
+      where: {
+        schoolId,
+        studentId,
+      },
+      select: {
+        id: true,
+        startTime: true,
+        endTime: true,
+        status: true,
+        notes: true,
+        school: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        student: {
+          select: {
+            id: true,
+            userSchool: {
+              select: {
+                user: {
+                  select: {
+                    name: true,
+                    email: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        teacher: {
+          select: {
+            id: true,
+            userSchool: {
+              select: {
+                user: {
+                  select: {
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     });
   }
 
-  async findByTeacherId(teacherId: string) {
+  async findBySchoolIdAndTeacherId(schoolId: string, teacherId: string) {
     return this.prismaService.appointment.findMany({
-      where: { teacherId },
+      where: {
+        schoolId,
+        teacherId,
+      },
+      select: {
+        id: true,
+        startTime: true,
+        endTime: true,
+        status: true,
+        notes: true,
+        school: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        student: {
+          select: {
+            id: true,
+            userSchool: {
+              select: {
+                user: {
+                  select: {
+                    name: true,
+                    email: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        teacher: {
+          select: {
+            id: true,
+            userSchool: {
+              select: {
+                user: {
+                  select: {
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     });
   }
 }

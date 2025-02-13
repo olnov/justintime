@@ -8,6 +8,7 @@ import {
   Badge,
   Spinner,
   List,
+  Stack,
 } from "@chakra-ui/react";
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -31,46 +32,12 @@ import {
 } from "@/components/ui/dialog";
 import { toaster } from "@/components/ui/toaster"
 import { getTeacherBySchoolId } from "@/services/TeacherService";
-import { getScheduleBySchoolId } from "@/services/ScheduleService";
+import { getScheduleBySchoolId, getScheduleBySchooIdAndTeacherId } from "@/services/ScheduleService";
 import { getStudentBySchoolId } from "@/services/StudentService";
 import { bookLesson } from "@/services/ScheduleService";
 import { Lesson } from "@/types/lesson.types";
 import { APILesson } from "@/types/transformation.types";
 
-
-
-// Helper function to get the current week's date
-const getDateForThisWeek = (dayIndex: number, hour: number, minute: number = 0): Date => {
-  const today = new Date();
-  const currentDay = today.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
-  const diff = dayIndex - (currentDay === 0 ? 7 : currentDay); // Adjust for start of the week (Monday)
-  const newDate = new Date(today);
-  newDate.setDate(today.getDate() + diff);
-  newDate.setHours(hour, minute, 0, 0);
-  return newDate;
-};
-
-// Sample lessons (dynamically aligned to the current week)
-// const initialLessons: Lesson[] = [
-//   {
-//     id: "1",
-//     teacher: "Natalia Neveditsyna",
-//     student: "Elena Studenkova",
-//     subject: "Jazz Vocal",
-//     start: getDateForThisWeek(1, 10),
-//     end: getDateForThisWeek(1, 11),
-//     status: "confirmed",
-//   },
-//   {
-//     id: "2",
-//     teacher: "Natalia Neveditsyna",
-//     student: "Oleg Novikov",
-//     subject: "Pop vocal",
-//     start: getDateForThisWeek(3, 14),
-//     end: getDateForThisWeek(3, 15),
-//     status: "planned",
-//   },
-// ];
 
 const statusCollection = createListCollection({
   items: [
@@ -86,7 +53,6 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
   const [teachers, setTeachers] = useState(
     createListCollection<{ label: string; value: string }>({ items: [] })
   );
-  const [status, setStatus] = useState<string>("");
   const [selectedTeacher, setSelectedTeacher] = useState<string>("");
   const [selectedStudent, setSelectedStudent] = useState<string>("");
   const [students, setStudents] = useState<{ id: string; name: string }[]>([]);
@@ -104,6 +70,27 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
 
   // A custom state for the dialog
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  // Fetching calendar data filtered by teacher and school
+  const fetchAppointmentsByTeacher = async (teacherId: string) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const data = await getScheduleBySchooIdAndTeacherId(token, schoolId, teacherId);
+      const transformedLessons: Lesson[] = data.map((item: any) => ({
+        id: item.id,
+        teacher: item.teacher?.userSchool?.user?.name || "",
+        student: item.student?.userSchool?.user?.name || "",
+        subject: "Vocal", // TBC: Implement subject on the backend. Default subject is Vocal.
+        start: new Date(item.startTime),
+        end: new Date(item.endTime),
+        status: item.status,
+      }));
+      setLessons(transformedLessons);
+    } else {
+      throw new Error("You are not authenticated");
+    }
+  }
+
 
   //Stroring lessons bookings
   const saveLessonBooking = async (lesson: APILesson) => {
@@ -195,7 +182,7 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
 
   // Handle event click (could be used for editing)
   const handleEventClick = (clickInfo: EventClickArg) => {
-    alert(`Editing: ${clickInfo.event.title}`);
+    alert(`Editing: ${clickInfo.event.extendedProps.student}`);
   };
 
   // Handle selection of an empty time slot on the calendar
@@ -266,13 +253,13 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
   };
 
   // Handle changes in the dialog form fields
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  // const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const { name, value } = e.target;
+  //   setFormData((prev) => ({
+  //     ...prev,
+  //     [name]: value,
+  //   }));
+  // };
 
   // Handle teacher selection in the dialog form
   const handleTeacherChange = (item: { value: string; label: string }) => {
@@ -285,6 +272,13 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
   // Handle teacher selection from the filter
   const handleFilterTeacherChange = (teacherValue: string) => {
     setSelectedTeacher(teacherValue);
+    fetchAppointmentsByTeacher(teacherValue);
+  };
+
+  // Reset the filter
+  const handleFilterReset = () => {
+    setSelectedTeacher("");
+    fetchAppointments();
   };
 
   // Handle changes of status in form
@@ -318,10 +312,12 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
       <Text fontSize="lg" fontWeight="bold" mb={4}>
         Teacher's Weekly Schedule
       </Text>
+      <Stack direction={"row"} h={10} mb={4} align={"flex-start"}>
       {/* Teacher Filter */}
       <SelectRoot
         collection={teachers}
         key={teachers.items.length ? teachers.items[0].value : "empty"}
+        value={selectedTeacher ? [selectedTeacher] : []}
         size="xs"
         mb={4}
       >
@@ -340,6 +336,8 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
           ))}
         </SelectContent>
       </SelectRoot>
+      <Button onClick={()=>handleFilterReset()} size={"sm"} bgColor={"blue.500"}>Reset</Button>
+      </Stack>
 
       {/* FullCalendar Component */}
       <FullCalendar
@@ -481,6 +479,9 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
                           key={student.id}
                           p="2"
                           _hover={{ bg: "gray.100", cursor: "pointer" }}
+                          fontStyle={"italic"}
+                          color={"gray.600"}
+                          bgColor={"yellow.100"}
                           onClick={() => handleSelectStudent(student)}
                         >
                           {student.userSchool?.user?.name || student.name}

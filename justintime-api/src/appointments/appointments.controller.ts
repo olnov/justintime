@@ -55,6 +55,23 @@ export class AppointmentsController {
     return this.appointmentsService.findBySchoolId(schoolId);
   }
 
+  @ApiOkResponse({ description: 'Appointments successfully retrieved' })
+  @ApiInternalServerErrorResponse({
+    description: 'Error while retrieving appointments',
+  })
+  @ApiBearerAuth('JWT-auth')
+  @UseGuards(JwtAuthGuard)
+  @Get('/school/:schoolId/teacher/:teacherId')
+  async getBySchoolIdAndTeacherId(
+    @Param('schoolId') schoolId: string,
+    @Param('teacherId') teacherId: string,
+  ) {
+    return this.appointmentsService.findBySchoolIdAndTeacherId(
+      schoolId,
+      teacherId,
+    );
+  }
+
   @ApiOkResponse({ description: 'Appointment successfully retrieved' })
   @ApiInternalServerErrorResponse({
     description: 'Error while retrieving the appointment',
