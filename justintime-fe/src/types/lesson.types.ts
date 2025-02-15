@@ -1,7 +1,10 @@
 // Define lesson structure
 export interface Lesson {
     id: string;
-    teacher: string;
+    teacher: {
+      id?: string;
+      name: string;
+    };
     student: string;
     school: string;
     subject: string;

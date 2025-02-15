@@ -78,7 +78,10 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
       const data = await getScheduleBySchooIdAndTeacherId(token, schoolId, teacherId);
       const transformedLessons: Lesson[] = data.map((item: any) => ({
         id: item.id,
-        teacher: item.teacher?.userSchool?.user?.name || "",
+        teacher: {
+          id: item.teacher?.id || "",
+          name: item.teacher?.userSchool?.user?.name || "",
+        },
         student: item.student?.userSchool?.user?.name || "",
         subject: "Vocal", // TBC: Implement subject on the backend. Default subject is Vocal.
         start: new Date(item.startTime),
@@ -142,14 +145,23 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
       const data = await getScheduleBySchoolId(token, schoolId);
       const transformedLessons: Lesson[] = data.map((item: any) => ({
         id: item.id,
-        teacher: item.teacher?.userSchool?.user?.name || "",
+        teacher: {
+          id: item.teacher?.id || "",
+          name: item.teacher?.userSchool?.user?.name || "",
+        },
         student: item.student?.userSchool?.user?.name || "",
         subject: "Vocal", // TBC: Implement subject on the backend. Default subject is Vocal.
         start: new Date(item.startTime),
         end: new Date(item.endTime),
         status: item.status,
       }));
-      setLessons(transformedLessons);
+
+      const filteredLessons = transformedLessons.filter((lesson) => {
+        return selectedTeacher === "" || lesson.teacher.id === selectedTeacher;
+      });
+
+      // setLessons(transformedLessons);
+      setLessons(filteredLessons);
     } else {
       throw new Error("You are not authenticated");
     }
@@ -163,7 +175,7 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
       setStudents([]);
     }
     fetchAppointments();
-  }, [selectedStudent, isDialogOpen]);
+  }, [selectedStudent, selectedTeacher]);
 
   // Handle event drop (drag & drop functionality)
   const handleEventDrop = (eventDropInfo: EventDropArg) => {
@@ -208,9 +220,18 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
     const formattedStart = formData.start.toISOString().replace(/\.\d{3}Z$/, 'Z');
     const formattedEnd = formData.end.toISOString().replace(/\.\d{3}Z$/, 'Z');
 
+    // Look up the teacher's name from your teacher list.
+    const teacherInfo = teachers.items.find(
+      (t: { label: string; value: string }) => t.value === formData.teacher
+    );
+    
+
     const newLesson: Lesson = {
       id: (lessons.length + 1).toString(),
-      teacher: formData.teacher,
+      teacher: {
+        id: formData.teacher,
+        name: teacherInfo?.label || "",
+      },
       student: formData.student,
       school: schoolId,
       subject: formData.subject,
@@ -229,7 +250,7 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
     }
 
     console.log("New lesson:", newLesson);
-    if (newLesson.student === "" || newLesson.teacher === "" || newLesson.status === "") {
+    if (newLesson.student.trim() === "" || !newLesson.teacher?.id?.trim() || newLesson.status.trim() === "") {
       toaster.create({
         title: "Validation error",
         description: "Please fill in all required fields",
@@ -239,7 +260,7 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
     }
 
     const convertedLesson:APILesson = {
-        teacherId: newLesson.teacher,
+        teacherId: newLesson.teacher.id,
         studentId: newLesson.student,
         schoolId: newLesson.school,
         startTime: newLesson.start,
@@ -360,7 +381,7 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
           end: lesson.end.toISOString(),
           extendedProps: {
             student: lesson.student,
-            teacher: lesson.teacher,
+            teacher: lesson.teacher.name,
             status: lesson.status,
           },
         }))}
