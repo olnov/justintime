@@ -55,6 +55,7 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
   );
   const [selectedTeacher, setSelectedTeacher] = useState<string>("");
   const [selectedStudent, setSelectedStudent] = useState<string>("");
+  const [selectedStudentInfo, setSelectedStudentInfo] = useState<{ id: string; name: string } | null>(null);
   const [students, setStudents] = useState<{ id: string; name: string }[]>([]);
   const [loading, setLoading] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -82,7 +83,10 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
           id: item.teacher?.id || "",
           name: item.teacher?.userSchool?.user?.name || "",
         },
-        student: item.student?.userSchool?.user?.name || "",
+        student: {
+          id: item.student?.id || "", 
+          name: item.student?.userSchool?.user?.name || "",
+        },
         subject: "Vocal", // TBC: Implement subject on the backend. Default subject is Vocal.
         start: new Date(item.startTime),
         end: new Date(item.endTime),
@@ -149,7 +153,10 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
           id: item.teacher?.id || "",
           name: item.teacher?.userSchool?.user?.name || "",
         },
-        student: item.student?.userSchool?.user?.name || "",
+        student: {
+          id: item.student?.id || "",
+          name: item.student?.userSchool?.user?.name || "",
+        },
         subject: "Vocal", // TBC: Implement subject on the backend. Default subject is Vocal.
         start: new Date(item.startTime),
         end: new Date(item.endTime),
@@ -225,14 +232,16 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
       (t: { label: string; value: string }) => t.value === formData.teacher
     );
     
-
     const newLesson: Lesson = {
       id: (lessons.length + 1).toString(),
       teacher: {
         id: formData.teacher,
         name: teacherInfo?.label || "",
       },
-      student: formData.student,
+      student:{ 
+        id: formData.student,
+        name: selectedStudentInfo?.name || "",
+      },
       school: schoolId,
       subject: formData.subject,
       start: new Date(formattedStart),
@@ -250,7 +259,7 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
     }
 
     console.log("New lesson:", newLesson);
-    if (newLesson.student.trim() === "" || !newLesson.teacher?.id?.trim() || newLesson.status.trim() === "") {
+    if (newLesson.student?.id?.trim() === "" || !newLesson.teacher?.id?.trim() || newLesson.status.trim() === "") {
       toaster.create({
         title: "Validation error",
         description: "Please fill in all required fields",
@@ -261,7 +270,7 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
 
     const convertedLesson:APILesson = {
         teacherId: newLesson.teacher.id,
-        studentId: newLesson.student,
+        studentId: newLesson.student.id || "",
         schoolId: newLesson.school,
         startTime: newLesson.start,
         endTime: newLesson.end,
@@ -273,14 +282,6 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
     setIsDialogOpen(false);
   };
 
-  // Handle changes in the dialog form fields
-  // const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const { name, value } = e.target;
-  //   setFormData((prev) => ({
-  //     ...prev,
-  //     [name]: value,
-  //   }));
-  // };
 
   // Handle teacher selection in the dialog form
   const handleTeacherChange = (item: { value: string; label: string }) => {
@@ -314,6 +315,7 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
   const handleSelectStudent = (student: any) => {
     const studentName = student.userSchool?.user?.name || "";
     setSelectedStudent(studentName);
+    setSelectedStudentInfo({ id: student.id, name: studentName }); // store full info. TBC: candidate for refactioring
     setFormData((prev) => ({
       ...prev,
       student: student.id,
@@ -380,7 +382,7 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
           start: lesson.start.toISOString(),
           end: lesson.end.toISOString(),
           extendedProps: {
-            student: lesson.student,
+            student: lesson.student.name,
             teacher: lesson.teacher.name,
             status: lesson.status,
           },
@@ -472,7 +474,6 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
                 autoComplete="off"
                 onChange={(e) => {
                   setSelectedStudent(e.target.value);
-                //   setFormData((prev) => ({ ...prev, student: e.target.value }));
                 }}
                 placeholder="Start typing student name and it will show suggestions"
               />

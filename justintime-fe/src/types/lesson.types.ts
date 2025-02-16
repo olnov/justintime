@@ -5,7 +5,10 @@ export interface Lesson {
       id?: string;
       name: string;
     };
-    student: string;
+    student: {
+      id?: string;
+      name: string;
+    };
     school: string;
     subject: string;
     start: Date;
