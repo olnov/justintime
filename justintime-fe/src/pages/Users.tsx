@@ -232,7 +232,7 @@ const Users = () => {
       />
       <DialogRoot open={isFormOpen} onOpenChange={(isOpen) => !isOpen && onClose()}>
         <DialogContent>
-          <DialogHeader>Add new school</DialogHeader>
+          <DialogHeader>Add new user</DialogHeader>
           <DialogBody pb="4">
             <Stack>
               <Input

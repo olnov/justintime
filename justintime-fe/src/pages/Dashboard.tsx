@@ -1,20 +1,21 @@
 import { Box, Heading, Card, Button, HStack, Text } from "@chakra-ui/react";
-// import { Avatar } from "@/components/ui/avatar";
 import { getSchools } from "@/services/SchoolService";
 import { getUsers } from "@/services/UserService";
 import { getTeachers } from "@/services/TeacherService";
 import { useState, useEffect } from "react";
+import { parseToken } from "@/services/AuthService";
 
 const Dashboard = () => {
     const [schools, setSchools] = useState<unknown[]>([]);
     const [users, setUsers] = useState<unknown[]>([]);
     const [teachers, setTeachers] = useState<unknown[]>([]);
     const token = localStorage.getItem("token");
+    const schoolName = parseToken(localStorage.getItem("token") as string).schools.map((sName: { name: string; }) => sName.name).join(", ");
 
     useEffect(() => {
-        fetchSchools();
-        fetchUsers();
-        fetchTeachers();
+        // fetchSchools();
+        // fetchUsers();
+        // fetchTeachers();
     });
 
     const fetchSchools = async () => {
@@ -47,7 +48,10 @@ const Dashboard = () => {
     return (
         <>
         <Box p={4}>
-            <Heading>Dashboard</Heading>
+            <Text fontSize="3xl">Welcome to {schoolName} dashboard</Text>
+        </Box>
+        {/* <Box p={4}>
+            <Heading>{schoolName} dashboard</Heading>
             <Box mt={4}>
                 <HStack>
                 <Card.Root width="320px">
@@ -85,7 +89,7 @@ const Dashboard = () => {
                 </Card.Root>
                 </HStack>
             </Box>
-        </Box>
+        </Box> */}
         </>
     );
 };

@@ -15,7 +15,7 @@ const Navbar = () => {
   const userRole = parseToken(localStorage.getItem("token") as string).schools.map((schoolRole: { roles: unknown; }) => schoolRole.roles).join(", ") as keyof typeof menuItemsByRole;
   const isGlobalAdmin = parseToken(localStorage.getItem("token") as string).isGlobalAdmin;
   const Role = userRole || (isGlobalAdmin ? "global_admin" : []);
-
+  
   const handleLogout = () => {
     localStorage.removeItem("userName");
     localStorage.removeItem("userRole");
