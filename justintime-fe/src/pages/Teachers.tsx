@@ -1,4 +1,4 @@
-import { Heading, Button, Stack, Input, Box, List, Spinner, Text, Portal, createListCollection } from "@chakra-ui/react";
+import { Heading, Button, Stack, Input, Textarea, Portal, Box } from "@chakra-ui/react";
 import TableComponent from "@/components/Table";
 import {
   DialogBody,
@@ -7,33 +7,19 @@ import {
   DialogHeader,
   DialogRoot,
 } from "@/components/ui/dialog";
-import {
-  SelectContent,
-  SelectItem,
-  SelectLabel,
-  SelectRoot,
-  SelectTrigger,
-  SelectValueText,
-} from "@/components/ui/select";
+import { NumberInputField, NumberInputRoot } from "@/components/ui/number-input"
 import { useState, useEffect } from "react";
-import { getTeachersWithSchools, getTeacherBySchoolId } from "@/services/TeacherService";
+import { getTeacherBySchoolId } from "@/services/TeacherService";
 import { parseToken } from "@/services/AuthService";
+import { createUser } from "@/services/UserService";
+import { createTeacher } from "@/services/TeacherService";
+import { createUserSchool } from "@/services/UserSchoolService";
+import { createRoleAssignment } from "@/services/RoleAssignmentService";
+import { Teacher } from "@/types/teacher.types";
+import { toaster } from "@/components/ui/toaster";
 
-interface Teacher {
-  id?: number;
-  userSchool?: {
-    user?: {
-      name?: string;
-      email?: string;
-    };
-    school?: {
-      name?: string;
-    };
-  };
-  specialization?: string;
-  bio?: string;
-  rating?: number;
-}
+
+
 
 const Teachers = () => {
   const [teachers, setTeachers] = useState<Teacher[]>([]);
@@ -42,32 +28,100 @@ const Teachers = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [selectedSchoolName, setSelectedSchoolName] = useState("");
-  const [results, setResults] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [role, setRole] = useState("");
-  const roles = createListCollection({
-    items: [
-      { label: "School Administrator", value: "admin" },
-      { label: "Teacher", value: "teacher" },
-      { label: "Student", value: "student" },
-    ],
-  })
+  const [specialization, setSpecialization] = useState("");
+  const [bio, setBio] = useState("");
+  const [rating, setRating] = useState<string>("0.00");
+  const ROLE = "teacher";
   const token = localStorage.getItem("token");
 
-
   useEffect(() => {
-    // fetchTeachersWithSchools();
     fetchTeachersBySchool();
   }, [isFormOpen]);
 
   const onClose = () => {
+    setFullName("");
+    setEmail("");
+    setPassword("");
+    setConfirmPassword("");
+    setSpecialization("");
+    setBio("");
+    setRating("0.00");
     setIsFormOpen(false);
   };
 
-  const handleSaveUser = () => {
-    console.log("Save user");
+  const handleSaveTeacher = async () => {
+    if (!token) {
+      throw new Error("You are not authenticated");
+    }
+    // Step 1: Validate password
+    if (password !== confirmPassword) {
+      toaster.create({
+        title: "Error",
+        description: "Passwords do not match",
+        type: "error",
+      });
+      return;
+    }
+    // Step 2: Create user
+    const newUser = await createUser(fullName, email, password);
+    if (!newUser) {
+      toaster.create({
+        title: "Error",
+        description: "Failed to create user",
+        type: "error",
+      });
+      return;
+    }
+    // Step 3: Adding user and school relationship. 
+    const schoolId = parseToken(token).schools[0].id;
+    const newUserSchool = await createUserSchool(token, newUser.id, schoolId);
+    if (!newUserSchool) {
+      toaster.create({
+        title: "Error",
+        description: "Failed to create user school relationship",
+        type: "error",
+      });
+      return;
+    }
+    // Step 4: Registering a teacher role for the user
+    const teacherRoleAssignment = await createRoleAssignment(token, newUserSchool.id, ROLE);
+    if (!teacherRoleAssignment) {
+      toaster.create({
+        title: "Error",
+        description: "Failed to register role for user",
+        type: "error",
+      });
+      return;
+    }
+    // Step 5: Create teacher
+    const newTeacher = await createTeacher(token, newUserSchool.id, specialization, bio, parseFloat(rating));
+    if (!newTeacher) {
+      toaster.create({
+        title: "Error",
+        description: "Failed to create teacher",
+        type: "error",
+      });
+      return;
+    } else {
+      toaster.create({
+        title: "Success",
+        description: "Teacher created successfully",
+        type: "success",
+      });
+    }
+    onClose();
   };
+
+  const handleOnChangeRating = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value === "") {
+      setRating("0.00");
+    } else {
+      setRating(value);
+      console.log(value);
+    }
+  };
+
 
   const fetchTeachersBySchool = async () => {
     if (token) {
@@ -149,30 +203,37 @@ const Teachers = () => {
                 required={true}
                 onChange={(e) => setConfirmPassword(e.target.value)}
               />
-              <SelectRoot variant={"outline"} collection={roles}>
-                <SelectLabel>Select role</SelectLabel>
-                <SelectTrigger>
-                  <SelectValueText placeholder="Select role" />
-                </SelectTrigger>
-                <Portal>
-                  <SelectContent
-                    style={{
-                      zIndex: 1500,
-                    }}
-                  >
-                    {roles.items.map((roleItem) => (
-                      <SelectItem item={roleItem} key={roleItem.value} onClick={() => setRole(roleItem.value)}>
-                        {roleItem.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Portal>
-              </SelectRoot>
+              <Textarea
+                placeholder="Specialization"
+                name="specialization"
+                value={specialization}
+                onChange={(e) => setSpecialization(e.target.value)}
+              />
+              <Textarea
+                placeholder="Bio"
+                name="bio"
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+              />
+              <Box>
+                <NumberInputRoot
+                  step={0.1}
+                  max={5}
+                  min={0}
+                  formatOptions={{ style: "decimal", minimumFractionDigits: 2 }}
+                  defaultValue="0.00"
+                >
+                  <NumberInputField
+                    name="rating"
+                    // value={rating}
+                    onChange={(e) => handleOnChangeRating(e)}
+                  />
+                </NumberInputRoot>
+              </Box>
             </Stack>
-
           </DialogBody>
           <DialogFooter>
-            <Button variant={"outline"} bgColor="green.300" onClick={handleSaveUser}>
+            <Button variant={"outline"} bgColor="green.300" onClick={handleSaveTeacher}>
               Save
             </Button>
             <Button variant="outline" bgColor={"red.300"} onClick={onClose}>

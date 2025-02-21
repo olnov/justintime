@@ -1,13 +1,13 @@
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
-export const createTeacher = async (token:string, userSchoolId: string ) => {
+export const createTeacher = async (token:string, userSchoolId: string, specialization?: string, bio?: string, rating?: number ) => {
     const requestOptions = {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token}`, 
             'Content-Type': 'application/json' 
         },
-        body: JSON.stringify({ userSchoolId, specialization: "", bio: "", rating: 0.0 })
+        body: JSON.stringify({ userSchoolId, specialization: specialization || "", bio: bio || "", rating: rating || 0.0 })
     };
     const response = await fetch(`${BACKEND_URL}/teachers`, requestOptions);
     if (!response.ok) {

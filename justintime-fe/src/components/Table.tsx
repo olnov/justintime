@@ -82,9 +82,9 @@ const TableComponent: React.FC<TableProps> = ({ title, data, columns, onAdd, act
                 <Card.Body>
                     <Stack>
                         <HStack>
-                            <Input placeholder={`Filter ${title.toLowerCase()} by name`} />
+                            <Input placeholder={`Filter ${title.toLowerCase()} by name`}/>
                             {onAdd && (
-                                <Button onClick={onAdd} colorScheme="teal" color={"blackAlpha.700"}>
+                                <Button onClick={onAdd} colorScheme="teal">
                                     <BiListPlus />
                                     Add New {title}
                                 </Button>

@@ -6,19 +6,8 @@ import { createTeacher } from "@/services/TeacherService";
 import { createStudent } from "@/services/StudentService";
 import { useEffect, useState } from "react";
 import TableComponent from "@/components/Table";
+import { User } from "@/types/user.types";
 
-interface UserSchool {
-  school: { name: string };
-  roles: { role: string }[];
-}
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  isGlobalAdmin: boolean;
-  UserSchools: UserSchool[];
-}
 
 import {
   Heading,

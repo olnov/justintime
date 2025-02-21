@@ -341,7 +341,7 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
         collection={teachers}
         key={teachers.items.length ? teachers.items[0].value : "empty"}
         value={selectedTeacher ? [selectedTeacher] : []}
-        size="xs"
+        size="sm"
         mb={4}
       >
         <SelectTrigger>
