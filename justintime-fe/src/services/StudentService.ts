@@ -17,14 +17,14 @@ export const getStudents = async (token:string) => {
     return data;
 }
 
-export const createStudent = async (token:string, userSchoolId: string) => {
+export const createStudent = async (token:string, userSchoolId: string, gradeLevel?: string) => {
     const requestOptions = {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token}`, 
             'Content-Type': 'application/json' 
         },
-        body: JSON.stringify({ userSchoolId, gradeLevel: "" })
+        body: JSON.stringify({ userSchoolId, gradeLevel: gradeLevel || "" })
     };
     const response = await fetch(`${BACKEND_URL}/students`, requestOptions);
     if (!response.ok) {

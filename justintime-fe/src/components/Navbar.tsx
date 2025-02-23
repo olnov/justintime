@@ -68,11 +68,11 @@ const Navbar = () => {
                 bgColor: "transparent",
             }}
           >
-            <Avatar.Root>
+            <Avatar.Root shape="rounded" size="lg">
               <Avatar.Fallback name={fullName} />
             </Avatar.Root>
             <VStack align="center">
-                <Text ml="2">{fullName}</Text>
+                <Text ml={2}>{fullName}</Text>
                 <Text textStyle="xs">{Role}</Text>
             </VStack>
           </MenuTrigger>

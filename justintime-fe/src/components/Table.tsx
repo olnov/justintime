@@ -23,41 +23,24 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BiListPlus } from "react-icons/bi";
+import { Column, DataItem, TableProps } from "@/types/table.types";
 
-interface TableColumn {
-    key: string;
-    label: string;
-    sortable?: boolean;
-}
-
-interface DataItem {
-    id: string;
-    [key: string]: unknown;
-}
-
-interface Column {
-    key: string;
-    label: string;
-}
-
-interface TableProps {
-    title: string;
-    data: unknown[];
-    columns: TableColumn[];
-    onAdd?: () => void;
-    actions?: React.ReactNode;
-}
 
 const TableComponent: React.FC<TableProps> = ({ title, data, columns, onAdd, actions }) => {
     const [selection, setSelection] = useState<string[]>([]);
     const [sortConfig, setSortConfig] = useState<{ key: string; direction: "asc" | "desc" } | null>(null);
+    const [filteredData, setFilteredData] = useState<DataItem[]>(data);
 
     const hasSelection = selection.length > 0;
     const indeterminate = hasSelection && selection.length < data.length;
 
-    const sortedData = [...data].sort((a, b) => {
+    useEffect(() => {
+        setFilteredData(data);
+      }, [data]);
+
+    const sortedData = [...filteredData].sort((a, b) => {
         if (!sortConfig) return 0;
         const { key, direction } = sortConfig;
         const aValue = (a as Record<string, unknown>)[key] as string | number;
@@ -67,6 +50,25 @@ const TableComponent: React.FC<TableProps> = ({ title, data, columns, onAdd, act
         if (aValue > bValue) return direction === "asc" ? 1 : -1;
         return 0;
     });
+
+    const handleFilter = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value.toLowerCase();
+        if (!value) {
+            setFilteredData(data);
+            return;
+        }
+        const newFilteredData = data.filter((item: DataItem) => {
+            return Object.values(item).some((val) => {
+                if (typeof val === "string") {
+                    return val.toLowerCase().includes(value);
+                }
+                return false;
+            });
+        });
+        setSortConfig(null);
+        setSelection([]);
+        setFilteredData(newFilteredData);
+    };
 
     const handleSort = (key: string) => {
         setSortConfig((prev) => {
@@ -83,7 +85,7 @@ const TableComponent: React.FC<TableProps> = ({ title, data, columns, onAdd, act
                 <Card.Body>
                     <Stack>
                         <HStack>
-                            <Input placeholder={`Filter ${title.toLowerCase()} by name`}/>
+                            <Input placeholder={`Filter ${title.toLowerCase()} by name`} onChange={(e)=>handleFilter(e)}/>
                             {onAdd && (
                                 <Button onClick={onAdd} colorScheme="teal">
                                     <BiListPlus />

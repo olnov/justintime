@@ -1,4 +1,4 @@
-import { Heading, Button, Stack, Input, Textarea, Box } from "@chakra-ui/react";
+import { Heading, Button, Stack, Input, Textarea, Box, Text } from "@chakra-ui/react";
 import TableComponent from "@/components/Table";
 import {
   DialogBody,
@@ -216,6 +216,7 @@ const Teachers = () => {
                 onChange={(e) => setBio(e.target.value)}
               />
               <Box>
+                <Text>Rating</Text>
                 <NumberInputRoot
                   step={0.1}
                   max={5}
