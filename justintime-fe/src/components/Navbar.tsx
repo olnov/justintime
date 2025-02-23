@@ -1,5 +1,4 @@
-import { Button, Flex, Text, VStack } from "@chakra-ui/react";
-import { Avatar } from "@/components/ui/avatar";
+import { Button, Flex, Text, VStack, Avatar } from "@chakra-ui/react";
 import {
   MenuContent,
   MenuItem,
@@ -11,10 +10,10 @@ import { parseToken } from "../services/AuthService";
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const fullName = localStorage.getItem("userName");
-  const userRole = parseToken(localStorage.getItem("token") as string).schools.map((schoolRole: { roles: unknown; }) => schoolRole.roles).join(", ") as keyof typeof menuItemsByRole;
-  const isGlobalAdmin = parseToken(localStorage.getItem("token") as string).isGlobalAdmin;
-  const Role = userRole || (isGlobalAdmin ? "global_admin" : []);
+  const fullName: string = localStorage.getItem("userName") || "";
+  const userRole = parseToken(localStorage.getItem("token") as string).schools.map((schoolRole: { roles: unknown; }) => schoolRole.roles).join(", ");
+  const isGlobalAdmin: boolean = parseToken(localStorage.getItem("token") as string).isGlobalAdmin;
+  const Role: string | boolean = String(userRole) || (isGlobalAdmin ? "global_admin" : false);
   
   const handleLogout = () => {
     localStorage.removeItem("userName");
@@ -69,11 +68,9 @@ const Navbar = () => {
                 bgColor: "transparent",
             }}
           >
-            <Avatar
-              size="sm"
-              name="Sage"
-              src="https://bit.ly/sage-adebayo"
-            />
+            <Avatar.Root>
+              <Avatar.Fallback name={fullName} />
+            </Avatar.Root>
             <VStack align="center">
                 <Text ml="2">{fullName}</Text>
                 <Text textStyle="xs">{Role}</Text>

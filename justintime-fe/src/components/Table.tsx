@@ -4,6 +4,7 @@ import {
     Stack,
     Table,
     Input,
+    Text,
 } from "@chakra-ui/react";
 
 import {
@@ -78,7 +79,7 @@ const TableComponent: React.FC<TableProps> = ({ title, data, columns, onAdd, act
 
     return (
         <>
-            <Card.Root width={"50vw"}>
+            <Card.Root width={"100%"} margin={"auto"}>
                 <Card.Body>
                     <Stack>
                         <HStack>
@@ -90,7 +91,13 @@ const TableComponent: React.FC<TableProps> = ({ title, data, columns, onAdd, act
                                 </Button>
                             )}
                         </HStack>
-                        <Table.Root>
+                        <Table.Root size={"md"} tableLayout={"fixed"}>
+                            <Table.ColumnGroup>
+                                <Table.Column width={"50px"} />
+                                {columns.map((col) => (
+                                    <Table.Column key={col.key} />
+                                ))}
+                            </Table.ColumnGroup>
                             <Table.Header>
                                 <Table.Row>
                                     <Table.ColumnHeader>
@@ -109,7 +116,7 @@ const TableComponent: React.FC<TableProps> = ({ title, data, columns, onAdd, act
                                             onClick={() => col.sortable && handleSort(col.key)}
                                             style={{ cursor: col.sortable ? "pointer" : "default" }}
                                         >
-                                            {col.label}
+                                            <Text fontWeight={"semibold"}>{col.label}</Text>
                                         </Table.ColumnHeader>
                                     ))}
                                 </Table.Row>
@@ -133,7 +140,11 @@ const TableComponent: React.FC<TableProps> = ({ title, data, columns, onAdd, act
                                                 />
                                             </Table.Cell>
                                             {columns.map((col: Column) => (
-                                                <Table.Cell key={col.key}>{String(dataItem[col.key])}</Table.Cell>
+                                                <Table.Cell key={col.key}>
+                                                    <Text lineClamp={1}>
+                                                    {String(dataItem[col.key])}
+                                                    </Text>
+                                                </Table.Cell>
                                             ))}
                                         </Table.Row>
                                     );

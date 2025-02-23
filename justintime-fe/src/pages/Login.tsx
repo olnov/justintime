@@ -86,6 +86,7 @@ const Login = () => {
                             <Text>Password</Text>
                             <PasswordInput
                                 name="password"
+                                width={250}
                                 onChange={(e) => setPassword(e.target.value)}
                                 onKeyDown={(e) => {
                                     if (e.key === "Enter") {

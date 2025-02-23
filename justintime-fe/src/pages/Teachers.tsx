@@ -1,4 +1,4 @@
-import { Heading, Button, Stack, Input, Textarea, Portal, Box } from "@chakra-ui/react";
+import { Heading, Button, Stack, Input, Textarea, Box } from "@chakra-ui/react";
 import TableComponent from "@/components/Table";
 import {
   DialogBody,

@@ -9,6 +9,7 @@ export const createTeacher = async (token:string, userSchoolId: string, speciali
         },
         body: JSON.stringify({ userSchoolId, specialization: specialization || "", bio: bio || "", rating: rating || 0.0 })
     };
+    console.log(requestOptions);
     const response = await fetch(`${BACKEND_URL}/teachers`, requestOptions);
     if (!response.ok) {
         throw new Error("Failed to create teacher");
