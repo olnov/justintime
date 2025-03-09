@@ -5,6 +5,7 @@ import {
     Table,
     Input,
     Text,
+    Alert,
 } from "@chakra-ui/react";
 
 import {
@@ -21,6 +22,14 @@ import {
     ActionBarSeparator,
 } from "@/components/ui/action-bar";
 
+// import {
+//     PopoverBody,
+//     PopoverContent,
+//     PopoverRoot,
+//     PopoverTitle,
+//     PopoverTrigger,
+// } from "@/components/ui/popover";
+
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState, useEffect } from "react";
@@ -28,7 +37,9 @@ import { BiListPlus } from "react-icons/bi";
 import { Column, DataItem, TableProps } from "@/types/table.types";
 
 
+
 const TableComponent: React.FC<TableProps> = ({ title, data, columns, onAdd, actions }) => {
+    
     const [selection, setSelection] = useState<string[]>([]);
     const [sortConfig, setSortConfig] = useState<{ key: string; direction: "asc" | "desc" } | null>(null);
     const [filteredData, setFilteredData] = useState<DataItem[]>(data);
@@ -38,7 +49,7 @@ const TableComponent: React.FC<TableProps> = ({ title, data, columns, onAdd, act
 
     useEffect(() => {
         setFilteredData(data);
-      }, [data]);
+    }, [data]);
 
     const sortedData = [...filteredData].sort((a, b) => {
         if (!sortConfig) return 0;
@@ -79,13 +90,23 @@ const TableComponent: React.FC<TableProps> = ({ title, data, columns, onAdd, act
         });
     };
 
+    const handleMouseOver = (e:React.MouseEvent<HTMLTableCellElement, MouseEvent>, value:string) => {
+        // alert(value);
+        // return (
+        //     <Alert.Root status="info" title="This is the alert title">
+        //         <Alert.Indicator />
+        //         <Alert.Title>{value}</Alert.Title>
+        //     </Alert.Root>
+        // )
+    };
+
     return (
         <>
             <Card.Root width={"100%"} margin={"auto"}>
                 <Card.Body>
                     <Stack>
                         <HStack>
-                            <Input placeholder={`Filter ${title.toLowerCase()} by name`} onChange={(e)=>handleFilter(e)}/>
+                            <Input placeholder={`Filter ${title.toLowerCase()} by name`} onChange={(e) => handleFilter(e)} />
                             {onAdd && (
                                 <Button onClick={onAdd} colorScheme="teal">
                                     <BiListPlus />
@@ -142,9 +163,9 @@ const TableComponent: React.FC<TableProps> = ({ title, data, columns, onAdd, act
                                                 />
                                             </Table.Cell>
                                             {columns.map((col: Column) => (
-                                                <Table.Cell key={col.key}>
+                                                <Table.Cell key={col.key} onMouseOver={(e) => {handleMouseOver(e, String(dataItem[col.key])); }}>
                                                     <Text lineClamp={1}>
-                                                    {String(dataItem[col.key])}
+                                                        {String(dataItem[col.key])}
                                                     </Text>
                                                 </Table.Cell>
                                             ))}

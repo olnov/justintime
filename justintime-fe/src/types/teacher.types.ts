@@ -13,3 +13,13 @@ export interface Teacher {
   bio?: string;
   rating?: number;
 }
+
+export interface FlattenedTeacher {
+  id: number;
+  name: string;
+  school: string;
+  email: string;
+  specialisation: string;
+  bio: string;
+  rating: number;
+}

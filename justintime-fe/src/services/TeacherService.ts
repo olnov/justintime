@@ -69,3 +69,38 @@ export const getTeacherBySchoolId = async (token:string, userSchoolId: string) =
     const data = await response.json();
     return data;
 }
+
+export const deleteTeacher = async (token:string, teacherId: string) => {
+    const requestOptions = {
+        method: 'DELETE',
+        headers: {
+            Authorization: `Bearer ${token}`, 
+            'Content-Type': 'application/json' 
+        }
+    };
+    const response = await fetch(`${BACKEND_URL}/teachers/${teacherId}`, requestOptions);
+    if (!response.ok) {
+        throw new Error("Failed to delete teacher");
+    }
+
+    const data = await response.json();
+    return data;
+}
+
+export const updateTeacher = async (token:string, teacherId: string, specialization?: string, bio?: string, rating?: number ) => {
+    const requestOptions = {
+        method: 'PUT',
+        headers: {
+            Authorization: `Bearer ${token}`, 
+            'Content-Type': 'application/json' 
+        },
+        body: JSON.stringify({ specialization: specialization || "", bio: bio || "", rating: rating || 0.0 })
+    };
+    const response = await fetch(`${BACKEND_URL}/teachers/${teacherId}`, requestOptions);
+    if (!response.ok) {
+        throw new Error("Failed to update teacher");
+    }
+
+    const data = await response.json();
+    return data;
+}

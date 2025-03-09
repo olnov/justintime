@@ -1,4 +1,5 @@
-import { Heading, Button, Stack, Input, Box, Text } from "@chakra-ui/react";
+import { Heading, Button, Stack, Input, Textarea, Box, Text } from "@chakra-ui/react";
+import TableComponent from "@/components/Table/Table";
 import {
   DialogBody,
   DialogContent,
@@ -7,61 +8,48 @@ import {
   DialogRoot,
 } from "@/components/ui/dialog";
 import { NumberInputField, NumberInputRoot } from "@/components/ui/number-input"
-import TableComponent from "@/components/Table/Table";
 import { useState, useEffect } from "react";
-import { getStudentsWithSchools, getStudentBySchoolId } from "@/services/StudentService";
+import { getTeacherBySchoolId } from "@/services/TeacherService";
 import { parseToken } from "@/services/AuthService";
-import { toaster } from "@/components/ui/toaster";
 import { createUser } from "@/services/UserService";
+import { createTeacher, deleteTeacher } from "@/services/TeacherService";
 import { createUserSchool } from "@/services/UserSchoolService";
 import { createRoleAssignment } from "@/services/RoleAssignmentService";
-import { createStudent } from "@/services/StudentService";
-import { Student } from "@/types/student.types";
+import { Teacher, FlattenedTeacher } from "@/types/teacher.types";
+import { toaster } from "@/components/ui/toaster";
 
 
-const Students = () => {
-  const [students, setStudents] = useState<Student[]>([]);
+
+
+const Teachers = () => {
+  const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const token = localStorage.getItem("token");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [gradeLevel, setGradeLevel] = useState<string>("0.00");
-  const ROLE = "student";
-
+  const [specialization, setSpecialization] = useState("");
+  const [bio, setBio] = useState("");
+  const [rating, setRating] = useState<string>("0.00");
+  const ROLE = "teacher";
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
-    // fetchStudentsWithSchools();
-    fetchStudentsBySchool();
+    fetchTeachersBySchool();
   }, [isFormOpen]);
 
+  const onClose = () => {
+    setFullName("");
+    setEmail("");
+    setPassword("");
+    setConfirmPassword("");
+    setSpecialization("");
+    setBio("");
+    setRating("0.00");
+    setIsFormOpen(false);
+  };
 
-  // const fetchStudentsWithSchools = async () => {
-  //   if (token) {
-  //     const data = await getStudentsWithSchools(token);
-  //     setStudents(data);
-  //   } else {
-  //     throw new Error("You are not authenticated");
-  //   }
-  // }
-
-
-  const fetchStudentsBySchool = async () => {
-    if (token) {
-      const schoolId = parseToken(token).schools[0].id;
-      const data = await getStudentBySchoolId(token, schoolId);
-      setStudents(data);
-    } else {
-      throw new Error("You are not authenticated");
-    }
-  }
-
-  const handleOnChangeRating = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setGradeLevel(e.target.value);
-  }
-
-  const handleSaveStudent = async () => {
+  const handleSaveTeacher = async () => {
     if (!token) {
       throw new Error("You are not authenticated");
     }
@@ -84,7 +72,7 @@ const Students = () => {
       });
       return;
     }
-    // Step 3: Adding user and school relationship.
+    // Step 3: Adding user and school relationship. 
     const schoolId = parseToken(token).schools[0].id;
     const newUserSchool = await createUserSchool(token, newUser.id, schoolId);
     if (!newUserSchool) {
@@ -106,64 +94,117 @@ const Students = () => {
       return;
     }
     // Step 5: Create teacher
-    const newTeacher = await createStudent(token, newUserSchool.id);
+    const newTeacher = await createTeacher(token, newUserSchool.id, specialization, bio, parseFloat(rating));
     if (!newTeacher) {
       toaster.create({
         title: "Error",
-        description: "Failed to create student",
+        description: "Failed to create teacher",
         type: "error",
       });
       return;
     } else {
       toaster.create({
         title: "Success",
-        description: "Student added successfully",
+        description: "Teacher created successfully",
         type: "success",
       });
-      onClose();
+    }
+    onClose();
+  };
+
+  const handleOnChangeRating = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value === "") {
+      setRating("0.00");
+    } else {
+      setRating(value);
+      console.log(value);
+    }
+  };
+
+  // New delete callback for teachers
+  const handleTeacherDelete = async (teacherId: string) => {
+    console.log("Teacher ID: ",teacherId);
+    try {
+      if (!token) throw new Error("Not authenticated");
+      await deleteTeacher(token, teacherId);
+      toaster.create({
+        title: "Success",
+        description: "Teacher deleted successfully",
+        type: "success",
+      });
+      setTeachers((prev) => prev.filter((teacher) => teacher.id?.toString() !== teacherId));
+    } catch (error) {
+      toaster.create({
+        title: "Error",
+        description: "Failed to delete teacher",
+        type: "error",
+      });
+    }
+  };
+
+  const handleTeachersEdit = async (teacher: FlattenedTeacher) => {
+    try {
+      console.log("Teacher: ",teacher);
+      if (!teacher) throw new Error("Teacher not found");
+      setFullName(teacher.name || "");
+      setEmail(teacher.email || "");
+      setSpecialization(teacher.specialisation || "");
+      setBio(teacher.bio || "");
+      setRating(teacher.rating.toString() || "0.00");
+      setIsFormOpen(true);
+    }catch (error) {
+      toaster.create({
+        title: "Error",
+        description: "Failed to edit teacher",
+        type: "error",
+      });
+    }
+  };
+
+
+  const fetchTeachersBySchool = async () => {
+    if (token) {
+      const schoolId = parseToken(token).schools[0].id;
+      const data = await getTeacherBySchoolId(token, schoolId);
+      setTeachers(data);
+    } else {
+      throw new Error("You are not authenticated");
     }
   }
 
-  const onClose = () => {
-    setFullName("");
-    setEmail("");
-    setPassword("");
-    setConfirmPassword("");
-    setIsFormOpen(false);
-  }
-
-  const flattenedSudents = students.map((student: Student) => ({
-    id: student.id,
-    name: student.userSchool?.user?.name || "N/A",
-    school: student.userSchool?.school?.name || "N/A",
-    email: student.userSchool?.user?.email || "N/A",
-    gradeLevel: student.gradeLevel || "N/A",
+  const flattenedTeachers = teachers.map((teacher: Teacher) => ({
+    id: teacher.id,
+    name: teacher.userSchool?.user?.name || "N/A",
+    school: teacher.userSchool?.school?.name || "N/A",
+    email: teacher.userSchool?.user?.email || "N/A",
+    specialisation: teacher.specialization || "N/A",
+    bio: teacher.bio || "N/A",
+    rating: teacher.rating || 0,
   }));
 
 
   return (
     <>
-      <Heading>Students</Heading>
+      <Heading>Teachers</Heading>
       <TableComponent
-        title="Students"
-        data={flattenedSudents}
+        title="Teachers"
+        data={flattenedTeachers}
         columns={[
-          { key: "name", label: "Student Name", sortable: true },
+          { key: "name", label: "Teacher Name", sortable: true },
           { key: "school", label: "School", sortable: true },
           { key: "email", label: "Email", sortable: true },
-          { key: "gradeLevel", label: "Grade Level", sortable: true },
+          { key: "specialisation", label: "Specialisation", sortable: true },
+          { key: "bio", label: "Bio", sortable: true },
+          { key: "rating", label: "Rating", sortable: true },
         ]}
         onAdd={() => setIsFormOpen(true)}
-        actions={
-          <>
-            <Button variant={"outline"}>Delete</Button>
-            <Button variant={"outline"}>Edit</Button>
-          </>
-        }
+        onDelete={handleTeacherDelete}
+        onEdit={handleTeachersEdit}
       />
       <DialogRoot open={isFormOpen} onOpenChange={(isOpen) => !isOpen && onClose()}>
         <DialogContent>
-          <DialogHeader>Add new student</DialogHeader>
+          <DialogHeader>Add new teacher</DialogHeader>
           <DialogBody pb="4">
             <Stack>
               <Input
@@ -198,8 +239,20 @@ const Students = () => {
                 required={true}
                 onChange={(e) => setConfirmPassword(e.target.value)}
               />
+              <Textarea
+                placeholder="Specialization"
+                name="specialization"
+                value={specialization}
+                onChange={(e) => setSpecialization(e.target.value)}
+              />
+              <Textarea
+                placeholder="Bio"
+                name="bio"
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+              />
               <Box>
-                <Text>Grade Level</Text>
+                <Text>Rating</Text>
                 <NumberInputRoot
                   step={0.1}
                   max={5}
@@ -207,9 +260,8 @@ const Students = () => {
                   formatOptions={{ style: "decimal", minimumFractionDigits: 2 }}
                   defaultValue="0.00"
                 >
-                  {/* <NumberInputLabel>Grade Level</NumberInputLabel> */}
                   <NumberInputField
-                    name="gradeLevel"
+                    name="rating"
                     // value={rating}
                     onChange={(e) => handleOnChangeRating(e)}
                   />
@@ -218,7 +270,7 @@ const Students = () => {
             </Stack>
           </DialogBody>
           <DialogFooter>
-            <Button variant={"outline"} bgColor="green.300" onClick={handleSaveStudent}>
+            <Button variant={"outline"} bgColor="green.300" onClick={handleSaveTeacher}>
               Save
             </Button>
             <Button variant="outline" bgColor={"red.300"} onClick={onClose}>
@@ -231,4 +283,4 @@ const Students = () => {
   );
 };
 
-export default Students;
+export default Teachers;

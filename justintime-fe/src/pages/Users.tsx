@@ -5,7 +5,7 @@ import { createRoleAssignment } from "@/services/RoleAssignmentService";
 import { createTeacher } from "@/services/TeacherService";
 import { createStudent } from "@/services/StudentService";
 import { useEffect, useState } from "react";
-import TableComponent from "@/components/Table";
+import TableComponent from "@/components/Table/Table";
 import { User } from "@/types/user.types";
 
 

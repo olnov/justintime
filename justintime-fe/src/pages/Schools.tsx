@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { getSchools, createSchool } from "@/services/SchoolService";
-import TableComponent from "@/components/Table";
+import TableComponent from "@/components/Table/Table";
 import { Heading, Button, Input, Stack } from "@chakra-ui/react";
 import {
   DialogBody,

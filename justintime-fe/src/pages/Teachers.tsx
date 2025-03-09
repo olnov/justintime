@@ -1,5 +1,5 @@
 import { Heading, Button, Stack, Input, Textarea, Box, Text } from "@chakra-ui/react";
-import TableComponent from "@/components/Table";
+import TableComponent from "@/components/Table/Table";
 import {
   DialogBody,
   DialogContent,
@@ -7,25 +7,25 @@ import {
   DialogHeader,
   DialogRoot,
 } from "@/components/ui/dialog";
-import { NumberInputField, NumberInputRoot } from "@/components/ui/number-input"
+import { NumberInputField, NumberInputRoot } from "@/components/ui/number-input";
 import { useState, useEffect } from "react";
-import { getTeacherBySchoolId } from "@/services/TeacherService";
+import { getTeacherBySchoolId, createTeacher, deleteTeacher, updateTeacher } from "@/services/TeacherService";
 import { parseToken } from "@/services/AuthService";
 import { createUser } from "@/services/UserService";
-import { createTeacher } from "@/services/TeacherService";
 import { createUserSchool } from "@/services/UserSchoolService";
 import { createRoleAssignment } from "@/services/RoleAssignmentService";
-import { Teacher } from "@/types/teacher.types";
+import { Teacher, FlattenedTeacher } from "@/types/teacher.types";
 import { toaster } from "@/components/ui/toaster";
-
-
-
 
 const Teachers = () => {
   const [teachers, setTeachers] = useState<Teacher[]>([]);
-  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingTeacher, setEditingTeacher] = useState<FlattenedTeacher | null>(null);
+
+  // Form state variables
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
+  // In add mode, we need password fields; in edit mode, these will be hidden.
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [specialization, setSpecialization] = useState("");
@@ -36,9 +36,10 @@ const Teachers = () => {
 
   useEffect(() => {
     fetchTeachersBySchool();
-  }, [isFormOpen]);
+  }, [isDialogOpen]);
 
   const onClose = () => {
+    // Reset form fields and mode
     setFullName("");
     setEmail("");
     setPassword("");
@@ -46,82 +47,150 @@ const Teachers = () => {
     setSpecialization("");
     setBio("");
     setRating("0.00");
-    setIsFormOpen(false);
+    setEditingTeacher(null);
+    setIsDialogOpen(false);
   };
 
   const handleSaveTeacher = async () => {
     if (!token) {
       throw new Error("You are not authenticated");
     }
-    // Step 1: Validate password
-    if (password !== confirmPassword) {
-      toaster.create({
-        title: "Error",
-        description: "Passwords do not match",
-        type: "error",
-      });
-      return;
-    }
-    // Step 2: Create user
-    const newUser = await createUser(fullName, email, password);
-    if (!newUser) {
-      toaster.create({
-        title: "Error",
-        description: "Failed to create user",
-        type: "error",
-      });
-      return;
-    }
-    // Step 3: Adding user and school relationship. 
-    const schoolId = parseToken(token).schools[0].id;
-    const newUserSchool = await createUserSchool(token, newUser.id, schoolId);
-    if (!newUserSchool) {
-      toaster.create({
-        title: "Error",
-        description: "Failed to create user school relationship",
-        type: "error",
-      });
-      return;
-    }
-    // Step 4: Registering a teacher role for the user
-    const teacherRoleAssignment = await createRoleAssignment(token, newUserSchool.id, ROLE);
-    if (!teacherRoleAssignment) {
-      toaster.create({
-        title: "Error",
-        description: "Failed to register role for user",
-        type: "error",
-      });
-      return;
-    }
-    // Step 5: Create teacher
-    const newTeacher = await createTeacher(token, newUserSchool.id, specialization, bio, parseFloat(rating));
-    if (!newTeacher) {
-      toaster.create({
-        title: "Error",
-        description: "Failed to create teacher",
-        type: "error",
-      });
-      return;
+    if (editingTeacher) {
+      // Edit mode: update the teacher record.
+      try {
+        await updateTeacher(token, editingTeacher.id, {
+          fullName, // optionally update user details
+          email,
+          specialization,
+          bio,
+          rating: parseFloat(rating),
+        });
+        toaster.create({
+          title: "Success",
+          description: "Teacher updated successfully",
+          type: "success",
+        });
+        onClose();
+      } catch (error) {
+        toaster.create({
+          title: "Error",
+          description: "Failed to update teacher",
+          type: "error",
+        });
+      }
     } else {
-      toaster.create({
-        title: "Success",
-        description: "Teacher created successfully",
-        type: "success",
-      });
+      // Add mode: create a new teacher.
+      if (password !== confirmPassword) {
+        toaster.create({
+          title: "Error",
+          description: "Passwords do not match",
+          type: "error",
+        });
+        return;
+      }
+      try {
+        // Step 1: Create user
+        const newUser = await createUser(fullName, email, password);
+        if (!newUser) {
+          toaster.create({
+            title: "Error",
+            description: "Failed to create user",
+            type: "error",
+          });
+          return;
+        }
+        // Step 2: Create user-school relationship
+        const schoolId = parseToken(token).schools[0].id;
+        const newUserSchool = await createUserSchool(token, newUser.id, schoolId);
+        if (!newUserSchool) {
+          toaster.create({
+            title: "Error",
+            description: "Failed to create user school relationship",
+            type: "error",
+          });
+          return;
+        }
+        // Step 3: Register teacher role
+        const teacherRoleAssignment = await createRoleAssignment(token, newUserSchool.id, ROLE);
+        if (!teacherRoleAssignment) {
+          toaster.create({
+            title: "Error",
+            description: "Failed to register role for user",
+            type: "error",
+          });
+          return;
+        }
+        // Step 4: Create teacher
+        const newTeacher = await createTeacher(token, newUserSchool.id, specialization, bio, parseFloat(rating));
+        if (!newTeacher) {
+          toaster.create({
+            title: "Error",
+            description: "Failed to create teacher",
+            type: "error",
+          });
+          return;
+        } else {
+          toaster.create({
+            title: "Success",
+            description: "Teacher created successfully",
+            type: "success",
+          });
+        }
+        onClose();
+      } catch (error) {
+        toaster.create({
+          title: "Error",
+          description: "An error occurred while creating teacher",
+          type: "error",
+        });
+      }
     }
-    onClose();
   };
 
   const handleOnChangeRating = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if (value === "") {
-      setRating("0.00");
-    } else {
-      setRating(value);
-      console.log(value);
+    setRating(value === "" ? "0.00" : value);
+  };
+
+  const handleTeacherDelete = async (teacherId: string) => {
+    try {
+      if (!token) throw new Error("Not authenticated");
+      await deleteTeacher(token, teacherId);
+      toaster.create({
+        title: "Success",
+        description: "Teacher deleted successfully",
+        type: "success",
+      });
+      setTeachers((prev) => prev.filter((teacher) => teacher.id?.toString() !== teacherId));
+    } catch (error) {
+      toaster.create({
+        title: "Error",
+        description: "Failed to delete teacher",
+        type: "error",
+      });
     }
   };
 
+  const handleTeachersEdit = (teacher: FlattenedTeacher) => {
+    try {
+      if (!teacher) throw new Error("Teacher not found");
+      // Populate form fields for editing.
+      setFullName(teacher.name || "");
+      setEmail(teacher.email || "");
+      setSpecialization(teacher.specialisation || "");
+      setBio(teacher.bio || "");
+      setRating(teacher.rating.toString() || "0.00");
+      // Do not pre-populate passwords in edit mode.
+      setEditingTeacher(teacher);
+      setIsDialogOpen(true);
+    } catch (error) {
+      toaster.create({
+        title: "Error",
+        description: "Failed to edit teacher",
+        type: "error",
+      });
+    }
+  };
 
   const fetchTeachersBySchool = async () => {
     if (token) {
@@ -131,7 +200,7 @@ const Teachers = () => {
     } else {
       throw new Error("You are not authenticated");
     }
-  }
+  };
 
   const flattenedTeachers = teachers.map((teacher: Teacher) => ({
     id: teacher.id,
@@ -142,7 +211,6 @@ const Teachers = () => {
     bio: teacher.bio || "N/A",
     rating: teacher.rating || 0,
   }));
-
 
   return (
     <>
@@ -158,25 +226,25 @@ const Teachers = () => {
           { key: "bio", label: "Bio", sortable: true },
           { key: "rating", label: "Rating", sortable: true },
         ]}
-        onAdd={() => setIsFormOpen(true)}
-        actions={
-          <>
-            <Button variant={"outline"}>Delete</Button>
-            <Button variant={"outline"}>Edit</Button>
-          </>
-        }
+        onAdd={() => {
+          // Open the dialog in add mode.
+          setEditingTeacher(null);
+          setIsDialogOpen(true);
+        }}
+        onDelete={handleTeacherDelete}
+        onEdit={handleTeachersEdit}
       />
-      <DialogRoot open={isFormOpen} onOpenChange={(isOpen) => !isOpen && onClose()}>
+      <DialogRoot open={isDialogOpen} onOpenChange={(isOpen) => { if (!isOpen) onClose(); }}>
         <DialogContent>
-          <DialogHeader>Add new teacher</DialogHeader>
+          <DialogHeader>{editingTeacher ? "Edit Teacher" : "Add New Teacher"}</DialogHeader>
           <DialogBody pb="4">
-            <Stack>
+            <Stack spacing={3}>
               <Input
                 type="text"
                 placeholder="Full Name"
                 name="name"
                 value={fullName}
-                required={true}
+                required
                 onChange={(e) => setFullName(e.target.value)}
               />
               <Input
@@ -184,25 +252,30 @@ const Teachers = () => {
                 placeholder="Email"
                 name="email"
                 value={email}
-                required={true}
+                required
                 onChange={(e) => setEmail(e.target.value)}
               />
-              <Input
-                type="password"
-                placeholder="Password"
-                name="password"
-                value={password}
-                required={true}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-              <Input
-                type="password"
-                placeholder="Confirm Password"
-                name="confirmPassword"
-                value={confirmPassword}
-                required={true}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-              />
+              {/* Show password fields only in add mode */}
+              {!editingTeacher && (
+                <>
+                  <Input
+                    type="password"
+                    placeholder="Password"
+                    name="password"
+                    value={password}
+                    required
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <Input
+                    type="password"
+                    placeholder="Confirm Password"
+                    name="confirmPassword"
+                    value={confirmPassword}
+                    required
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                  />
+                </>
+              )}
               <Textarea
                 placeholder="Specialization"
                 name="specialization"
@@ -226,18 +299,18 @@ const Teachers = () => {
                 >
                   <NumberInputField
                     name="rating"
-                    // value={rating}
                     onChange={(e) => handleOnChangeRating(e)}
+                    value={rating}
                   />
                 </NumberInputRoot>
               </Box>
             </Stack>
           </DialogBody>
           <DialogFooter>
-            <Button variant={"outline"} bgColor="green.300" onClick={handleSaveTeacher}>
+            <Button variant="outline" bgColor="green.300" onClick={handleSaveTeacher}>
               Save
             </Button>
-            <Button variant="outline" bgColor={"red.300"} onClick={onClose}>
+            <Button variant="outline" bgColor="red.300" onClick={onClose}>
               Cancel
             </Button>
           </DialogFooter>
