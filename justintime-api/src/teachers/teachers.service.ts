@@ -23,8 +23,28 @@ export class TeachersService {
     return this.prismaService.teacher.findUnique({ where: { id } });
   }
 
-  update(id: string, updateTeacherDto: UpdateTeacherDto) {
-    return `This action updates a #${id} teacher`;
+  async update(updateTeacherDto: UpdateTeacherDto) {
+    console.log('Starting update: ', updateTeacherDto);
+    const { id, userData, ...teacherData } = updateTeacherDto;
+
+    const updatedTeacher = await this.prismaService.$transaction(async (tx) => {
+      const teacher = await tx.teacher.update({
+        where: { id: id },
+        data: teacherData,
+      });
+
+      if (userData) {
+        await tx.user.update({
+          where: { id: userData.userId },
+          data: {
+            name: userData.name,
+            email: userData.email,
+          },
+        });
+      }
+      return teacher;
+    });
+    return updatedTeacher;
   }
 
   async remove(id: string) {

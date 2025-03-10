@@ -20,7 +20,6 @@ import {
   ApiOkResponse,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import * as string_decoder from "node:string_decoder";
 
 @Controller('teachers')
 export class TeachersController {
@@ -91,16 +90,15 @@ export class TeachersController {
   })
   @ApiBearerAuth('JWT-auth')
   @UseGuards(JwtAuthGuard)
-  @Patch(':id')
-  async update(
-    @Param('id') id: string,
-    @Body() updateTeacherDto: UpdateTeacherDto,
-  ) {
-    const teacher = await this.teachersService.findOne(id);
+  @Patch()
+  async update(@Body() updateTeacherDto: UpdateTeacherDto) {
+    console.log('Incoming payload for update:', updateTeacherDto);
+    console.log('Payload id: ', updateTeacherDto.id);
+    const teacher = await this.teachersService.findOne(updateTeacherDto.id);
     if (!teacher) {
       throw new HttpException('Teacher not found', HttpStatus.NOT_FOUND);
     }
-    return this.teachersService.update(id, updateTeacherDto);
+    return this.teachersService.update(updateTeacherDto);
   }
 
   @ApiOkResponse({ description: 'Teacher successfully removed' })

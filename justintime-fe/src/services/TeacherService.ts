@@ -1,3 +1,4 @@
+import { updateTeacherPayload } from "@/types/teacher.types";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 export const createTeacher = async (token:string, userSchoolId: string, specialization?: string, bio?: string, rating?: number ) => {
@@ -87,16 +88,16 @@ export const deleteTeacher = async (token:string, teacherId: string) => {
     return data;
 }
 
-export const updateTeacher = async (token:string, teacherId: string, specialization?: string, bio?: string, rating?: number ) => {
+export const updateTeacher = async (token:string, updateTeacherPayload: updateTeacherPayload ) => {
     const requestOptions = {
-        method: 'PUT',
+        method: 'PATCH',
         headers: {
             Authorization: `Bearer ${token}`, 
             'Content-Type': 'application/json' 
         },
-        body: JSON.stringify({ specialization: specialization || "", bio: bio || "", rating: rating || 0.0 })
+        body: JSON.stringify(updateTeacherPayload)
     };
-    const response = await fetch(`${BACKEND_URL}/teachers/${teacherId}`, requestOptions);
+    const response = await fetch(`${BACKEND_URL}/teachers/`, requestOptions);
     if (!response.ok) {
         throw new Error("Failed to update teacher");
     }

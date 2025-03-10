@@ -1,3 +1,4 @@
+// Incoming data from the backend
 export interface Teacher {
   id?: number;
   userSchool?: {
@@ -5,6 +6,7 @@ export interface Teacher {
       name?: string;
       email?: string;
     };
+    userId?: string;
     school?: {
       name?: string;
     };
@@ -14,8 +16,10 @@ export interface Teacher {
   rating?: number;
 }
 
+// This is the type for the flattened teacher data. Used to generate the table view.
 export interface FlattenedTeacher {
-  id: number;
+  id: string;
+  userId: string;
   name: string;
   school: string;
   email: string;
@@ -23,3 +27,16 @@ export interface FlattenedTeacher {
   bio: string;
   rating: number;
 }
+
+// This is the adaptor to transform fromntend data to backend compatible format. Used for pupdates.
+export interface updateTeacherPayload {
+    id: string;
+    specialization: string;
+    bio: string;
+    rating: number;
+    userData: {
+      userId: string; 
+      name: string; 
+      email: string; 
+    }
+  }
