@@ -92,8 +92,6 @@ export class TeachersController {
   @UseGuards(JwtAuthGuard)
   @Patch()
   async update(@Body() updateTeacherDto: UpdateTeacherDto) {
-    console.log('Incoming payload for update:', updateTeacherDto);
-    console.log('Payload id: ', updateTeacherDto.id);
     const teacher = await this.teachersService.findOne(updateTeacherDto.id);
     if (!teacher) {
       throw new HttpException('Teacher not found', HttpStatus.NOT_FOUND);

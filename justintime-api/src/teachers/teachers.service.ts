@@ -24,7 +24,6 @@ export class TeachersService {
   }
 
   async update(updateTeacherDto: UpdateTeacherDto) {
-    console.log('Starting update: ', updateTeacherDto);
     const { id, userData, ...teacherData } = updateTeacherDto;
 
     const updatedTeacher = await this.prismaService.$transaction(async (tx) => {
