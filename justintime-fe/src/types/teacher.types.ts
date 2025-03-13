@@ -1,6 +1,6 @@
 // Incoming data from the backend
 export interface Teacher {
-  id?: number;
+  id?: string;
   userSchool?: {
     user?: {
       name?: string;

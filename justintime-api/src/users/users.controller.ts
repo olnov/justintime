@@ -27,8 +27,10 @@ export class UsersController {
 
   @ApiOkResponse({ description: 'User created successfully.' })
   @ApiInternalServerErrorResponse({ description: 'Error while creating user.' })
+  @ApiBearerAuth('JWT-auth')
+  @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
+  async create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
 

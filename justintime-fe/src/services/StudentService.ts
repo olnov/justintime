@@ -1,3 +1,5 @@
+import { updateStudentPayload } from "@/types/student.types";
+
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 export const getStudents = async (token:string) => {
@@ -67,4 +69,36 @@ export const getStudentBySchoolId = async (token:string, userSchoolId: string) =
 
     const data = await response.json();
     return data;
+}
+
+export const updateStudent = async (token:string, student: updateStudentPayload) => {
+    const requestOptions = {
+        method: 'PATCH',
+        headers: {
+            Authorization: `Bearer ${token}`, 
+            'Content-Type': 'application/json' 
+        },
+        body: JSON.stringify(student)
+    };
+    const response = await fetch(`${BACKEND_URL}/students/`, requestOptions);
+    if (!response.ok) {
+        throw new Error("Failed to update student");
+    }
+
+    const data = await response.json();
+    return data;
+}
+
+export const deleteStudent = async (token:string, studentId: string) => {
+  const requestOptions = {
+    method: 'DELETE',
+    headers: {
+        Authorization: `Bearer ${token}`, 
+        'Content-Type': 'application/json' 
+    }
+  };
+    const response = await fetch(`${BACKEND_URL}/students/${studentId}`, requestOptions);
+    if (!response.ok) {
+        throw new Error("Failed to delete student");
+    }
 }

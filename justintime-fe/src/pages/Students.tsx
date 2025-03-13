@@ -9,42 +9,32 @@ import {
 import { NumberInputField, NumberInputRoot } from "@/components/ui/number-input"
 import TableComponent from "@/components/Table/Table";
 import { useState, useEffect } from "react";
-import { getStudentsWithSchools, getStudentBySchoolId } from "@/services/StudentService";
+import { getStudentBySchoolId, updateStudent, deleteStudent } from "@/services/StudentService";
 import { parseToken } from "@/services/AuthService";
 import { toaster } from "@/components/ui/toaster";
 import { createUser } from "@/services/UserService";
 import { createUserSchool } from "@/services/UserSchoolService";
 import { createRoleAssignment } from "@/services/RoleAssignmentService";
 import { createStudent } from "@/services/StudentService";
-import { Student } from "@/types/student.types";
+import { Student, FlattenedStudent } from "@/types/student.types";
 
 
 const Students = () => {
   const [students, setStudents] = useState<Student[]>([]);
-  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const token = localStorage.getItem("token");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [gradeLevel, setGradeLevel] = useState<string>("0.00");
+  const [editingStudent, setEditingStudent] = useState<FlattenedStudent | null>(null);
   const ROLE = "student";
 
 
   useEffect(() => {
-    // fetchStudentsWithSchools();
     fetchStudentsBySchool();
-  }, [isFormOpen]);
-
-
-  // const fetchStudentsWithSchools = async () => {
-  //   if (token) {
-  //     const data = await getStudentsWithSchools(token);
-  //     setStudents(data);
-  //   } else {
-  //     throw new Error("You are not authenticated");
-  //   }
-  // }
+  }, [isDialogOpen]);
 
 
   const fetchStudentsBySchool = async () => {
@@ -57,70 +47,139 @@ const Students = () => {
     }
   }
 
-  const handleOnChangeRating = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setGradeLevel(e.target.value);
-  }
+
+  const handleStudentDelete = async (studentId: string) => {
+        try {
+          if (!token) throw new Error("Not authenticated");
+          await deleteStudent(token, studentId);
+          toaster.create({
+            title: "Success",
+            description: "Student deleted successfully",
+            type: "success",
+          });
+          setStudents((prev) => prev.filter((student) => student.id?.toString() !== studentId));
+        } catch {
+          toaster.create({
+            title: "Error",
+            description: "Failed to delete srudent",
+            type: "error",
+          });
+        }
+      };
+
+  const handleStudentEdit = (student: FlattenedStudent) => {
+        try {
+          if (!student) throw new Error("Student not found");
+          // Populate form fields for editing.
+          setFullName(student.name || "");
+          setEmail(student.email || "");
+          setGradeLevel(student.gradeLevel.toString() || "0.00");
+          setEditingStudent(student);
+          setIsDialogOpen(true);
+        } catch {
+          toaster.create({
+            title: "Error",
+            description: "Failed to edit student",
+            type: "error",
+          });
+        }
+      };
 
   const handleSaveStudent = async () => {
     if (!token) {
       throw new Error("You are not authenticated");
     }
-    // Step 1: Validate password
-    if (password !== confirmPassword) {
-      toaster.create({
-        title: "Error",
-        description: "Passwords do not match",
-        type: "error",
-      });
-      return;
-    }
-    // Step 2: Create user
-    const newUser = await createUser(fullName, email, password);
-    if (!newUser) {
-      toaster.create({
-        title: "Error",
-        description: "Failed to create user",
-        type: "error",
-      });
-      return;
-    }
-    // Step 3: Adding user and school relationship.
-    const schoolId = parseToken(token).schools[0].id;
-    const newUserSchool = await createUserSchool(token, newUser.id, schoolId);
-    if (!newUserSchool) {
-      toaster.create({
-        title: "Error",
-        description: "Failed to create user school relationship",
-        type: "error",
-      });
-      return;
-    }
-    // Step 4: Registering a teacher role for the user
-    const teacherRoleAssignment = await createRoleAssignment(token, newUserSchool.id, ROLE);
-    if (!teacherRoleAssignment) {
-      toaster.create({
-        title: "Error",
-        description: "Failed to register role for user",
-        type: "error",
-      });
-      return;
-    }
-    // Step 5: Create teacher
-    const newTeacher = await createStudent(token, newUserSchool.id);
-    if (!newTeacher) {
-      toaster.create({
-        title: "Error",
-        description: "Failed to create student",
-        type: "error",
-      });
+    // Editing mode
+    if (editingStudent) {
+      const updatedStrudent = {
+        id: editingStudent.id,
+        gradeLevel: gradeLevel,
+        userData: {
+          userId: editingStudent.userId,
+          name: fullName,
+          email: email,
+        },
+      }
+
+      // Update student
+      // console.log(updatedStrudent);
+      const updatedStudent = await updateStudent(token, updatedStrudent);
+      if (!updatedStudent) {
+        toaster.create({
+          title: "Error",
+          description: "Failed to update student",
+          type: "error",
+        });
+        return;
+      } else {
+        toaster.create({
+          title: "Success",
+          description: "Student updated successfully",
+          type: "success",
+        });
+        onClose();
+      }
       return;
     } else {
-      toaster.create({
-        title: "Success",
-        description: "Student added successfully",
-        type: "success",
-      });
-      onClose();
+      // Adding mode
+
+      // Step 1: Validate password
+      if (password !== confirmPassword) {
+        toaster.create({
+          title: "Error",
+          description: "Passwords do not match",
+          type: "error",
+        });
+        return;
+      }
+      // Step 2: Create user
+      const newUser = await createUser(token, fullName, email, password);
+      if (!newUser) {
+        toaster.create({
+          title: "Error",
+          description: "Failed to create user",
+          type: "error",
+        });
+        return;
+      }
+      // Step 3: Adding user and school relationship.
+      const schoolId = parseToken(token).schools[0].id;
+      const newUserSchool = await createUserSchool(token, newUser.id, schoolId);
+      if (!newUserSchool) {
+        toaster.create({
+          title: "Error",
+          description: "Failed to create user school relationship",
+          type: "error",
+        });
+        return;
+      }
+      // Step 4: Registering a student role for the user
+      const studentRoleAssignment = await createRoleAssignment(token, newUserSchool.id, ROLE);
+      if (!studentRoleAssignment) {
+        toaster.create({
+          title: "Error",
+          description: "Failed to register role for user",
+          type: "error",
+        });
+        return;
+      }
+      // Step 5: Create student
+      const newStudent = await createStudent(token, newUserSchool.id);
+      if (!newStudent) {
+        toaster.create({
+          title: "Error",
+          description: "Failed to create student",
+          type: "error",
+        });
+        return;
+      } else {
+        toaster.create({
+          title: "Success",
+          description: "Student added successfully",
+          type: "success",
+        });
+        onClose();
+      }
     }
   }
 
@@ -129,15 +188,17 @@ const Students = () => {
     setEmail("");
     setPassword("");
     setConfirmPassword("");
-    setIsFormOpen(false);
+    setIsDialogOpen(false);
+    setEditingStudent(null);
   }
 
   const flattenedSudents = students.map((student: Student) => ({
     id: student.id,
+    userId: student.userSchool?.userId || "",
     name: student.userSchool?.user?.name || "N/A",
     school: student.userSchool?.school?.name || "N/A",
     email: student.userSchool?.user?.email || "N/A",
-    gradeLevel: student.gradeLevel || "N/A",
+    gradeLevel: student.gradeLevel || 0,
   }));
 
 
@@ -153,17 +214,16 @@ const Students = () => {
           { key: "email", label: "Email", sortable: true },
           { key: "gradeLevel", label: "Grade Level", sortable: true },
         ]}
-        onAdd={() => setIsFormOpen(true)}
-        actions={
-          <>
-            <Button variant={"outline"}>Delete</Button>
-            <Button variant={"outline"}>Edit</Button>
-          </>
-        }
+        onAdd={() => {
+          setEditingStudent(null);
+          setIsDialogOpen(true);
+        }}
+        onDelete={handleStudentDelete}
+        onEdit={handleStudentEdit}
       />
-      <DialogRoot open={isFormOpen} onOpenChange={(isOpen) => !isOpen && onClose()}>
+      <DialogRoot open={isDialogOpen} onOpenChange={(isOpen) => !isOpen && onClose()}>
         <DialogContent>
-          <DialogHeader>Add new student</DialogHeader>
+        <DialogHeader>{editingStudent ? "Edit Student" : "Add New Student"}</DialogHeader>
           <DialogBody pb="4">
             <Stack>
               <Input
@@ -182,22 +242,26 @@ const Students = () => {
                 required={true}
                 onChange={(e) => setEmail(e.target.value)}
               />
-              <Input
-                type="password"
-                placeholder="Password"
-                name="password"
-                value={password}
-                required={true}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-              <Input
-                type="password"
-                placeholder="Confirm Password"
-                name="confirmPassword"
-                value={confirmPassword}
-                required={true}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-              />
+              {!editingStudent && (
+                <>
+                <Input
+                  type="password"
+                  placeholder="Password"
+                  name="password"
+                  value={password}
+                  required={true}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <Input
+                  type="password"
+                  placeholder="Confirm Password"
+                  name="confirmPassword"
+                  value={confirmPassword}
+                  required={true}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                />
+                </>
+              )}
               <Box>
                 <Text>Grade Level</Text>
                 <NumberInputRoot
@@ -205,13 +269,12 @@ const Students = () => {
                   max={5}
                   min={0}
                   formatOptions={{ style: "decimal", minimumFractionDigits: 2 }}
-                  defaultValue="0.00"
+                  value={gradeLevel}
+                  onValueChange={(e) => setGradeLevel(e.value)}
                 >
                   {/* <NumberInputLabel>Grade Level</NumberInputLabel> */}
                   <NumberInputField
                     name="gradeLevel"
-                    // value={rating}
-                    onChange={(e) => handleOnChangeRating(e)}
                   />
                 </NumberInputRoot>
               </Box>

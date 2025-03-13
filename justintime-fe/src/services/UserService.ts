@@ -17,10 +17,11 @@ export const getUsers = async (token:string) => {
     return data;
 }
 
-export const createUser = async (name: string, email: string, password: string) => {
+export const createUser = async (token: string, name: string, email: string, password: string) => {
     const requestOptions = {
         method: 'POST',
         headers: {
+            Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({ name, email, password, isGlobalAdmin: false }),

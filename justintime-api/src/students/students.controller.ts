@@ -6,7 +6,7 @@ import {
   Patch,
   Param,
   Delete,
-  UseGuards,
+  UseGuards, HttpException, HttpStatus,
 } from '@nestjs/common';
 import { StudentsService } from './students.service';
 import { CreateStudentDto } from './dto/create-student.dto';
@@ -60,9 +60,14 @@ export class StudentsController {
 
   @ApiBearerAuth('JWT-auth')
   @UseGuards(JwtAuthGuard)
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateStudentDto: UpdateStudentDto) {
-    return this.studentsService.update(id, updateStudentDto);
+  @Patch()
+  async update(@Body() updateStudentDto: UpdateStudentDto) {
+    const student = this.studentsService.findOne(updateStudentDto.id);
+    if (!student) {
+      throw new HttpException('Student not found', HttpStatus.NOT_FOUND);
+    } else {
+      return this.studentsService.update(updateStudentDto);
+    }
   }
 
   @ApiBearerAuth('JWT-auth')

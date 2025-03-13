@@ -23,7 +23,6 @@ export class CreateUserDto {
   @MaxLength(16, { message: 'Password cannot exceed 16 characters.' })
   password: string;
 
-  @ApiProperty({ description: "Global admin indicator", example: 'true or false' })
   @IsBoolean()
   isGlobalAdmin: boolean;
 }

@@ -95,7 +95,7 @@ const Teachers = () => {
         }
         try {
           // Step 1: Create user
-          const newUser = await createUser(fullName, email, password);
+          const newUser = await createUser(token, fullName, email, password);
           if (!newUser) {
             toaster.create({
               title: "Error",
@@ -300,12 +300,11 @@ const Teachers = () => {
                     max={5}
                     min={0}
                     formatOptions={{ style: "decimal", minimumFractionDigits: 2 }}
-                    defaultValue="0.00"
+                    value = {rating}
+                    onValueChange={(e) => setRating(e.value)}
                   >
                     <NumberInputField
                       name="rating"
-                      onChange={(e) => handleOnChangeRating(e)}
-                      value={rating}
                     />
                   </NumberInputRoot>
                 </Box>

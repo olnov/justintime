@@ -7,8 +7,6 @@ import { createStudent } from "@/services/StudentService";
 import { useEffect, useState } from "react";
 import TableComponent from "@/components/Table/Table";
 import { User } from "@/types/user.types";
-
-
 import {
   Heading,
   Button,
@@ -104,7 +102,7 @@ const Users = () => {
     if (!token) {
       throw new Error("You are not authenticated");
     }
-    const responseUser = await createUser(fullName, email, password);
+    const responseUser = await createUser(token, fullName, email, password);
     if (!responseUser) {
       toaster.create({
         title: "Failed to create user",

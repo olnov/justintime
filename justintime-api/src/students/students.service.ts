@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import { PrismaService } from '../prisma/prisma.service';
+import {UpdateTeacherDto} from "../teachers/dto/update-teacher.dto";
 
 @Injectable()
 export class StudentsService {
@@ -22,8 +23,27 @@ export class StudentsService {
     return this.prismaService.student.findUnique({ where: { id } });
   }
 
-  async update(id: string, updateStudentDto: UpdateStudentDto) {
-    return `This action updates a #${id} student`;
+  async update(updateStudentDto: UpdateStudentDto) {
+    const { id, userData, ...studentData } = updateStudentDto;
+
+    const updatedStudent = await this.prismaService.$transaction(async (tx) => {
+      const student = await tx.student.update({
+        where: { id: id },
+        data: studentData,
+      });
+
+      if (userData) {
+        await tx.user.update({
+          where: { id: userData.userId },
+          data: {
+            name: userData.name,
+            email: userData.email,
+          },
+        });
+      }
+      return student;
+    });
+    return updatedStudent;
   }
 
   async remove(id: string) {
