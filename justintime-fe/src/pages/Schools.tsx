@@ -11,9 +11,11 @@ import {
 } from "@/components/ui/dialog"
 import { withMask } from "use-mask-input";
 import { toaster } from "@/components/ui/toaster"
+import { DataItem } from "@/types/table.types"
 
 const Schools = () => {
-  const [schools, setSchools] = useState<unknown[]>([]);
+  
+  const [schools, setSchools] = useState<DataItem[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [schoolName, setSchoolName] = useState("");
   const [address, setAddress] = useState("");

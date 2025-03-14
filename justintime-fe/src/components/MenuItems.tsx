@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom";
 import { FaUsers, FaSchool, FaChalkboardTeacher, FaUserGraduate } from "react-icons/fa";
 import { CgUser } from "react-icons/cg";
 import { parseToken } from "@/services/AuthService";
+import { UserSchool } from "@/types/user.types";
 
 const menuItemsByRole = {
   global_admin: [
@@ -61,12 +62,13 @@ const MenuItems = () => {
 
   // Handle school-based users (admins, teachers, students)
   if (userInfo.schools?.length > 0) {
+    console.log("User infro structure", userInfo);
     const schoolId = userInfo.schools[0].id; // ✅ Use the first school (or let the user select)
-    const roles = userInfo.schools.flatMap((school) => school.roles);
+    const roles = userInfo.schools.flatMap((school:UserSchool) => school.roles);
 
     // Find the first matching role in `menuItemsByRole`
     const matchedRole = Object.keys(menuItemsByRole).find((role) =>
-      roles.includes(role as any)
+      roles.includes(role as string)
     ) as keyof typeof menuItemsByRole;
 
     if (!matchedRole) return null; // Prevent crashes if no role is found

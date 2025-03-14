@@ -3,7 +3,7 @@ import { SimpleGrid, Text, Card } from "@chakra-ui/react";
 const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
 const CardView = () => (
-  <SimpleGrid columns={3} spacing={4}>
+  <SimpleGrid columns={3}>
     {days.map(day => (
       <Card.Root key={day}>
         <Card.Header>

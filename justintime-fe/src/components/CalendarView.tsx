@@ -13,8 +13,7 @@ import {
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import DateSelectArg from "@fullcalendar/interaction";
-import { EventClickArg, EventDropArg } from "@fullcalendar/core";
+import { DateSelectArg, EventClickArg, EventDropArg } from "@fullcalendar/core";
 import {
   SelectContent,
   SelectItem,
@@ -37,6 +36,9 @@ import { getStudentBySchoolId } from "@/services/StudentService";
 import { bookLesson } from "@/services/ScheduleService";
 import { Lesson } from "@/types/lesson.types";
 import { APILesson } from "@/types/transformation.types";
+import { Teacher } from "@/types/teacher.types";
+import { RawScheduleItem } from "@/types/schedule.types";
+import { Student } from "@/types/student.types";
 
 
 const statusCollection = createListCollection({
@@ -77,7 +79,8 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
     const token = localStorage.getItem("token");
     if (token) {
       const data = await getScheduleBySchooIdAndTeacherId(token, schoolId, teacherId);
-      const transformedLessons: Lesson[] = data.map((item: any) => ({
+      console.log("Data:", data);
+      const transformedLessons: Lesson[] = data.map((item: RawScheduleItem) => ({
         id: item.id,
         teacher: {
           id: item.teacher?.id || "",
@@ -115,8 +118,8 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
     const token = localStorage.getItem("token");
     if (token) {
       const data = await getTeacherBySchoolId(token, schoolId);
-      const teacherList = data.map((teacher: any) => ({
-        label: teacher.userSchool.user.name,
+      const teacherList = data.map((teacher: Teacher) => ({
+        label: teacher.userSchool?.user?.name,
         value: teacher.id,
       }));
       setTeachers(createListCollection({ items: teacherList }));
@@ -131,7 +134,7 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
     if (token) {
       setLoading(true);
       const data = await getStudentBySchoolId(token, schoolId);
-      const filteredStudentList = data.filter((student: any) => {
+      const filteredStudentList = data.filter((student: Student) => {
         const studentName = student.userSchool?.user?.name ?? "";
         return studentName.toLowerCase().includes(selectedStudent.toLowerCase());
       });
@@ -147,7 +150,7 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
     const token = localStorage.getItem("token");
     if (token) {
       const data = await getScheduleBySchoolId(token, schoolId);
-      const transformedLessons: Lesson[] = data.map((item: any) => ({
+      const transformedLessons: Lesson[] = data.map((item: RawScheduleItem) => ({
         id: item.id,
         teacher: {
           id: item.teacher?.id || "",
@@ -312,7 +315,7 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
   };
 
   // Handle selecting a student from the suggestions list
-  const handleSelectStudent = (student: any) => {
+  const handleSelectStudent = (student: Student) => {
     const studentName = student.userSchool?.user?.name || "";
     setSelectedStudent(studentName);
     setSelectedStudentInfo({ id: student.id, name: studentName }); // store full info. TBC: candidate for refactioring
@@ -398,7 +401,7 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
         eventContent={(arg) => {
           const timeText = arg.timeText;
           const status = arg.event.extendedProps.status;
-          const subject = arg.event.title;
+          // const subject = arg.event.title;
           const student = arg.event.extendedProps.student;
           const teacher = arg.event.extendedProps.teacher;
           return (
@@ -496,7 +499,7 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
                     </Box>
                   ) : students.length > 0 ? (
                     <List.Root variant={"plain"}>
-                      {students.map((student) => (
+                      {students.map((student: Student) => (
                         <List.Item
                           key={student.id}
                           p="2"
@@ -506,7 +509,7 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
                           bgColor={"yellow.100"}
                           onClick={() => handleSelectStudent(student)}
                         >
-                          {student.userSchool?.user?.name || student.name}
+                          {student.userSchool?.user?.name || "N/A"}
                         </List.Item>
                       ))}
                     </List.Root>

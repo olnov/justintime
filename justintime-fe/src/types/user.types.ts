@@ -10,3 +10,14 @@ export interface User {
     isGlobalAdmin: boolean;
     UserSchools: UserSchool[];
 }
+
+
+export interface UserToken {
+    id: string;
+    username: string;
+    email: string;
+    isGlobalAdmin: boolean;
+    schools: UserSchool[];
+    iat: number;
+    exp: number;
+}

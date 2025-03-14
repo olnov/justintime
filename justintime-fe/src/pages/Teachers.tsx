@@ -76,7 +76,7 @@ const Teachers = () => {
             type: "success",
           });
           onClose();
-        } catch (error) {
+        } catch {
           toaster.create({
             title: "Error",
             description: "Failed to update teacher",
@@ -142,7 +142,7 @@ const Teachers = () => {
             });
           }
           onClose();
-        } catch (error) {
+        } catch {
           toaster.create({
             title: "Error",
             description: "An error occurred while creating teacher",
@@ -152,10 +152,10 @@ const Teachers = () => {
       }
     };
 
-    const handleOnChangeRating = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value;
-      setRating(value === "" ? "0.00" : value);
-    };
+    // const handleOnChangeRating = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //   const value = e.target.value;
+    //   setRating(value === "" ? "0.00" : value);
+    // };
 
     const handleTeacherDelete = async (teacherId: string) => {
       try {
@@ -167,7 +167,7 @@ const Teachers = () => {
           type: "success",
         });
         setTeachers((prev) => prev.filter((teacher) => teacher.id?.toString() !== teacherId));
-      } catch (error) {
+      } catch {
         toaster.create({
           title: "Error",
           description: "Failed to delete teacher",
@@ -187,7 +187,7 @@ const Teachers = () => {
         setRating(teacher.rating.toString() || "0.00");
         setEditingTeacher(teacher);
         setIsDialogOpen(true);
-      } catch (error) {
+      } catch {
         toaster.create({
           title: "Error",
           description: "Failed to edit teacher",
@@ -207,7 +207,7 @@ const Teachers = () => {
     };
 
     const flattenedTeachers = teachers.map((teacher: Teacher) => ({
-      id: teacher.id,
+      id: teacher.id || "",
       userId: teacher.userSchool?.userId || "",
       name: teacher.userSchool?.user?.name || "N/A",
       school: teacher.userSchool?.school?.name || "N/A",
@@ -237,13 +237,13 @@ const Teachers = () => {
             setIsDialogOpen(true);
           }}
           onDelete={handleTeacherDelete}
-          onEdit={handleTeachersEdit}
+          onEdit={(item) => handleTeachersEdit(item as unknown as FlattenedTeacher)}
         />
         <DialogRoot open={isDialogOpen} onOpenChange={(isOpen) => { if (!isOpen) onClose(); }}>
           <DialogContent>
             <DialogHeader>{editingTeacher ? "Edit Teacher" : "Add New Teacher"}</DialogHeader>
             <DialogBody pb="4">
-              <Stack spacing={3}>
+              <Stack>
                 <Input
                   type="text"
                   placeholder="Full Name"

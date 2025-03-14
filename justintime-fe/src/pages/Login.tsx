@@ -4,6 +4,7 @@ import { toaster } from "@/components/ui/toaster"
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { login, isAuthenticated, parseToken } from "@/services/AuthService";
+import bgImage from '@/assets/bg-image.jpg';
 
 const Login = () => {
     const [email, setEmail] = useState("");
@@ -30,7 +31,6 @@ const Login = () => {
                 navigate("/admin/dashboard");
             } else if (userInfo.schools?.length > 0) {
                 const schoolId = userInfo.schools[0].id;
-                console.log("Here!!!", schoolId);
                 navigate(`/school/${schoolId}/dashboard`);
             } else {
                 navigate("/dashboard");
@@ -51,7 +51,7 @@ const Login = () => {
             minW="100vw"
             align="center"
             justify="center"
-            bgImage="url('/src/assets/bg-image.jpg')"
+            bgImage={`url(${bgImage})`}
             bgPos="center"
             bgRepeat="no-repeat"
             bgSize="cover"

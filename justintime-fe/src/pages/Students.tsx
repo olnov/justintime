@@ -193,7 +193,7 @@ const Students = () => {
   }
 
   const flattenedSudents = students.map((student: Student) => ({
-    id: student.id,
+    id: student.id || "",
     userId: student.userSchool?.userId || "",
     name: student.userSchool?.user?.name || "N/A",
     school: student.userSchool?.school?.name || "N/A",
@@ -219,7 +219,7 @@ const Students = () => {
           setIsDialogOpen(true);
         }}
         onDelete={handleStudentDelete}
-        onEdit={handleStudentEdit}
+        onEdit={(item) => handleStudentEdit(item as unknown as FlattenedStudent)}
       />
       <DialogRoot open={isDialogOpen} onOpenChange={(isOpen) => !isOpen && onClose()}>
         <DialogContent>

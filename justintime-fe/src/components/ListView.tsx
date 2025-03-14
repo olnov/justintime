@@ -19,7 +19,7 @@ const ListView = () => (
           </Box>
         </AccordionItemTrigger>
         <AccordionItemContent>
-          <List.Root spacing={3}>
+          <List.Root>
             <List.Item p={2} bg="gray.50">9:00 - Piano with John Doe</List.Item>
             <List.Item p={2} bg="gray.50">10:00 - Violin with Jane Smith</List.Item>
           </List.Root>

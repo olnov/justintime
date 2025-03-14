@@ -18,7 +18,6 @@ import {
     DialogFooter,
     DialogHeader,
     DialogRoot,
-    DialogActionTrigger,
     DialogTitle,
 } from "@/components/ui/dialog";
 
@@ -42,16 +41,16 @@ const TableComponent: React.FC<TableProps & {
     onEdit?: (item: DataItem) => void;
 }> = ({ title, data, columns, onAdd, onDelete, onEdit }) => {
 
-    const [selection, setSelection] = useState<string[]>([]);
+    // const [selection, setSelection] = useState<string[]>([]);
     const [sortConfig, setSortConfig] = useState<{ key: string; direction: "asc" | "desc" } | null>(null);
     const [filteredData, setFilteredData] = useState<DataItem[]>(data);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [selectedId, setSelectedId] = useState<string | null>(null);
-    const [selectedItem, setSelectedItem] = useState<DataItem | null>(null);
+    // const [selectedItem, setSelectedItem] = useState<DataItem | null>(null);
     const [selectedName, setSelectedName] = useState<string | null>(null);
 
-    const hasSelection = selection.length > 0;
-    const indeterminate = hasSelection && selection.length < data.length;
+    // const hasSelection = selection.length > 0;
+    // const indeterminate = hasSelection && selection.length < data.length;
 
     useEffect(() => {
         setFilteredData(data);
@@ -83,7 +82,7 @@ const TableComponent: React.FC<TableProps & {
             });
         });
         setSortConfig(null);
-        setSelection([]);
+        // setSelection([]);
         setFilteredData(newFilteredData);
     };
 
@@ -108,7 +107,7 @@ const TableComponent: React.FC<TableProps & {
     // Opens the delete confirmation dialog and saves the selected item's id
     const handleDeleteDialog = (id: string, item: DataItem) => {
         setSelectedId(id);
-        setSelectedItem(item);
+        // setSelectedItem(item);
         setSelectedName(String(item.name));
         setIsDialogOpen(true);
     };
@@ -126,15 +125,15 @@ const TableComponent: React.FC<TableProps & {
         }
     };
 
-    const handleMouseOver = (e: React.MouseEvent<HTMLTableCellElement, MouseEvent>, value: string) => {
-        // alert(value);
-        // return (
-        //     <Alert.Root status="info" title="This is the alert title">
-        //         <Alert.Indicator />
-        //         <Alert.Title>{value}</Alert.Title>
-        //     </Alert.Root>
-        // )
-    };
+    // const handleMouseOver = (e: React.MouseEvent<HTMLTableCellElement, MouseEvent>, value: string) => {
+    //     alert(value);
+    //     return (
+    //         <Alert.Root status="info" title="This is the alert title">
+    //             <Alert.Indicator />
+    //             <Alert.Title>{value}</Alert.Title>
+    //         </Alert.Root>
+    //     )
+    // };
 
     return (
         <>
@@ -189,9 +188,9 @@ const TableComponent: React.FC<TableProps & {
                                             {columns.map((col: Column) => (
                                                 <Table.Cell
                                                     key={col.key}
-                                                    onMouseOver={(e) =>
-                                                        handleMouseOver(e, String(dataItem[col.key]))
-                                                    }
+                                                    // onMouseOver={(e) =>
+                                                    //     handleMouseOver(e, String(dataItem[col.key]))
+                                                    // }
                                                 >
                                                     <Text lineClamp={1}>
                                                         {String(dataItem[col.key])}
