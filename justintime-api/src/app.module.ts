@@ -11,6 +11,8 @@ import { TeachersModule } from './teachers/teachers.module';
 import { SchoolsModule } from './schools/schools.module';
 import { UserSchoolModule } from './user-school/user-school.module';
 import { RoleAssignmentModule } from './role-assignment/role-assignment.module';
+import { MailNotifierModule } from './mail-notifier/mail-notifier.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -23,6 +25,10 @@ import { RoleAssignmentModule } from './role-assignment/role-assignment.module';
     AppointmentsModule,
     UserSchoolModule,
     RoleAssignmentModule,
+    MailNotifierModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],

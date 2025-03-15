@@ -137,7 +137,7 @@ const TableComponent: React.FC<TableProps & {
 
     return (
         <>
-            <Card.Root width="100%" margin="auto">
+            <Card.Root width="90wv" margin="auto">
                 <Card.Body>
                     <Stack>
                         <HStack>

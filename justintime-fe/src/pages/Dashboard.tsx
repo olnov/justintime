@@ -1,16 +1,18 @@
 // import { Box, Heading, Card, Button, HStack, Text } from "@chakra-ui/react";
-import { Box, Text } from "@chakra-ui/react";
+import { Box, Button, Text } from "@chakra-ui/react";
 // import { getSchools } from "@/services/SchoolService";
 // import { getUsers } from "@/services/UserService";
 // import { getTeachers } from "@/services/TeacherService";
 // import { useState, useEffect } from "react";
 import { parseToken } from "@/services/AuthService";
+import { sendEmail } from "@/services/EmailNotificationService";
+import { Email } from "@/types/email.types";
 
 const Dashboard = () => {
     // const [schools, setSchools] = useState<unknown[]>([]);
     // const [users, setUsers] = useState<unknown[]>([]);
     // const [teachers, setTeachers] = useState<unknown[]>([]);
-    // const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token");
     const schoolName = parseToken(localStorage.getItem("token") as string).schools.map((sName: { name: string; }) => sName.name).join(", ");
 
     // useEffect(() => {
@@ -46,11 +48,26 @@ const Dashboard = () => {
     //     }
     // }
 
+    const message:Email = {
+        from:"Support Novlab <support@novlab.org>",
+        to:"Oleg Novikov<o.novikov@ymail.com>",
+        subject:"Class booking notification",
+        html:"<p>Dear Oleg, <br> Your class has been booked successfully. <br> Best regards, <br> Novlab Support</p>"
+    }
+
+    const sendMessage = async () => {
+        if (!token) {
+            throw new Error("You are not authenticated");
+        }
+        await sendEmail(token, message);
+    }
+
     return (
         <>
         <Box p={4}>
             <Text fontSize="3xl">Welcome to {schoolName} dashboard</Text>
         </Box>
+        <Button onClick={sendMessage}>Test notification</Button>
         {/* <Box p={4}>
             <Heading>{schoolName} dashboard</Heading>
             <Box mt={4}>

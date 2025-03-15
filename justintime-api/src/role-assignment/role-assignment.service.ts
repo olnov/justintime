@@ -1,4 +1,4 @@
-import { Injectable, UseGuards } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateRoleAssignmentDto } from './dto/create-role-assignment.dto';
 import { UpdateRoleAssignmentDto } from './dto/update-role-assignment.dto';
 import { PrismaService } from '../prisma/prisma.service';
