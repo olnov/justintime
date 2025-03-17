@@ -8,6 +8,7 @@ export interface Lesson {
     student: {
       id?: string;
       name: string;
+      email: string;
     };
     school: string;
     subject: string;

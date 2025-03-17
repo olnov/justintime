@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/menu";
 import { useNavigate } from "react-router-dom";
 import { parseToken } from "../services/AuthService";
+import LanguageSwitcher  from "./LanguageSwitcher";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ const Navbar = () => {
     navigate("/login");
   };
 
+  
   return (
     <Flex
       as="nav"
@@ -82,6 +84,7 @@ const Navbar = () => {
             <MenuItem value="logout" onClick={handleLogout}>
               Logout
             </MenuItem>
+            <LanguageSwitcher />
           </MenuContent>
         </MenuRoot>
       </Flex>

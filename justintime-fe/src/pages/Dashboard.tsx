@@ -7,6 +7,7 @@ import { Box, Button, Text } from "@chakra-ui/react";
 import { parseToken } from "@/services/AuthService";
 import { sendEmail } from "@/services/EmailNotificationService";
 import { Email } from "@/types/email.types";
+import { useTranslation } from 'react-i18next';
 
 const Dashboard = () => {
     // const [schools, setSchools] = useState<unknown[]>([]);
@@ -14,6 +15,7 @@ const Dashboard = () => {
     // const [teachers, setTeachers] = useState<unknown[]>([]);
     const token = localStorage.getItem("token");
     const schoolName = parseToken(localStorage.getItem("token") as string).schools.map((sName: { name: string; }) => sName.name).join(", ");
+    const { t } = useTranslation();
 
     // useEffect(() => {
     //     fetchSchools();
@@ -65,7 +67,7 @@ const Dashboard = () => {
     return (
         <>
         <Box p={4}>
-            <Text fontSize="3xl">Welcome to {schoolName} dashboard</Text>
+            <Text fontSize="3xl">{t('welcome')} {schoolName}</Text>
         </Box>
         <Button onClick={sendMessage}>Test notification</Button>
         {/* <Box p={4}>

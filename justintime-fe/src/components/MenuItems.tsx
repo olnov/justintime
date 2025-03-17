@@ -4,33 +4,37 @@ import { FaUsers, FaSchool, FaChalkboardTeacher, FaUserGraduate } from "react-ic
 import { CgUser } from "react-icons/cg";
 import { parseToken } from "@/services/AuthService";
 import { UserSchool } from "@/types/user.types";
+import { useTranslation } from 'react-i18next';
 
-const menuItemsByRole = {
-  global_admin: [
-    { to: "/admin/users", label: "Users", icon: FaUsers },
-    { to: "/admin/schools", label: "Schools", icon: FaSchool },
-  ],
-  admin: [
-    { to: "/school/:schoolId/teachers", label: "Teachers", icon: FaChalkboardTeacher },
-    { to: "/school/:schoolId/students", label: "Students", icon: FaUserGraduate },
-    { to: "/school/:schoolId/schedule", label: "Schedule", icon: FaChalkboardTeacher },
-  ],
-  teacher: [
-    { to: "/profile", label: "Profile", icon: CgUser },
-    { to: "/schedule", label: "My schedule", icon: FaChalkboardTeacher },
-  ],
-  student: [
-    { to: "/profile", label: "Profile", icon: CgUser },
-    { to: "/schedule", label: "Book a lesson", icon: FaChalkboardTeacher },
-  ],
-};
 
 const MenuItems = () => {
   const token = localStorage.getItem("token");
+  const { t } = useTranslation();
   if (!token) return null; // Prevent crashes if token is missing
 
   const userInfo = parseToken(token);
   const isGlobalAdmin = userInfo.isGlobalAdmin;
+
+  const menuItemsByRole = {
+    global_admin: [
+      { to: "/admin/users", label: t('users'), icon: FaUsers },
+      { to: "/admin/schools", label: t('schools'), icon: FaSchool },
+    ],
+    admin: [
+      { to: "/school/:schoolId/teachers", label: t('teachers'), icon: FaChalkboardTeacher },
+      { to: "/school/:schoolId/students", label: t('students'), icon: FaUserGraduate },
+      { to: "/school/:schoolId/schedule", label: t('schedule'), icon: FaChalkboardTeacher },
+    ],
+    teacher: [
+      { to: "/profile", label: t('profile'), icon: CgUser },
+      { to: "/schedule", label: "My schedule", icon: FaChalkboardTeacher },
+    ],
+    student: [
+      { to: "/profile", label: "Profile", icon: CgUser },
+      { to: "/schedule", label: "Book a lesson", icon: FaChalkboardTeacher },
+    ],
+  };
+
 
   if (isGlobalAdmin) {
     return (

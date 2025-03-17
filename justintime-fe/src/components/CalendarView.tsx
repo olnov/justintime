@@ -39,6 +39,8 @@ import { APILesson } from "@/types/transformation.types";
 import { Teacher } from "@/types/teacher.types";
 import { RawScheduleItem } from "@/types/schedule.types";
 import { Student } from "@/types/student.types";
+import { Email } from "@/types/email.types";
+import { sendEmail } from "@/services/EmailNotificationService";
 
 
 const statusCollection = createListCollection({
@@ -57,7 +59,7 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
   );
   const [selectedTeacher, setSelectedTeacher] = useState<string>("");
   const [selectedStudent, setSelectedStudent] = useState<string>("");
-  const [selectedStudentInfo, setSelectedStudentInfo] = useState<{ id: string; name: string } | null>(null);
+  const [selectedStudentInfo, setSelectedStudentInfo] = useState<{ id: string; name: string, email: string } | null>(null);
   const [students, setStudents] = useState<{ id: string; name: string }[]>([]);
   const [loading, setLoading] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -244,6 +246,7 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
       student:{ 
         id: formData.student,
         name: selectedStudentInfo?.name || "",
+        email: selectedStudentInfo?.email || "",
       },
       school: schoolId,
       subject: formData.subject,
@@ -282,6 +285,17 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
 
     setLessons((prev) => [...prev, newLesson]);
     saveLessonBooking(convertedLesson);
+    // Sending notification
+
+    const notification: Email = {
+      from:"Support Novlab <support@novlab.org>",
+      to: newLesson.student.email,
+      subject:"Class booking notification",
+      html:`<p>Dear ${newLesson.student.name}, <br> Your class with ${newLesson.teacher.name} has been booked successfully. 
+      <br>Save the date: <b>${newLesson.start.toLocaleDateString()}: ${newLesson.start.toLocaleTimeString()} - ${newLesson.end.toLocaleTimeString()}</b><br> Best regards, <br> Novlab Support</p>`
+    }
+    sendEmail(localStorage.getItem("token") as string, notification);
+    // console.log("Notification sent:", notification);
     setIsDialogOpen(false);
   };
 
@@ -318,7 +332,7 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
   const handleSelectStudent = (student: Student) => {
     const studentName = student.userSchool?.user?.name || "";
     setSelectedStudent(studentName);
-    setSelectedStudentInfo({ id: student.id, name: studentName }); // store full info. TBC: candidate for refactioring
+    setSelectedStudentInfo({ id: student.id, name: studentName, email: student.userSchool?.user?.email || "" }); // store full info. TBC: candidate for refactioring
     setFormData((prev) => ({
       ...prev,
       student: student.id,

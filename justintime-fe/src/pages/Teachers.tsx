@@ -16,11 +16,13 @@ import { createUserSchool } from "@/services/UserSchoolService";
 import { createRoleAssignment } from "@/services/RoleAssignmentService";
 import { Teacher, FlattenedTeacher } from "@/types/teacher.types";
 import { toaster } from "@/components/ui/toaster";
+import { useTranslation } from 'react-i18next';
 
 const Teachers = () => {
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTeacher, setEditingTeacher] = useState<FlattenedTeacher | null>(null);
+  const { t } = useTranslation();
 
   // Form state variables
   const [fullName, setFullName] = useState("");
@@ -219,17 +221,17 @@ const Teachers = () => {
 
     return (
       <>
-        <Heading>Teachers</Heading>
+        <Heading>{t('teachers')}</Heading>
         <TableComponent
-          title="Teachers"
+          title="Teacher"
           data={flattenedTeachers}
           columns={[
-            { key: "name", label: "Teacher Name", sortable: true },
-            { key: "school", label: "School", sortable: true },
-            { key: "email", label: "Email", sortable: true },
-            { key: "specialisation", label: "Specialisation", sortable: true },
-            { key: "bio", label: "Bio", sortable: true },
-            { key: "rating", label: "Rating", sortable: true },
+            { key: "name", label: t('teacher_name'), sortable: true },
+            { key: "school", label: t('school'), sortable: true },
+            { key: "email", label: t('email'), sortable: true },
+            { key: "specialisation", label: t('specialization'), sortable: true },
+            { key: "bio", label: t('bio'), sortable: true },
+            { key: "rating", label: t('rating'), sortable: true },
           ]}
           onAdd={() => {
             // Open the dialog in add mode.
