@@ -33,6 +33,7 @@ import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { BiListPlus } from "react-icons/bi";
 import { Column, DataItem, TableProps } from "@/types/table.types";
+import { useTranslation } from "react-i18next";
 
 
 
@@ -48,6 +49,7 @@ const TableComponent: React.FC<TableProps & {
     const [selectedId, setSelectedId] = useState<string | null>(null);
     // const [selectedItem, setSelectedItem] = useState<DataItem | null>(null);
     const [selectedName, setSelectedName] = useState<string | null>(null);
+    const { t } = useTranslation();
 
     // const hasSelection = selection.length > 0;
     // const indeterminate = hasSelection && selection.length < data.length;
@@ -142,17 +144,18 @@ const TableComponent: React.FC<TableProps & {
                     <Stack>
                         <HStack>
                             <Input
-                                placeholder={`Filter ${title.toLowerCase()} by name`}
+                                placeholder={t('table_filter')}
                                 onChange={handleFilter}
                             />
                             {onAdd && (
                                 <Button onClick={onAdd} colorScheme="teal">
                                     <BiListPlus />
-                                    Add New {title}
+                                    {/* Add New {title} */}
+                                    {t('add_new', { entity: title })}
                                 </Button>
                             )}
                         </HStack>
-                        <Table.Root size="md" tableLayout="fixed">
+                        <Table.Root size="sm" tableLayout="auto">
 
                             <Table.Header>
                                 <Table.Row>
@@ -168,7 +171,7 @@ const TableComponent: React.FC<TableProps & {
                                     ))}
                                     {/* Replace checkbox header with an Actions header */}
                                     <Table.ColumnHeader>
-                                        <Text fontWeight="semibold">Actions</Text>
+                                        <Text fontWeight="semibold">{t('actions')}</Text>
                                     </Table.ColumnHeader>
                                 </Table.Row>
                             </Table.Header>
@@ -206,7 +209,7 @@ const TableComponent: React.FC<TableProps & {
                                                     variant={"subtle"}
                                                     mr={2}
                                                 >
-                                                    Edit
+                                                    {t('edit')}
                                                 </Button>
                                                 <Button
                                                     size="xs"
@@ -214,7 +217,7 @@ const TableComponent: React.FC<TableProps & {
                                                     colorPalette={"red"}
                                                     variant={"subtle"}
                                                 >
-                                                    Delete
+                                                    {t('delete')}
                                                 </Button>
                                             </Table.Cell>
                                         </Table.Row>
@@ -246,10 +249,10 @@ const TableComponent: React.FC<TableProps & {
                 >
                     <DialogContent>
                         <DialogHeader>
-                            <DialogTitle>Delete item</DialogTitle>
+                            <DialogTitle>{t('delete_item')}</DialogTitle>
                         </DialogHeader>
                         <DialogBody>
-                            Are you sure you want to delete this item?
+                            <Text>{t('delete_item_confirm')}</Text>
                             <Text fontWeight="semibold" mt={2}>
                                 {selectedName}
                             </Text>
@@ -260,13 +263,13 @@ const TableComponent: React.FC<TableProps & {
                                 onClick={handleConfirmDelete}
                                 mr={1}
                             >
-                                Delete
+                                {t('delete')}
                             </Button>
                             <Button
                                 colorPalette="gray"
                                 onClick={() => setIsDialogOpen(false)}
                             >
-                                Cancel
+                                {t('cancel')}
                             </Button>
                         </DialogFooter>
                     </DialogContent>

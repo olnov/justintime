@@ -47,7 +47,24 @@ export class StudentsService {
   }
 
   async remove(id: string) {
-    return this.prismaService.student.delete({ where: { id } });
+    return this.prismaService.$transaction(async (tx) => {
+      const student = await tx.student.findUnique({ where: { id: id } });
+      if (!student) {
+        throw new Error(`Student with id ${id} not found`);
+      }
+      const userSchool = await tx.userSchool.findUnique({
+        where: { id: student.userSchoolId },
+      });
+      if (!userSchool) {
+        throw new Error(
+          `UserSchool relation for student with id ${id} not found`,
+        );
+      }
+      const deletedUser = await tx.user.delete({
+        where: { id: userSchool.userId },
+      });
+      return { deletedUserId: deletedUser.id };
+    });
   }
 
   async findBySchoolId(id: string) {

@@ -73,15 +73,15 @@ const Teachers = () => {
         };
         await updateTeacher(token, updatedTeacher);
           toaster.create({
-            title: "Success",
-            description: "Teacher updated successfully",
+            title: t('success'),
+            description: t('teacher_updated'),
             type: "success",
           });
           onClose();
         } catch {
           toaster.create({
-            title: "Error",
-            description: "Failed to update teacher",
+            title: t('error'),
+            description: t('failed_update_teacher'),
             type: "error",
           });
         }
@@ -89,8 +89,8 @@ const Teachers = () => {
         // Add mode: create a new teacher.
         if (password !== confirmPassword) {
           toaster.create({
-            title: "Error",
-            description: "Passwords do not match",
+            title: t('error'),
+            description: t('passwords_do_not_match'),
             type: "error",
           });
           return;
@@ -100,8 +100,8 @@ const Teachers = () => {
           const newUser = await createUser(token, fullName, email, password);
           if (!newUser) {
             toaster.create({
-              title: "Error",
-              description: "Failed to create user",
+              title: t('error'),
+              description: t('failed_create_user'),
               type: "error",
             });
             return;
@@ -111,8 +111,8 @@ const Teachers = () => {
           const newUserSchool = await createUserSchool(token, newUser.id, schoolId);
           if (!newUserSchool) {
             toaster.create({
-              title: "Error",
-              description: "Failed to create user school relationship",
+              title: t('error'),
+              description: t('failed_create_user_school_relationship'),
               type: "error",
             });
             return;
@@ -121,8 +121,8 @@ const Teachers = () => {
           const teacherRoleAssignment = await createRoleAssignment(token, newUserSchool.id, ROLE);
           if (!teacherRoleAssignment) {
             toaster.create({
-              title: "Error",
-              description: "Failed to register role for user",
+              title: t('error'),
+              description: t('failed_register_role'),
               type: "error",
             });
             return;
@@ -131,23 +131,23 @@ const Teachers = () => {
           const newTeacher = await createTeacher(token, newUserSchool.id, specialization, bio, parseFloat(rating));
           if (!newTeacher) {
             toaster.create({
-              title: "Error",
-              description: "Failed to create teacher",
+              title: t('error'),
+              description: t('failed_create_teacher'),
               type: "error",
             });
             return;
           } else {
             toaster.create({
-              title: "Success",
-              description: "Teacher created successfully",
+              title: t('success'),
+              description: t('teacher_added'),
               type: "success",
             });
           }
           onClose();
         } catch {
           toaster.create({
-            title: "Error",
-            description: "An error occurred while creating teacher",
+            title: t('error'),
+            description: t('failed_create_teacher'),
             type: "error",
           });
         }
@@ -164,15 +164,15 @@ const Teachers = () => {
         if (!token) throw new Error("Not authenticated");
         await deleteTeacher(token, teacherId);
         toaster.create({
-          title: "Success",
-          description: "Teacher deleted successfully",
+          title: t('success'),
+          description: t('teacher_deleted'),
           type: "success",
         });
         setTeachers((prev) => prev.filter((teacher) => teacher.id?.toString() !== teacherId));
       } catch {
         toaster.create({
-          title: "Error",
-          description: "Failed to delete teacher",
+          title: t('error'),
+          description: t('failed_teacher_deletion'),
           type: "error",
         });
       }
@@ -189,10 +189,10 @@ const Teachers = () => {
         setRating(teacher.rating.toString() || "0.00");
         setEditingTeacher(teacher);
         setIsDialogOpen(true);
-      } catch {
+      } catch(error) {
         toaster.create({
-          title: "Error",
-          description: "Failed to edit teacher",
+          title: t('error'),
+          description: t('failed_update_teacher') + `\n ${error}`,
           type: "error",
         });
       }
@@ -243,12 +243,12 @@ const Teachers = () => {
         />
         <DialogRoot open={isDialogOpen} onOpenChange={(isOpen) => { if (!isOpen) onClose(); }}>
           <DialogContent>
-            <DialogHeader>{editingTeacher ? "Edit Teacher" : "Add New Teacher"}</DialogHeader>
+            <DialogHeader>{editingTeacher ? t('edit_teacher') : t('add_new_teacher')}</DialogHeader>
             <DialogBody pb="4">
               <Stack>
                 <Input
                   type="text"
-                  placeholder="Full Name"
+                  placeholder={t('full_name')}
                   name="name"
                   value={fullName}
                   required
@@ -256,7 +256,7 @@ const Teachers = () => {
                 />
                 <Input
                   type="email"
-                  placeholder="Email"
+                  placeholder={t('email')}
                   name="email"
                   value={email}
                   required
@@ -267,7 +267,7 @@ const Teachers = () => {
                   <>
                     <Input
                       type="password"
-                      placeholder="Password"
+                      placeholder={t('password')}
                       name="password"
                       value={password}
                       required
@@ -275,7 +275,7 @@ const Teachers = () => {
                     />
                     <Input
                       type="password"
-                      placeholder="Confirm Password"
+                      placeholder={t('confirm_password')}
                       name="confirmPassword"
                       value={confirmPassword}
                       required
@@ -284,19 +284,19 @@ const Teachers = () => {
                   </>
                 )}
                 <Textarea
-                  placeholder="Specialization"
+                  placeholder={t('specialization')}
                   name="specialization"
                   value={specialization}
                   onChange={(e) => setSpecialization(e.target.value)}
                 />
                 <Textarea
-                  placeholder="Bio"
+                  placeholder={t('bio')}
                   name="bio"
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
                 />
                 <Box>
-                  <Text>Rating</Text>
+                  <Text>{t('rating')}</Text>
                   <NumberInputRoot
                     step={0.1}
                     max={5}
@@ -314,10 +314,10 @@ const Teachers = () => {
             </DialogBody>
             <DialogFooter>
               <Button variant="outline" bgColor="green.300" onClick={handleSaveTeacher}>
-                Save
+                {t('save')}
               </Button>
               <Button variant="outline" bgColor="red.300" onClick={onClose}>
-                Cancel
+                {t('cancel')}
               </Button>
             </DialogFooter>
           </DialogContent>

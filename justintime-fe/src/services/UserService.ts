@@ -52,3 +52,20 @@ export const getUsersWithDetails = async (token:string) => {
     const data = await response.json();
     return data;
 }
+
+export const deleteUser = async (token:string, userId: string) => {
+    const requestOptions = {
+        method: 'DELETE',
+        headers: {
+            Authorization: `Bearer ${token}`, 
+            'Content-Type': 'application/json' 
+        }
+    };
+    const response = await fetch(`${BACKEND_URL}/users/${userId}`, requestOptions);
+    if (!response.ok) {
+        throw new Error("Failed to delete user");
+    }
+
+    const data = await response.json();
+    return data;
+}

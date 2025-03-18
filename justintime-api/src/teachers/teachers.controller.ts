@@ -8,7 +8,7 @@ import {
   Delete,
   UseGuards,
   HttpException,
-  HttpStatus,
+  HttpStatus, HttpCode, BadRequestException,
 } from '@nestjs/common';
 import { TeachersService } from './teachers.service';
 import { CreateTeacherDto } from './dto/create-teacher.dto';
@@ -108,10 +108,13 @@ export class TeachersController {
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async remove(@Param('id') id: string) {
-    const teacher = await this.teachersService.findOne(id);
-    if (!teacher) {
-      throw new HttpException('Teacher not found', HttpStatus.NOT_FOUND);
+    try {
+      return await this.teachersService.remove(id);
+    } catch (error) {
+      if (error.message.includes('not found')) {
+        throw new HttpException('Teacher not found', HttpStatus.NOT_FOUND);
+      }
+      throw new BadRequestException(error.message);
     }
-    return this.teachersService.remove(id);
   }
 }

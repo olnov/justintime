@@ -6,7 +6,10 @@ import {
   Patch,
   Param,
   Delete,
-  UseGuards, HttpException, HttpStatus,
+  UseGuards,
+  HttpException,
+  HttpStatus,
+  BadRequestException,
 } from '@nestjs/common';
 import { StudentsService } from './students.service';
 import { CreateStudentDto } from './dto/create-student.dto';
@@ -74,6 +77,13 @@ export class StudentsController {
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.studentsService.remove(id);
+    try {
+      return this.studentsService.remove(id);
+    } catch (error) {
+      if (error.message.includes('not found')) {
+        throw new HttpException('Student not found', HttpStatus.NOT_FOUND);
+      }
+      throw new BadRequestException(error.message);
+    }
   }
 }

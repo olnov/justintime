@@ -17,6 +17,7 @@ import { createUserSchool } from "@/services/UserSchoolService";
 import { createRoleAssignment } from "@/services/RoleAssignmentService";
 import { createStudent } from "@/services/StudentService";
 import { Student, FlattenedStudent } from "@/types/student.types";
+import { useTranslation } from "react-i18next";
 
 
 const Students = () => {
@@ -29,6 +30,7 @@ const Students = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [gradeLevel, setGradeLevel] = useState<string>("0.00");
   const [editingStudent, setEditingStudent] = useState<FlattenedStudent | null>(null);
+  const { t } = useTranslation();
   const ROLE = "student";
 
 
@@ -204,15 +206,15 @@ const Students = () => {
 
   return (
     <>
-      <Heading>Students</Heading>
+      <Heading>{t('students')}</Heading>
       <TableComponent
         title="Students"
         data={flattenedSudents}
         columns={[
-          { key: "name", label: "Student Name", sortable: true },
-          { key: "school", label: "School", sortable: true },
-          { key: "email", label: "Email", sortable: true },
-          { key: "gradeLevel", label: "Grade Level", sortable: true },
+          { key: "name", label: t('student_name'), sortable: true },
+          { key: "school", label: t('school'), sortable: true },
+          { key: "email", label: t('email'), sortable: true },
+          { key: "gradeLevel", label: t('grade_level'), sortable: true },
         ]}
         onAdd={() => {
           setEditingStudent(null);

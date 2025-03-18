@@ -47,7 +47,23 @@ export class TeachersService {
   }
 
   async remove(id: string) {
-    return this.prismaService.teacher.delete({ where: { id } });
+    // Deleting teacher in cascade mode via userId
+    return this.prismaService.$transaction(async (tx) => {
+      const teacher = await tx.teacher.findUnique({ where: { id: id } });
+      if (!teacher) {
+        throw new Error(`Teacher with id ${id} not found`);
+      }
+      const userSchool = await tx.userSchool.findUnique({
+        where: { id: teacher.userSchoolId },
+      });
+      if (!userSchool) {
+        throw new Error(`UserSchool for teacher ${id} not found`);
+      }
+      const deletedUser = await tx.user.delete({
+        where: { id: userSchool.userId },
+      });
+      return { deletedUserId: deletedUser.id };
+    });
   }
 
   async findBySchoolId(id: string) {

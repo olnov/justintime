@@ -8,6 +8,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { parseToken } from "../services/AuthService";
 import LanguageSwitcher  from "./LanguageSwitcher";
+import { useTranslation } from "react-i18next";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ const Navbar = () => {
   const userRole = parseToken(localStorage.getItem("token") as string).schools.map((schoolRole: { roles: unknown; }) => schoolRole.roles).join(", ");
   const isGlobalAdmin: boolean = parseToken(localStorage.getItem("token") as string).isGlobalAdmin;
   const Role: string | boolean = String(userRole) || (isGlobalAdmin ? "global_admin" : false);
+  const { t } = useTranslation();
   
   const handleLogout = () => {
     localStorage.removeItem("userName");
@@ -27,7 +29,7 @@ const Navbar = () => {
   return (
     <Flex
       as="nav"
-      p="4"
+      p="3"
       bg="#1a2035"
       color="white"
       justifyContent="space-between"
@@ -38,7 +40,7 @@ const Navbar = () => {
       width="100%"
       zIndex="1000"
     >
-      <Text fontSize="xl">Admin Panel</Text>
+      <Text fontSize="xl" marginLeft={5} fontFamily={'heading'}>{t('admin_panel')}</Text>
       <Flex alignItems="center">
         <MenuRoot>
           <MenuTrigger
@@ -70,19 +72,19 @@ const Navbar = () => {
                 bgColor: "transparent",
             }}
           >
-            <Avatar.Root shape="rounded" size="lg">
+            <Avatar.Root shape="rounded" size="sm">
               <Avatar.Fallback name={fullName} />
             </Avatar.Root>
             <VStack align="center">
-                <Text ml={2}>{fullName}</Text>
+                <Text ml={2} fontSize={'sm'}>{fullName}</Text>
                 <Text textStyle="xs">{Role}</Text>
             </VStack>
           </MenuTrigger>
           <MenuContent>
-            <MenuItem value="profile">Profile</MenuItem>
-            <MenuItem value="settings">Settings</MenuItem>
+            <MenuItem value="profile">{t('profile')}</MenuItem>
+            <MenuItem value="settings">{t('settings')}</MenuItem>
             <MenuItem value="logout" onClick={handleLogout}>
-              Logout
+              {t('logout')}
             </MenuItem>
             <LanguageSwitcher />
           </MenuContent>

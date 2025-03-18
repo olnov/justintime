@@ -1,4 +1,4 @@
-import { createUser, getUsersWithDetails } from "@/services/UserService";
+import { createUser, getUsersWithDetails} from "@/services/UserService";
 import { getSchools } from "@/services/SchoolService";
 import { createUserSchool } from "@/services/UserSchoolService";
 import { createRoleAssignment } from "@/services/RoleAssignmentService";
@@ -35,6 +35,7 @@ import {
   SelectValueText,
 } from "@/components/ui/select";
 import { toaster } from "@/components/ui/toaster";
+import { useTranslation } from "react-i18next";
 
 const roles = createListCollection({
   items: [
@@ -57,6 +58,7 @@ const Users = () => {
   const [loading, setLoading] = useState(false);
   const [selectedSchoolName, setSelectedSchoolName] = useState("");
   const token = localStorage.getItem("token");
+  const { t } = useTranslation();
 
   useEffect(() => {
     fetchUsers();
@@ -198,16 +200,16 @@ const Users = () => {
 
   return (
     <>
-      <Heading>Users</Heading>
+      <Heading>{t('users')}</Heading>
       <TableComponent
         title="Users"
         data={flattenedUsers}
         columns={[
-          { key: "name", label: "Name", sortable: true },
-          { key: "email", label: "Email", sortable: true },
-          { key: "isGlobalAdmin", label: "Global Admin", sortable: true },
-          { key: "school", label: "School", sortable: true },
-          { key: "role", label: "Role", sortable: true },
+          { key: "name", label: t('name'), sortable: true },
+          { key: "email", label: t('email'), sortable: true },
+          { key: "isGlobalAdmin", label: t('global_admin'), sortable: true },
+          { key: "school", label: t('school'), sortable: true },
+          { key: "role", label: t('role'), sortable: true },
         ]}
         onAdd={() => setIsFormOpen(true)} // Open the form
         actions={
@@ -216,15 +218,17 @@ const Users = () => {
             <Button variant={"outline"}>Edit</Button>
           </>
         }
+        // onDelete={}
+        // onEdit={}
       />
       <DialogRoot open={isFormOpen} onOpenChange={(isOpen) => !isOpen && onClose()}>
         <DialogContent>
-          <DialogHeader>Add new user</DialogHeader>
+          <DialogHeader>{t('add_new_user')}</DialogHeader>
           <DialogBody pb="4">
             <Stack>
               <Input
                 type="text"
-                placeholder="Full Name"
+                placeholder={t('full_name')}
                 name="name"
                 value={fullName}
                 required={true}
@@ -232,7 +236,7 @@ const Users = () => {
               />
               <Input
                 type="email"
-                placeholder="Email"
+                placeholder={t('email')}
                 name="email"
                 value={email}
                 required={true}
@@ -240,7 +244,7 @@ const Users = () => {
               />
               <Input
                 type="password"
-                placeholder="Password"
+                placeholder={t('password')}
                 name="password"
                 value={password}
                 required={true}
@@ -248,7 +252,7 @@ const Users = () => {
               />
               <Input
                 type="password"
-                placeholder="Confirm Password"
+                placeholder={t('confirm_password')}
                 name="confirmPassword"
                 value={confirmPassword}
                 required={true}
@@ -257,7 +261,7 @@ const Users = () => {
               <Box position="relative" width="100%">
                 <Input
                   type="text"
-                  placeholder="School name"
+                  placeholder={t('school_name')}
                   name="schoolId"
                   value={selectedSchoolName}
                   onChange={(e) => setSelectedSchoolName(e.target.value)}
@@ -301,7 +305,7 @@ const Users = () => {
                 )}
               </Box>
               <SelectRoot variant={"outline"} collection={roles}>
-                <SelectLabel>Select role</SelectLabel>
+                <SelectLabel>{t('select_role')}</SelectLabel>
                 <SelectTrigger>
                   <SelectValueText placeholder="Select role" />
                 </SelectTrigger>
@@ -324,10 +328,10 @@ const Users = () => {
           </DialogBody>
           <DialogFooter>
             <Button variant={"outline"} bgColor="green.300" onClick={handleSaveUser}>
-              Save
+              {t('save')}
             </Button>
             <Button variant="outline" bgColor={"red.300"} onClick={onClose}>
-              Cancel
+              {t('cancel')}
             </Button>
           </DialogFooter>
         </DialogContent>

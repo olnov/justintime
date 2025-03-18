@@ -12,6 +12,7 @@ const Sidebar = () => {
       top="64px"
       left="0"
       height="calc(100vh - 64px)"
+      overflowY="auto"
     >
       <VStack align="stretch">
         <MenuItems />

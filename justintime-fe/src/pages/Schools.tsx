@@ -12,15 +12,17 @@ import {
 import { withMask } from "use-mask-input";
 import { toaster } from "@/components/ui/toaster"
 import { DataItem } from "@/types/table.types"
+import { useTranslation } from "react-i18next";
 
 const Schools = () => {
-  
+
   const [schools, setSchools] = useState<DataItem[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [schoolName, setSchoolName] = useState("");
   const [address, setAddress] = useState("");
   const [phone, setPhone] = useState("");
   const token = localStorage.getItem("token");
+  const { t } = useTranslation();
 
   useEffect(() => {
     fetchSchools();
@@ -58,14 +60,14 @@ const Schools = () => {
 
   return (
     <>
-      <Heading>Schools</Heading>
+      <Heading>{t('schools')}</Heading>
       <TableComponent
         title="Schools"
         data={schools}
         columns={[
-          { key: "name", label: "School Name", sortable: true },
-          { key: "address", label: "Address", sortable: true },
-          { key: "phone", label: "Phone", sortable: true },
+          { key: "name", label: t('school'), sortable: true },
+          { key: "address", label: t('address'), sortable: true },
+          { key: "phone", label: t('phone'), sortable: true },
         ]}
         onAdd={() => setIsFormOpen(true)}
         actions={
@@ -77,12 +79,12 @@ const Schools = () => {
       />
       <DialogRoot open={isFormOpen} onOpenChange={(isOpen) => !isOpen && onClose()}>
         <DialogContent>
-          <DialogHeader>Add new school</DialogHeader>
+          <DialogHeader>{t('add_new_school')}</DialogHeader>
           <DialogBody pb="4">
             <Stack>
               <Input
                 type="text"
-                placeholder="School Name"
+                placeholder={t('school_name')}
                 name="name"
                 value={schoolName}
                 required = {true}
@@ -90,7 +92,7 @@ const Schools = () => {
               />
               <Input
                 type="text"
-                placeholder="Address"
+                placeholder={t('address')}
                 name="address"
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
@@ -107,10 +109,10 @@ const Schools = () => {
           </DialogBody>
           <DialogFooter>
             <Button variant={"outline"} bgColor="green.300" onClick={handleSave}>
-              Save
+              {t('save')}
             </Button>
             <Button variant="outline" bgColor={"red.300"} onClick={onClose}>
-              Cancel
+              {t('cancel')}
             </Button>
           </DialogFooter>
         </DialogContent>
