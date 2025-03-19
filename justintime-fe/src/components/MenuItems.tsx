@@ -66,7 +66,6 @@ const MenuItems = () => {
 
   // Handle school-based users (admins, teachers, students)
   if (userInfo.schools?.length > 0) {
-    console.log("User infro structure", userInfo);
     const schoolId = userInfo.schools[0].id; // ✅ Use the first school (or let the user select)
     const roles = userInfo.schools.flatMap((school:UserSchool) => school.roles);
 

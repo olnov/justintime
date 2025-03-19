@@ -61,6 +61,8 @@ const resources = {
       "failed_update_teacher": "Failed to update teacher",
       "delete_item": "Delete item",
       "delete_item_confirm": "Are you sure you want to delete this item?",
+      "user_deleted_successfully": "User deleted successfully",
+      "user_delete_failed": "Failed to delete user",
 
     }
   },
@@ -122,8 +124,8 @@ const resources = {
       "failed_update_teacher": "Не удалось обновить преподавателя",
       "delete_item": "Удалить элемент",
       "delete_item_confirm": "Вы уверены, что хотите удалить этот элемент?",
-
-
+      "user_deleted_successfully": "Пользователь успешно удален",
+      "user_delete_failed": "Не удалось удалить пользователя",
     }
   },
 };

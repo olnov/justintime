@@ -87,6 +87,12 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+    try {
+      return this.usersService.remove(id);
+    } catch (error) {
+      if (error.message.includes('not found')) {
+        throw new HttpException('User not found.', HttpStatus.NOT_FOUND);
+      }
+    }
   }
 }

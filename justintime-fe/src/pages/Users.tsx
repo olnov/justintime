@@ -1,4 +1,4 @@
-import { createUser, getUsersWithDetails} from "@/services/UserService";
+import { createUser, deleteUser, getUsersWithDetails} from "@/services/UserService";
 import { getSchools } from "@/services/SchoolService";
 import { createUserSchool } from "@/services/UserSchoolService";
 import { createRoleAssignment } from "@/services/RoleAssignmentService";
@@ -187,6 +187,27 @@ const Users = () => {
     setIsFormOpen(false);
   };
 
+  const handleUserDelete = async (id: string) => {
+    if (!token) {
+      throw new Error("You are not authenticated");
+    }
+    try {
+      await deleteUser(token, id);
+      toaster.create({
+        title: t('success'),
+        description: t('user_deleted_successfully'),
+        type: "success",
+      });
+      fetchUsers();
+    } catch {
+      toaster.create({
+        title: t('error'),
+        description: t('user_delete_failed'),
+        type: "error",
+      });
+    }
+  };
+
   // Converting users to a table readable format
   const flattenedUsers = (users as User[]).map((user) => ({
     id: user.id,
@@ -212,13 +233,8 @@ const Users = () => {
           { key: "role", label: t('role'), sortable: true },
         ]}
         onAdd={() => setIsFormOpen(true)} // Open the form
-        actions={
-          <>
-            <Button variant={"outline"}>Delete</Button>
-            <Button variant={"outline"}>Edit</Button>
-          </>
-        }
-        // onDelete={}
+        
+        onDelete={handleUserDelete}
         // onEdit={}
       />
       <DialogRoot open={isFormOpen} onOpenChange={(isOpen) => !isOpen && onClose()}>
