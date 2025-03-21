@@ -21,3 +21,12 @@ export interface UserToken {
     iat: number;
     exp: number;
 }
+
+export interface FlattenedUser {
+    id: string; 
+    name: string;
+    email: string;
+    isGlobalAdmin: boolean;
+    school: string [];
+    role: string [];
+}

@@ -1,12 +1,8 @@
-import { createUser, deleteUser, getUsersWithDetails} from "@/services/UserService";
+import { deleteUser, getUsersWithDetails} from "@/services/UserService";
 import { getSchools } from "@/services/SchoolService";
-import { createUserSchool } from "@/services/UserSchoolService";
-import { createRoleAssignment } from "@/services/RoleAssignmentService";
-import { createTeacher } from "@/services/TeacherService";
-import { createStudent } from "@/services/StudentService";
 import { useEffect, useState } from "react";
 import TableComponent from "@/components/Table/Table";
-import { User } from "@/types/user.types";
+import { FlattenedUser, User } from "@/types/user.types";
 import {
   Heading,
   Button,
@@ -36,6 +32,7 @@ import {
 } from "@/components/ui/select";
 import { toaster } from "@/components/ui/toaster";
 import { useTranslation } from "react-i18next";
+import { createUserAdmin } from "@/services/AdminServices";
 
 const roles = createListCollection({
   items: [
@@ -47,7 +44,7 @@ const roles = createListCollection({
 
 const Users = () => {
   const [users, setUsers] = useState<unknown[]>([]);
-  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -57,6 +54,7 @@ const Users = () => {
   const [results, setResults] = useState<{ id: string; name: string; }[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedSchoolName, setSelectedSchoolName] = useState("");
+  const [edititngUser, setEditingUser] = useState<FlattenedUser | null>(null);
   const token = localStorage.getItem("token");
   const { t } = useTranslation();
 
@@ -67,7 +65,7 @@ const Users = () => {
     } else {
       setResults([]);
     }
-  }, [isFormOpen, selectedSchoolName]);
+  }, [isDialogOpen, selectedSchoolName]);
 
   const fetchUsers = async () => {
     if (token) {
@@ -97,94 +95,62 @@ const Users = () => {
   };
 
   const onClose = () => {
-    setIsFormOpen(false);
+    setEditingUser(null);
+    setFullName("");
+    setEmail("");
+    setPassword("");
+    setConfirmPassword("");
+    setSchoolId("");
+    setRole("");
+    setIsDialogOpen(false);
   };
+
 
   const handleSaveUser = async () => {
     if (!token) {
       throw new Error("You are not authenticated");
     }
-    const responseUser = await createUser(token, fullName, email, password);
+    if (edititngUser) {
+      // Edit user
+      const updatedUser = {
+        id: edititngUser.id,
+        name: fullName,
+        email: email,
+        school: schoolId,
+        role: role,
+      }
+      console.log("Updating user", updatedUser);
+      setIsDialogOpen(false);
+    }
+    const responseUser = await createUserAdmin(token, fullName, email, password, schoolId, role);
     if (!responseUser) {
       toaster.create({
-        title: "Failed to create user",
-        description: responseUser.message,
+        title: t('error'),
+        description: t('failed_create_teacher'),
         type: "error",
       });
-      throw new Error(responseUser.message);
+      throw new Error(t('failed_create_teacher'));
     }
-    console.log("User created:", responseUser.id);
+    toaster.create({
+      title: t('success'),
+      description: t('teacher_added'),
+      type: "success",
+    });
+    onClose();
+    setIsDialogOpen(false);
+  }
 
-    const responseUserSchool = await createUserSchool(token, responseUser.id, schoolId);
-    if (!responseUserSchool) {
-      toaster.create({
-        title: "Failed to create a user school relation",
-        description: responseUserSchool.message,
-        type: "error",
-      });
-      throw new Error(responseUserSchool.message);
-    }
-    console.log("User school relation created:", responseUserSchool.id);
-
-    if (role === "admin") {
-      const responseAdminRole = await createRoleAssignment(token, responseUserSchool.id, role);
-      if (!responseAdminRole) {
-        toaster.create({
-          title: "Failed to create an admin",
-          description: responseAdminRole.message,
-          type: "error",
-        });
-        throw new Error(responseAdminRole.message);
-      }
+  const hadnleUserEdit = (user: FlattenedUser) => {
+    if (!user) {
+      throw new Error("User not found");
     }
 
-    if (role === "teacher") {
-      const responseTeacherRole = await createRoleAssignment(token, responseUserSchool.id, role);
-      if (!responseTeacherRole) {
-        toaster.create({
-          title: "Failed to create a teacher",
-          description: responseTeacherRole.message,
-          type: "error",
-        });
-        throw new Error(responseTeacherRole.message);
-      } else {
-        const responseTeacher = await createTeacher(token, responseUserSchool.id);
-        if (!responseTeacher) {
-          toaster.create({
-            title: "Failed to create a teacher",
-            description: responseTeacher.message,
-            type: "error",
-          });
-          throw new Error(responseTeacher.message);
-        }
-      }
-    }
-
-    if (role === "student") {
-      const responseStudentRole = await createRoleAssignment(token, responseUserSchool.id, role);
-      console.log("Student role created:", responseStudentRole);
-      if (!responseStudentRole) {
-        toaster.create({
-          title: "Failed to create a student",
-          description: responseStudentRole.message,
-          type: "error",
-        });
-        throw new Error(responseStudentRole.message);
-      } else {
-        const responseStudent = await createStudent(token, responseUserSchool.id);
-        console.log("Student created:", responseStudent);
-        if (!responseStudent) {
-          toaster.create({
-            title: "Failed to create a student",
-            description: responseStudent.message,
-            type: "error",
-          });
-          throw new Error(responseStudent.message);
-        }
-      }
-    }
-
-    setIsFormOpen(false);
+    setFullName(user.name || "");
+    setEmail(user.email || "");
+    setSchoolId(Array.isArray(user.school) ? user.school[0] : user.school);
+    setRole(user.role.length > 0 ? user.role[0] : "");
+    setEditingUser(user);
+    setIsDialogOpen(true);
   };
 
   const handleUserDelete = async (id: string) => {
@@ -232,14 +198,13 @@ const Users = () => {
           { key: "school", label: t('school'), sortable: true },
           { key: "role", label: t('role'), sortable: true },
         ]}
-        onAdd={() => setIsFormOpen(true)} // Open the form
-        
+        onAdd={() => setIsDialogOpen(true)} // Open the form
+        onEdit={(item)=>hadnleUserEdit(item as unknown as FlattenedUser)}
         onDelete={handleUserDelete}
-        // onEdit={}
       />
-      <DialogRoot open={isFormOpen} onOpenChange={(isOpen) => !isOpen && onClose()}>
+      <DialogRoot open={isDialogOpen} onOpenChange={(isOpen) => !isOpen && onClose()}>
         <DialogContent>
-          <DialogHeader>{t('add_new_user')}</DialogHeader>
+          <DialogHeader>{edititngUser ? t('edit_user') : t('add_new_user')}</DialogHeader>
           <DialogBody pb="4">
             <Stack>
               <Input

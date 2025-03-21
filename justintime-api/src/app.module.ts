@@ -13,6 +13,7 @@ import { UserSchoolModule } from './user-school/user-school.module';
 import { RoleAssignmentModule } from './role-assignment/role-assignment.module';
 import { MailNotifierModule } from './mail-notifier/mail-notifier.module';
 import { ConfigModule } from '@nestjs/config';
+import { UsersAdminModule } from './users-admin/users-admin.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { ConfigModule } from '@nestjs/config';
     UserSchoolModule,
     RoleAssignmentModule,
     MailNotifierModule,
+    UsersAdminModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),

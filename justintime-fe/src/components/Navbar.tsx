@@ -40,7 +40,7 @@ const Navbar = () => {
       width="100%"
       zIndex="1000"
     >
-      <Text fontSize="xl" marginLeft={5} fontFamily={'heading'}>{t('admin_panel')}</Text>
+      <Text fontSize="xl" marginLeft={5} fontFamily={'heading'}>{t('admin_panel')}</Text> 
       <Flex alignItems="center">
         <MenuRoot>
           <MenuTrigger
@@ -81,9 +81,9 @@ const Navbar = () => {
             </VStack>
           </MenuTrigger>
           <MenuContent>
-            <MenuItem value="profile">{t('profile')}</MenuItem>
-            <MenuItem value="settings">{t('settings')}</MenuItem>
-            <MenuItem value="logout" onClick={handleLogout}>
+            <MenuItem value="profile" fontSize={"md"}>{t('profile')}</MenuItem>
+            <MenuItem value="settings" fontSize={"md"}>{t('settings')}</MenuItem>
+            <MenuItem value="logout" fontSize={"md"} onClick={handleLogout}>
               {t('logout')}
             </MenuItem>
             <LanguageSwitcher />

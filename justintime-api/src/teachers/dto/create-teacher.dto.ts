@@ -13,7 +13,7 @@ export class CreateTeacherDto {
   })
   @IsString()
   @IsOptional()
-  specialization: string;
+  specialization?: string;
 
   @ApiPropertyOptional({
     description: 'About the teacher',
@@ -26,5 +26,5 @@ export class CreateTeacherDto {
   @ApiProperty({ description: "Teacher's rating", example: '5,0' })
   @IsNumber()
   @IsOptional()
-  rating: number;
+  rating?: number;
 }
