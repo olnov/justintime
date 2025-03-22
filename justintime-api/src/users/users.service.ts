@@ -1,9 +1,4 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../prisma/prisma.service';
@@ -22,10 +17,9 @@ export class UsersService {
     return this.prismaService.user.create({
       data: { name, email, password: hash },
     });
-    // return 'This action adds a new user';
   }
 
-  findAll() {
+  async findAll() {
     return this.prismaService.user.findMany();
   }
 
@@ -42,7 +36,9 @@ export class UsersService {
   }
 
   async remove(id: string) {
-    const user = this.prismaService.user.findUnique({ where: { id: id } });
+    const user = await this.prismaService.user.findUnique({
+      where: { id: id },
+    });
     if (!user) {
       throw new Error(`User with id ${id} not found`);
     }

@@ -14,6 +14,7 @@ import { RoleAssignmentModule } from './role-assignment/role-assignment.module';
 import { MailNotifierModule } from './mail-notifier/mail-notifier.module';
 import { ConfigModule } from '@nestjs/config';
 import { UsersAdminModule } from './users-admin/users-admin.module';
+import { TeachersAdminModule } from './teachers-admin/teachers-admin.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { UsersAdminModule } from './users-admin/users-admin.module';
     RoleAssignmentModule,
     MailNotifierModule,
     UsersAdminModule,
+    TeachersAdminModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
