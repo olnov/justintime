@@ -63,6 +63,11 @@ const resources = {
       "delete_item_confirm": "Are you sure you want to delete this item?",
       "user_deleted_successfully": "User deleted successfully",
       "user_delete_failed": "Failed to delete user",
+      "add_new_student": "Add New Student",
+      "edit_student": "Edit Student",
+      "student_added": "Student added successfully",
+      "student_deleted": "Student deleted successfully",
+      "student_updated": "Student updated successfully",
 
     }
   },
@@ -126,6 +131,10 @@ const resources = {
       "delete_item_confirm": "Вы уверены, что хотите удалить этот элемент?",
       "user_deleted_successfully": "Пользователь успешно удален",
       "user_delete_failed": "Не удалось удалить пользователя",
+      "add_new_student": "Добавить нового студента",
+      "edit_student": "Изменить студента",
+      "student_added": "Студент успешно добавлен",
+      "student_deleted": "Студент успешно удален",
     }
   },
 };

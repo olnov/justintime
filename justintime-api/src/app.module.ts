@@ -15,6 +15,7 @@ import { MailNotifierModule } from './mail-notifier/mail-notifier.module';
 import { ConfigModule } from '@nestjs/config';
 import { UsersAdminModule } from './users-admin/users-admin.module';
 import { TeachersAdminModule } from './teachers-admin/teachers-admin.module';
+import { StudentsAdminModule } from './students-admin/students-admin.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { TeachersAdminModule } from './teachers-admin/teachers-admin.module';
     MailNotifierModule,
     UsersAdminModule,
     TeachersAdminModule,
+    StudentsAdminModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),

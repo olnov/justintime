@@ -29,7 +29,7 @@ export class TeachersAdminController {
   @ApiBearerAuth('JWT-auth')
   async create(@Body() createUserAdminDto: CreateUserAdminDto) {
     try {
-      await this.teachersAdminService.createTeacherAdmin(createUserAdminDto);
+      return this.teachersAdminService.createTeacherAdmin(createUserAdminDto);
     } catch (error) {
       throw new InternalServerErrorException(
         'Error creating teacher: ',

@@ -9,14 +9,12 @@ import {
 } from "@/components/ui/dialog";
 import { NumberInputField, NumberInputRoot } from "@/components/ui/number-input";
 import { useState, useEffect } from "react";
-import { getTeacherBySchoolId, createTeacher, deleteTeacher, updateTeacher } from "@/services/TeacherService";
+import { getTeacherBySchoolId, deleteTeacher, updateTeacher } from "@/services/TeacherService";
 import { parseToken } from "@/services/AuthService";
-import { createUser } from "@/services/UserService";
-import { createUserSchool } from "@/services/UserSchoolService";
-import { createRoleAssignment } from "@/services/RoleAssignmentService";
 import { Teacher, FlattenedTeacher } from "@/types/teacher.types";
 import { toaster } from "@/components/ui/toaster";
 import { useTranslation } from 'react-i18next';
+import { createTeacherAdmin } from "@/services/AdminServices";
 
 const Teachers = () => {
   const [teachers, setTeachers] = useState<Teacher[]>([]);
@@ -35,6 +33,7 @@ const Teachers = () => {
   const [rating, setRating] = useState<string>("0.00");
   const ROLE = "teacher";
   const token = localStorage.getItem("token");
+  const schoolId = parseToken(token as string).schools[0].id;
 
   useEffect(() => {
     fetchTeachersBySchool();
@@ -53,6 +52,7 @@ const Teachers = () => {
     setIsDialogOpen(false);
   };
 
+  
   const handleSaveTeacher = async () => {
     if (!token) {
       throw new Error("You are not authenticated");
@@ -66,94 +66,53 @@ const Teachers = () => {
           bio: bio,
           rating: Number(rating),
           userData: {
-            userId: editingTeacher.userId, 
-            name: fullName, 
-            email: email, 
+            userId: editingTeacher.userId,
+            name: fullName,
+            email: email,
           }
         };
         await updateTeacher(token, updatedTeacher);
-          toaster.create({
-            title: t('success'),
-            description: t('teacher_updated'),
-            type: "success",
-          });
-          onClose();
-        } catch {
-          toaster.create({
-            title: t('error'),
-            description: t('failed_update_teacher'),
-            type: "error",
-          });
-        }
-      } else {
-        // Add mode: create a new teacher.
-        if (password !== confirmPassword) {
-          toaster.create({
-            title: t('error'),
-            description: t('passwords_do_not_match'),
-            type: "error",
-          });
-          return;
-        }
-        try {
-          // Step 1: Create user
-          const newUser = await createUser(token, fullName, email, password);
-          if (!newUser) {
-            toaster.create({
-              title: t('error'),
-              description: t('failed_create_user'),
-              type: "error",
-            });
-            return;
-          }
-          // Step 2: Create user-school relationship
-          const schoolId = parseToken(token).schools[0].id;
-          const newUserSchool = await createUserSchool(token, newUser.id, schoolId);
-          if (!newUserSchool) {
-            toaster.create({
-              title: t('error'),
-              description: t('failed_create_user_school_relationship'),
-              type: "error",
-            });
-            return;
-          }
-          // Step 3: Register teacher role
-          const teacherRoleAssignment = await createRoleAssignment(token, newUserSchool.id, ROLE);
-          if (!teacherRoleAssignment) {
-            toaster.create({
-              title: t('error'),
-              description: t('failed_register_role'),
-              type: "error",
-            });
-            return;
-          }
-          // Step 4: Create teacher
-          const newTeacher = await createTeacher(token, newUserSchool.id, specialization, bio, parseFloat(rating));
-          if (!newTeacher) {
-            toaster.create({
-              title: t('error'),
-              description: t('failed_create_teacher'),
-              type: "error",
-            });
-            return;
-          } else {
-            toaster.create({
-              title: t('success'),
-              description: t('teacher_added'),
-              type: "success",
-            });
-          }
-          onClose();
-        } catch {
-          toaster.create({
-            title: t('error'),
-            description: t('failed_create_teacher'),
-            type: "error",
-          });
-        }
+        toaster.create({
+          title: t('success'),
+          description: t('teacher_updated'),
+          type: "success",
+        });
+        onClose();
+      } catch {
+        toaster.create({
+          title: t('error'),
+          description: t('failed_update_teacher'),
+          type: "error",
+        });
+      }
+    } else {
+      // Add mode: create a new teacher.
+      if (password !== confirmPassword) {
+        toaster.create({
+          title: t('error'),
+          description: t('passwords_do_not_match'),
+          type: "error",
+        });
+        return;
+      }
+      const newTeacher = await createTeacherAdmin(token, fullName, email, password, schoolId, ROLE, specialization, parseFloat(rating), bio);
+      if (!newTeacher) {
+        toaster.create({
+          title: t('error'),
+          description: t('failed_create_teacher'),
+          type: "error",
+        });
+        return;
+      }
+        toaster.create({
+          title: t('success'),
+          description: t('teacher_added'),
+          type: "success",
+        });
+        onClose();
       }
     };
-
+  
     // const handleOnChangeRating = (e: React.ChangeEvent<HTMLInputElement>) => {
     //   const value = e.target.value;
     //   setRating(value === "" ? "0.00" : value);
@@ -189,7 +148,7 @@ const Teachers = () => {
         setRating(teacher.rating.toString() || "0.00");
         setEditingTeacher(teacher);
         setIsDialogOpen(true);
-      } catch(error) {
+      } catch (error) {
         toaster.create({
           title: t('error'),
           description: t('failed_update_teacher') + `\n ${error}`,
@@ -302,7 +261,7 @@ const Teachers = () => {
                     max={5}
                     min={0}
                     formatOptions={{ style: "decimal", minimumFractionDigits: 2 }}
-                    value = {rating}
+                    value={rating}
                     onValueChange={(e) => setRating(e.value)}
                   >
                     <NumberInputField
@@ -326,4 +285,4 @@ const Teachers = () => {
     );
   };
 
-  export default Teachers;
+export default Teachers;

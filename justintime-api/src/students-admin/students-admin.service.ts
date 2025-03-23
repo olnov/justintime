@@ -1,23 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateTeacherAdminDto } from './dto/teachers-admin-create.dto';
+import { CreateStudentsAdminDto } from './dto/create-students-admin.dto';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
-export class TeachersAdminService {
+export class StudentsAdminService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async createTeacherAdmin(createTeacherAdminDto: CreateTeacherAdminDto) {
+  async createStudentAdmin(createStudentsAdminDto: CreateStudentsAdminDto) {
     const {
       name,
       email,
       password,
+      role = 'student',
       schoolId,
-      role = 'teacher',
-      specialization,
-      bio,
-      rating,
-    } = createTeacherAdminDto;
+      gradeLevel,
+    } = createStudentsAdminDto;
     return this.prismaService.$transaction(async (tx) => {
       const salt = await bcrypt.genSalt();
       const hash = await bcrypt.hash(password, salt);
@@ -39,18 +37,17 @@ export class TeachersAdminService {
       if (!newRoleAssignment) {
         throw new Error('Failed to assign role');
       }
+
       try {
-        const newTeacher = await tx.teacher.create({
+        const newStudent = await tx.student.create({
           data: {
             userSchool: { connect: { id: newUserSchool.id } },
-            specialization,
-            bio,
-            rating,
+            gradeLevel,
           },
         });
-        return { user: newUser, teacher: newTeacher };
+        return { user: newUser, student: newStudent };
       } catch (e) {
-        throw new Error(`Error creating teacher ${e}`);
+        throw new Error(`Failed to create student: ${e}`);
       }
     });
   }
