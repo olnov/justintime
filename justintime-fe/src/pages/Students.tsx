@@ -12,10 +12,6 @@ import { useState, useEffect } from "react";
 import { getStudentBySchoolId, updateStudent, deleteStudent } from "@/services/StudentService";
 import { parseToken } from "@/services/AuthService";
 import { toaster } from "@/components/ui/toaster";
-import { createUser } from "@/services/UserService";
-import { createUserSchool } from "@/services/UserSchoolService";
-import { createRoleAssignment } from "@/services/RoleAssignmentService";
-import { createStudent } from "@/services/StudentService";
 import { Student, FlattenedStudent } from "@/types/student.types";
 import { useTranslation } from "react-i18next";
 import { createStudentAdmin } from "@/services/AdminServices";
@@ -89,105 +85,7 @@ const Students = () => {
         }
       };
 
-  // const handleSaveStudent = async () => {
-  //   if (!token) {
-  //     throw new Error("You are not authenticated");
-  //   }
-  //   // Editing mode
-  //   if (editingStudent) {
-  //     const updatedStrudent = {
-  //       id: editingStudent.id,
-  //       gradeLevel: gradeLevel,
-  //       userData: {
-  //         userId: editingStudent.userId,
-  //         name: fullName,
-  //         email: email,
-  //       },
-  //     }
-
-  //     // Update student
-  //     // console.log(updatedStrudent);
-  //     const updatedStudent = await updateStudent(token, updatedStrudent);
-  //     if (!updatedStudent) {
-  //       toaster.create({
-  //         title: "Error",
-  //         description: "Failed to update student",
-  //         type: "error",
-  //       });
-  //       return;
-  //     } else {
-  //       toaster.create({
-  //         title: "Success",
-  //         description: "Student updated successfully",
-  //         type: "success",
-  //       });
-  //       onClose();
-  //     }
-  //     return;
-  //   } else {
-  //     // Adding mode
-
-  //     // Step 1: Validate password
-  //     if (password !== confirmPassword) {
-  //       toaster.create({
-  //         title: "Error",
-  //         description: "Passwords do not match",
-  //         type: "error",
-  //       });
-  //       return;
-  //     }
-  //     // Step 2: Create user
-  //     const newUser = await createUser(token, fullName, email, password);
-  //     if (!newUser) {
-  //       toaster.create({
-  //         title: "Error",
-  //         description: "Failed to create user",
-  //         type: "error",
-  //       });
-  //       return;
-  //     }
-  //     // Step 3: Adding user and school relationship.
-  //     const schoolId = parseToken(token).schools[0].id;
-  //     const newUserSchool = await createUserSchool(token, newUser.id, schoolId);
-  //     if (!newUserSchool) {
-  //       toaster.create({
-  //         title: "Error",
-  //         description: "Failed to create user school relationship",
-  //         type: "error",
-  //       });
-  //       return;
-  //     }
-  //     // Step 4: Registering a student role for the user
-  //     const studentRoleAssignment = await createRoleAssignment(token, newUserSchool.id, ROLE);
-  //     if (!studentRoleAssignment) {
-  //       toaster.create({
-  //         title: "Error",
-  //         description: "Failed to register role for user",
-  //         type: "error",
-  //       });
-  //       return;
-  //     }
-  //     // Step 5: Create student
-  //     const newStudent = await createStudent(token, newUserSchool.id);
-  //     if (!newStudent) {
-  //       toaster.create({
-  //         title: "Error",
-  //         description: "Failed to create student",
-  //         type: "error",
-  //       });
-  //       return;
-  //     } else {
-  //       toaster.create({
-  //         title: "Success",
-  //         description: "Student added successfully",
-  //         type: "success",
-  //       });
-  //       onClose();
-  //     }
-  //   }
-  // }
-
-  
+    
   const handleSaveStudent = async () => {
     if (!token) {
       throw new Error("You are not authenticated");
