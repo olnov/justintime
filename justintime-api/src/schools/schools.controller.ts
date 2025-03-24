@@ -6,7 +6,7 @@ import {
   Patch,
   Param,
   Delete,
-  UseGuards,
+  UseGuards, Query,
 } from '@nestjs/common';
 import { SchoolsService } from './schools.service';
 import { CreateSchoolDto } from './dto/create-school.dto';
@@ -41,8 +41,10 @@ export class SchoolsController {
   @ApiBearerAuth('JWT-auth')
   @UseGuards(JwtAuthGuard)
   @Get()
-  async findAll() {
-    return this.schoolsService.findAll();
+  async findAll(@Query('skip') skip?: string, @Query('take') take?: string) {
+    const parsedSkip = skip ? parseInt(skip, 10) : undefined;
+    const parsedTake = take ? parseInt(take, 10) : undefined;
+    return this.schoolsService.findAll(parsedSkip, parsedTake);
   }
 
   @ApiOkResponse({ description: 'Successfully retrieved school.' })

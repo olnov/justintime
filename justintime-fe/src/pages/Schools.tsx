@@ -23,15 +23,26 @@ const Schools = () => {
   const [phone, setPhone] = useState("");
   const token = localStorage.getItem("token");
   const { t } = useTranslation();
+  // Pagination options
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(10);
+  const [totalCount, setTotalCount] = useState(0);
 
   useEffect(() => {
     fetchSchools();
   }, [isFormOpen]);
 
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  };
+
   const fetchSchools = async () => {
     if (token) {
-      const data = await getSchools(token);
-      setSchools(data);
+      const skip = (currentPage - 1) * pageSize;
+      const take = pageSize;
+      const data = await getSchools(token, skip, take);
+      setSchools(data.data);
+      setTotalCount(data.totalCount);
     } else {
       throw new Error("You are not authenticated");
     }
@@ -76,6 +87,10 @@ const Schools = () => {
             <Button variant={"outline"}>Edit</Button>
           </>
         }
+        currentPage={currentPage}
+        pageSize={pageSize}
+        onPageChange={handlePageChange}
+        totalCount={totalCount}
       />
       <DialogRoot open={isFormOpen} onOpenChange={(isOpen) => !isOpen && onClose()}>
         <DialogContent>
@@ -87,7 +102,7 @@ const Schools = () => {
                 placeholder={t('school_name')}
                 name="name"
                 value={schoolName}
-                required = {true}
+                required={true}
                 onChange={(e) => setSchoolName(e.target.value)}
               />
               <Input

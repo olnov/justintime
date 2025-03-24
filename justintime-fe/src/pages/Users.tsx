@@ -56,6 +56,10 @@ const Users = () => {
   const [selectedSchoolName, setSelectedSchoolName] = useState("");
   const [edititngUser, setEditingUser] = useState<FlattenedUser | null>(null);
   const token = localStorage.getItem("token");
+  // Pagination options
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(10);
+  const [totalCount, setTotalCount] = useState(0);
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -65,12 +69,19 @@ const Users = () => {
     } else {
       setResults([]);
     }
-  }, [isDialogOpen, selectedSchoolName]);
+  }, [isDialogOpen, selectedSchoolName, pageSize, currentPage]);
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  };
 
   const fetchUsers = async () => {
     if (token) {
-      const data = await getUsersWithDetails(token);
-      setUsers(data);
+      const skip = (currentPage - 1) * pageSize;
+      const take = pageSize;
+      const data = await getUsersWithDetails(token, skip, take);
+      setTotalCount(data.totalCount); 
+      setUsers(data.data);
     } else {
       throw new Error("You are not authenticated");
     }
@@ -201,6 +212,10 @@ const Users = () => {
         onAdd={() => setIsDialogOpen(true)} // Open the form
         onEdit={(item)=>hadnleUserEdit(item as unknown as FlattenedUser)}
         onDelete={handleUserDelete}
+        currentPage={currentPage}
+        pageSize={pageSize}
+        onPageChange={handlePageChange}
+        totalCount={totalCount}
       />
       <DialogRoot open={isDialogOpen} onOpenChange={(isOpen) => !isOpen && onClose()}>
         <DialogContent>

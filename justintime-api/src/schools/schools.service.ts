@@ -16,8 +16,15 @@ export class SchoolsService {
     });
   }
 
-  async findAll() {
-    return this.prismaService.school.findMany();
+  async findAll(skip?: number, take?: number) {
+    const queryOptions: { skip?: number; take?: number } = {};
+    if (typeof skip === 'number' && typeof take === 'number') {
+      queryOptions.skip = skip;
+      queryOptions.take = take;
+    }
+    const data = await this.prismaService.school.findMany(queryOptions);
+    const totalCount = await this.prismaService.school.count({});
+    return { data, totalCount };
   }
 
   async findOne(id: string) {

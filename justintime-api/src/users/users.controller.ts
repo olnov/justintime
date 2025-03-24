@@ -9,6 +9,7 @@ import {
   HttpException,
   HttpStatus,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -49,8 +50,13 @@ export class UsersController {
   @ApiBearerAuth('JWT-auth')
   @UseGuards(JwtAuthGuard)
   @Get('/allWithDetails')
-  async findAllWithDetails() {
-    return this.usersService.getAllWithDetails();
+  async findAllWithDetails(
+    @Query('skip') skip?: string,
+    @Query('take') take?: string,
+  ) {
+    const parsedSkip = skip ? parseInt(skip, 10) : undefined;
+    const parsedTake = take ? parseInt(take, 10) : undefined;
+    return this.usersService.getAllWithDetails(parsedSkip, parsedTake);
   }
 
   @ApiOkResponse({ description: 'The user has been successfully retrieved.' })

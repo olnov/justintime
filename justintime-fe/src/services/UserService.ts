@@ -36,22 +36,29 @@ export const createUser = async (token: string, name: string, email: string, pas
     }
 }
 
-export const getUsersWithDetails = async (token:string) => {
+export const getUsersWithDetails = async (token: string, skip?: number, take?: number) => {
+    const queryParams = new URLSearchParams();
+    if (skip !== undefined) queryParams.append('skip', skip.toString());
+    if (take !== undefined) queryParams.append('take', take.toString());
+    
     const requestOptions = {
-        method: 'GET',
-        headers: {
-            Authorization: `Bearer ${token}`, 
-            'Content-Type': 'application/json' 
-        }
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`, 
+        'Content-Type': 'application/json' 
+      }
     };
-    const response = await fetch(`${BACKEND_URL}/users/allWithDetails`, requestOptions);
+  
+    const url = `${BACKEND_URL}/users/allWithDetails${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
+    const response = await fetch(url, requestOptions);
     if (!response.ok) {
         throw new Error("Failed to fetch users with details");
     }
-
+  
     const data = await response.json();
     return data;
-}
+  }
+  
 
 export const deleteUser = async (token:string, userId: string) => {
     const requestOptions = {

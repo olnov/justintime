@@ -45,8 +45,8 @@ export class UsersService {
     return this.prismaService.user.delete({ where: { id: id } });
   }
 
-  async getAllWithDetails() {
-    return this.prismaService.user.findMany({
+  async getAllWithDetails(skip?: number, take?: number) {
+    const queryOptions: any = {
       select: {
         id: true,
         name: true,
@@ -67,6 +67,15 @@ export class UsersService {
           },
         },
       },
-    });
+    };
+
+    if (typeof skip === 'number' && typeof take === 'number') {
+      queryOptions.skip = skip;
+      queryOptions.take = take;
+    }
+
+    const data = await this.prismaService.user.findMany(queryOptions);
+    const totalCount = await this.prismaService.user.count();
+    return { data, totalCount };
   }
 }

@@ -1,6 +1,10 @@
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
-export const getSchools = async (token:string) => {
+export const getSchools = async (token:string, skip?:number, take?:number) => {
+    const queryParams = new URLSearchParams();
+    if (skip !== undefined ) queryParams.append('skip', skip.toString());
+    if (take !== undefined ) queryParams.append('take', take.toString());
+
     const requestOptions = {
         method: 'GET',
         headers: {
@@ -8,7 +12,9 @@ export const getSchools = async (token:string) => {
             'Content-Type': 'application/json' 
         }
     };
-    const response = await fetch(`${BACKEND_URL}/schools`, requestOptions);
+
+    const url = `${BACKEND_URL}/schools${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
+    const response = await fetch(url, requestOptions);
     if (!response.ok) {
         throw new Error("Failed to fetch schools");
     }

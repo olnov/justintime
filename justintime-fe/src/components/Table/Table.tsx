@@ -5,13 +5,10 @@ import {
     Table,
     Input,
     Text,
+    Pagination,
+    IconButton,
+    ButtonGroup,
 } from "@chakra-ui/react";
-import {
-    PaginationItems,
-    PaginationNextTrigger,
-    PaginationPrevTrigger,
-    PaginationRoot,
-} from "@/components/ui/pagination";
 import {
     DialogBody,
     DialogContent,
@@ -30,17 +27,35 @@ import {
 // } from "@/components/ui/popover";
 
 import { Button } from "@/components/ui/button";
+import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
 import { useState, useEffect } from "react";
 import { BiListPlus } from "react-icons/bi";
 import { Column, DataItem, TableProps } from "@/types/table.types";
 import { useTranslation } from "react-i18next";
 
-
-
-const TableComponent: React.FC<TableProps & {
+interface TableComponentProps extends TableProps {
+    currentPage?: number;
+    pageSize?: number;
+    onPageChange?: (page: number) => void;
+    totalCount: number,
+    onAdd?: () => void;
     onDelete?: (id: string) => void;
     onEdit?: (item: DataItem) => void;
-}> = ({ title, data, columns, onAdd, onDelete, onEdit }) => {
+}
+
+
+const TableComponent: React.FC<TableComponentProps> = ({
+    title,
+    data,
+    columns,
+    onAdd,
+    onDelete,
+    onEdit,
+    currentPage = 1,
+    pageSize = 10,
+    onPageChange = () => { },
+    totalCount,
+}) => {
 
     // const [selection, setSelection] = useState<string[]>([]);
     const [sortConfig, setSortConfig] = useState<{ key: string; direction: "asc" | "desc" } | null>(null);
@@ -49,6 +64,7 @@ const TableComponent: React.FC<TableProps & {
     const [selectedId, setSelectedId] = useState<string | null>(null);
     // const [selectedItem, setSelectedItem] = useState<DataItem | null>(null);
     const [selectedName, setSelectedName] = useState<string | null>(null);
+    const totalPages = (Math.ceil(totalCount / pageSize))
     const { t } = useTranslation();
 
     // const hasSelection = selection.length > 0;
@@ -68,6 +84,18 @@ const TableComponent: React.FC<TableProps & {
         if (aValue > bValue) return direction === "asc" ? 1 : -1;
         return 0;
     });
+
+    const handlePrevPage = () => {
+        if (currentPage > 1) {
+            onPageChange(currentPage - 1);
+        }
+    };
+
+    const handleNextPage = () => {
+        if (currentPage < totalPages) {
+            onPageChange(currentPage + 1);
+        }
+    };
 
     const handleFilter = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value.toLowerCase();
@@ -191,9 +219,9 @@ const TableComponent: React.FC<TableProps & {
                                             {columns.map((col: Column) => (
                                                 <Table.Cell
                                                     key={col.key}
-                                                    // onMouseOver={(e) =>
-                                                    //     handleMouseOver(e, String(dataItem[col.key]))
-                                                    // }
+                                                // onMouseOver={(e) =>
+                                                //     handleMouseOver(e, String(dataItem[col.key]))
+                                                // }
                                                 >
                                                     <Text lineClamp={1}>
                                                         {String(dataItem[col.key])}
@@ -225,15 +253,35 @@ const TableComponent: React.FC<TableProps & {
                                 })}
                             </Table.Body>
                         </Table.Root>
+                        <Pagination.Root count={totalCount} pageSize={pageSize} page={currentPage}>
+                        <HStack justify={'center'}>
+                        <ButtonGroup variant="ghost" size="sm" wrap="wrap">
+                            <Pagination.PrevTrigger asChild>
+                                <IconButton aria-label="Previous page" onClick={handlePrevPage}>
+                                    <LuChevronLeft />
+                                </IconButton>
+                            </Pagination.PrevTrigger>
 
-                        {/* Optionally, remove the ActionBarRoot if no longer needed */}
-                        <PaginationRoot count={data.length} pageSize={5} page={1}>
-                            <HStack justify="center">
-                                <PaginationPrevTrigger />
-                                <PaginationItems />
-                                <PaginationNextTrigger />
-                            </HStack>
-                        </PaginationRoot>
+                            <Pagination.Items
+                                render={(page) => (
+                                    <IconButton
+                                        aria-label={`Page ${page.value}`}
+                                        variant={page.value === currentPage ? "outline" : "ghost"}
+                                        onClick={() => onPageChange(page.value)}
+                                    >
+                                        {page.value}
+                                    </IconButton>
+                                )}
+                            />
+
+                            <Pagination.NextTrigger asChild>
+                                <IconButton aria-label="Next page" onClick={handleNextPage}>
+                                    <LuChevronRight />
+                                </IconButton>
+                            </Pagination.NextTrigger>
+                        </ButtonGroup>
+                        </HStack>
+                        </Pagination.Root>
                     </Stack>
                 </Card.Body>
             </Card.Root>
