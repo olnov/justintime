@@ -54,7 +54,7 @@ const TableComponent: React.FC<TableComponentProps> = ({
     currentPage = 1,
     pageSize = 10,
     onPageChange = () => { },
-    totalCount,
+    totalCount = 0,
 }) => {
 
     // const [selection, setSelection] = useState<string[]>([]);
