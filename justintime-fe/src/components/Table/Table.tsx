@@ -37,7 +37,7 @@ interface TableComponentProps extends TableProps {
     currentPage?: number;
     pageSize?: number;
     onPageChange?: (page: number) => void;
-    totalCount: number,
+    totalCount?: number,
     onAdd?: () => void;
     onDelete?: (id: string) => void;
     onEdit?: (item: DataItem) => void;
