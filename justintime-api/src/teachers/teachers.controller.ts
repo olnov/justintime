@@ -8,7 +8,9 @@ import {
   Delete,
   UseGuards,
   HttpException,
-  HttpStatus, HttpCode, BadRequestException,
+  HttpStatus,
+  BadRequestException,
+  Query,
 } from '@nestjs/common';
 import { TeachersService } from './teachers.service';
 import { CreateTeacherDto } from './dto/create-teacher.dto';
@@ -63,8 +65,14 @@ export class TeachersController {
   @ApiBearerAuth('JWT-auth')
   @UseGuards(JwtAuthGuard)
   @Get('/allBySchool/:id')
-  async allBySchool(@Param('id') id: string) {
-    return this.teachersService.findBySchoolId(id);
+  async allBySchool(
+    @Param('id') id: string,
+    @Query('skip') skip?: string,
+    @Query('take') take?: string,
+  ) {
+    const parsedSkip = skip ? parseInt(skip, 10) : undefined;
+    const parsedTake = take ? parseInt(take, 10) : undefined;
+    return this.teachersService.findBySchoolId(id, parsedSkip, parsedTake);
   }
 
   @ApiOkResponse({ description: 'Teacher successfully retrieved' })

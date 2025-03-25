@@ -53,7 +53,11 @@ export const getTeachersWithSchools = async (token:string) => {
     return data;
 }
 
-export const getTeacherBySchoolId = async (token:string, userSchoolId: string) => {
+export const getTeacherBySchoolId = async (token:string, userSchoolId: string, skip?: number, take?: number) => {
+    const queryParams = new URLSearchParams();
+    if (skip !== undefined) queryParams.append('skip', skip.toString());
+    if (take !== undefined) queryParams.append('take', take.toString());
+
     const requestOptions = {
         method: 'GET',
         headers: {
@@ -61,7 +65,9 @@ export const getTeacherBySchoolId = async (token:string, userSchoolId: string) =
             'Content-Type': 'application/json' 
         }
     };
-    const response = await fetch(`${BACKEND_URL}/teachers/allBySchool/${userSchoolId}`, requestOptions);
+
+    const url = `${BACKEND_URL}/teachers/allBySchool/${userSchoolId}${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
+    const response = await fetch(url, requestOptions);
     if (!response.ok) {
         throw new Error("Failed to fetch teacher");
     }

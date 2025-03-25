@@ -66,8 +66,8 @@ export class TeachersService {
     });
   }
 
-  async findBySchoolId(id: string) {
-    return this.prismaService.teacher.findMany({
+  async findBySchoolId(id: string, skip?: number, take?: number) {
+    const queryOptions: any = {
       where: {
         userSchool: {
           schoolId: id,
@@ -90,7 +90,16 @@ export class TeachersService {
           },
         },
       },
-    });
+    };
+
+    if (typeof skip === 'number' && typeof take === 'number') {
+      queryOptions.skip = skip;
+      queryOptions.take = take;
+    }
+
+    const data = await this.prismaService.teacher.findMany(queryOptions);
+    const totalCount = await this.prismaService.teacher.count();
+    return { data, totalCount };
   }
 
   async findAllWithSchool() {
