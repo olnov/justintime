@@ -13,6 +13,8 @@ import {
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
+import ruLocale from '@fullcalendar/core/locales/ru';
+import enLocale from '@fullcalendar/core/locales/en-gb';
 import { DateSelectArg, EventClickArg, EventDropArg } from "@fullcalendar/core";
 import {
   SelectContent,
@@ -41,16 +43,8 @@ import { RawScheduleItem } from "@/types/schedule.types";
 import { Student } from "@/types/student.types";
 import { Email } from "@/types/email.types";
 import { sendEmail } from "@/services/EmailNotificationService";
+import { useTranslation } from "react-i18next";
 
-
-const statusCollection = createListCollection({
-  items: [
-    { label: "Planning", value: "planned" },
-    { label: "Confirmed", value: "scheduled" },
-    { label: "Completed", value: "completed" },
-    { label: "Cancelled", value: "cancelled" },
-  ],
-});
 
 const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
   const [lessons, setLessons] = useState<Lesson[]>([]);
@@ -63,6 +57,16 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
   const [students, setStudents] = useState<{ id: string; name: string }[]>([]);
   const [loading, setLoading] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation();
+
+  const statusCollection = createListCollection({
+    items: [
+      { label: t('planning'), value: "planned" },
+      { label: t('confirmed'), value: "scheduled" },
+      { label: t('completed'), value: "completed" },
+      { label: t('cancelled'), value: "cancelled" },
+    ],
+  });
 
   const [formData, setFormData] = useState({
     student: "",
@@ -120,7 +124,7 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
     const token = localStorage.getItem("token");
     if (token) {
       const data = await getTeacherBySchoolId(token, schoolId);
-      const teacherList = data.map((teacher: Teacher) => ({
+      const teacherList = data.data.map((teacher: Teacher) => ({
         label: teacher.userSchool?.user?.name,
         value: teacher.id,
       }));
@@ -136,7 +140,7 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
     if (token) {
       setLoading(true);
       const data = await getStudentBySchoolId(token, schoolId);
-      const filteredStudentList = data.filter((student: Student) => {
+      const filteredStudentList = data.data.filter((student: Student) => {
         const studentName = student.userSchool?.user?.name ?? "";
         return studentName.toLowerCase().includes(selectedStudent.toLowerCase());
       });
@@ -257,8 +261,8 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
 
     if (!formData.student || formData.student.trim() === "") {
         toaster.create({
-            title: "Validation error",
-            description: "There is no such a student. Please select a student from the suggestion list.",
+            title: t('error'),
+            description: t('no_such_student'),
             type: "warning",
           });
           return;
@@ -267,8 +271,8 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
     console.log("New lesson:", newLesson);
     if (newLesson.student?.id?.trim() === "" || !newLesson.teacher?.id?.trim() || newLesson.status.trim() === "") {
       toaster.create({
-        title: "Validation error",
-        description: "Please fill in all required fields",
+        title: t('error'),
+        description: t('fill_all_fields'),
         type: "error",
       });
       return;
@@ -350,7 +354,7 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
       mx={[-5, -5, "-10%"]}
     >
       <Text fontSize="lg" fontWeight="bold" mb={4}>
-        Teacher's Weekly Schedule
+        {t('weekly_schedule_title')}
       </Text>
       <Stack direction={"row"} h={10} mb={4} align={"flex-start"}>
       {/* Teacher Filter */}
@@ -362,7 +366,7 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
         mb={4}
       >
         <SelectTrigger>
-          <SelectValueText placeholder="Select teacher" />
+          <SelectValueText placeholder={t('select_teacher')} />
         </SelectTrigger>
         <SelectContent>
           {teachers.items.map((teacher: { label: string; value: string }) => (
@@ -376,12 +380,13 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
           ))}
         </SelectContent>
       </SelectRoot>
-      <Button onClick={()=>handleFilterReset()} size={"sm"} bgColor={"blue.500"}>Reset</Button>
+      <Button onClick={()=>handleFilterReset()} size={"sm"} bgColor={"blue.500"}>{t('reset')}</Button>
       </Stack>
 
       {/* FullCalendar Component */}
       <FullCalendar
         plugins={[timeGridPlugin, interactionPlugin]}
+        locale={localStorage.getItem("language") === "ru" ? ruLocale : enLocale}
         themeSystem="standard"
         stickyHeaderDates={true}
         initialView="timeGridWeek"
@@ -455,11 +460,11 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
                 </div>
               )}
               <div>
-                <span style={{ fontWeight: "bold" }}>Student: </span>
+                <span style={{ fontWeight: "bold" }}>{t('student')}: </span>
                 <span style={{ fontStyle: "italic" }}>{student}</span>
               </div>
               <div>
-                <span style={{ fontWeight: "bold" }}>Teacher: </span>
+                <span style={{ fontWeight: "bold" }}>{t('teacher')}: </span>
                 <span style={{ fontStyle: "italic" }}>{teacher}</span>
               </div>
               <br />
@@ -478,11 +483,11 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
         }}
       >
         <DialogContent ref={contentRef}>
-          <DialogHeader>Book a Lesson</DialogHeader>
+          <DialogHeader>{t('book_lesson')}</DialogHeader>
           <DialogBody>
             <Box mb={3} position="relative">
               <label htmlFor="student">
-                <Text mb={1}>Student Name</Text>
+                <Text mb={1}>{t('student_name')}</Text>
               </label>
               <Input
                 id="student"
@@ -492,7 +497,7 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
                 onChange={(e) => {
                   setSelectedStudent(e.target.value);
                 }}
-                placeholder="Start typing student name and it will show suggestions"
+                placeholder={t('start_input_student')}
               />
               {(selectedStudent?.length ?? 0) >= 3 && (students?.length ?? 0) > 0 && (
                 <Box
@@ -537,7 +542,7 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
             </Box>
             <Box mb={3}>
               <label htmlFor="start">
-                <Text mb={1}>Start Time</Text>
+                <Text mb={1}>{t('start_time')}</Text>
               </label>
               <Input
                 id="start"
@@ -555,7 +560,7 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
             </Box>
             <Box mb={3}>
               <label htmlFor="end">
-                <Text mb={1}>End Time</Text>
+                <Text mb={1}>{t('end_time')}</Text>
               </label>
               <Input
                 id="end"
@@ -573,18 +578,17 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
             </Box>
             <Box mb={3}>
               <label htmlFor="teacher">
-                <Text mb={1}>Teacher</Text>
+                <Text mb={1}>{t('teacher')}</Text>
               </label>
               <SelectRoot
                 collection={teachers}
                 key={teachers.items.length ? teachers.items[0].value : "empty"}
                 value={[formData.teacher]}
                 required={true}
-                size="xs"
                 mb={4}
               >
                 <SelectTrigger bgColor={"white"}>
-                  <SelectValueText placeholder="Select teacher" />
+                  <SelectValueText placeholder={t('select_teacher')} />
                 </SelectTrigger>
                 <SelectContent portalRef={contentRef}>
                   {teachers.items.map((teacher: { label: string; value: string }) => (
@@ -601,16 +605,15 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
             </Box>
             <Box mb={3}>
               <label htmlFor="status">
-                <Text mb={1}>Status</Text>
+                <Text mb={1}>{t('status')}</Text>
               </label>
               <SelectRoot
                 collection={statusCollection}
-                size="xs"
                 key={statusCollection.items.length ? statusCollection.items[0].value : "empty"}
                 required={true}
               >
                 <SelectTrigger>
-                  <SelectValueText placeholder="Select status" />
+                  <SelectValueText placeholder={t('select_status')} />
                 </SelectTrigger>
                 <SelectContent portalRef={contentRef}>
                   {statusCollection.items.map((status) => (
@@ -624,10 +627,10 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
           </DialogBody>
           <DialogFooter>
             <Button variant={"outline"} bgColor="green.300" onClick={handleFormSubmit}>
-              Save
+              {t('save')}
             </Button>
             <Button variant="ghost" bgColor={"red.300"} onClick={() => setIsDialogOpen(false)}>
-              Cancel
+              {t('cancel')}
             </Button>
           </DialogFooter>
         </DialogContent>
