@@ -10,6 +10,7 @@ import {
   HttpException,
   HttpStatus,
   BadRequestException,
+  Query,
 } from '@nestjs/common';
 import { StudentsService } from './students.service';
 import { CreateStudentDto } from './dto/create-student.dto';
@@ -50,8 +51,14 @@ export class StudentsController {
   @ApiBearerAuth('JWT-auth')
   @UseGuards(JwtAuthGuard)
   @Get('/allBySchool/:id')
-  async allBySchool(@Param('id') id: string) {
-    return this.studentsService.findBySchoolId(id);
+  async allBySchool(
+    @Param('id') id: string,
+    @Query('skip') skip?: string,
+    @Query('take') take?: string,
+  ) {
+    const parsedSkip = skip ? parseInt(skip, 10) : undefined;
+    const parsedTake = take ? parseInt(take, 10) : undefined;
+    return this.studentsService.findBySchoolId(id, parsedSkip, parsedTake);
   }
 
   @ApiBearerAuth('JWT-auth')

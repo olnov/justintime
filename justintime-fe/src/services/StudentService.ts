@@ -54,7 +54,11 @@ export const getStudentsWithSchools = async (token:string) => {
     return data;
 }
 
-export const getStudentBySchoolId = async (token:string, userSchoolId: string) => {
+export const getStudentBySchoolId = async (token:string, userSchoolId: string, skip?: number, take?: number) => {
+    const queryParams = new URLSearchParams();
+    if (skip !== undefined ) queryParams.append('skip', skip.toString());
+    if (take !== undefined ) queryParams.append('take', take.toString());
+
     const requestOptions = {
         method: 'GET',
         headers: {
@@ -62,7 +66,10 @@ export const getStudentBySchoolId = async (token:string, userSchoolId: string) =
             'Content-Type': 'application/json' 
         }
     };
-    const response = await fetch(`${BACKEND_URL}/students/allBySchool/${userSchoolId}`, requestOptions);
+    
+    const url = `${BACKEND_URL}/students/allBySchool/${userSchoolId}${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
+    const response = await fetch(url, requestOptions);
+    // const response = await fetch(`${BACKEND_URL}/students/allBySchool/${userSchoolId}`, requestOptions);
     if (!response.ok) {
         throw new Error("Failed to fetch students by school");
     }

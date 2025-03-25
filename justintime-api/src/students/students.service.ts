@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import { PrismaService } from '../prisma/prisma.service';
-import {UpdateTeacherDto} from "../teachers/dto/update-teacher.dto";
+import { UpdateTeacherDto } from '../teachers/dto/update-teacher.dto';
 
 @Injectable()
 export class StudentsService {
@@ -67,8 +67,8 @@ export class StudentsService {
     });
   }
 
-  async findBySchoolId(id: string) {
-    return this.prismaService.student.findMany({
+  async findBySchoolId(id: string, skip?: number, take?: number) {
+    const queryOptions: any = {
       where: {
         userSchool: {
           schoolId: id,
@@ -91,7 +91,14 @@ export class StudentsService {
           },
         },
       },
-    });
+    };
+    if (typeof skip === 'number' && typeof take === 'number') {
+      queryOptions.skip = skip;
+      queryOptions.take = take;
+    }
+    const data = await this.prismaService.student.findMany(queryOptions);
+    const totalCount = await this.prismaService.student.count();
+    return { data, totalCount };
   }
 
   async findAllWithSchool() {

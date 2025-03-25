@@ -30,18 +30,28 @@ const Students = () => {
   const schoolId = parseToken(token as string).schools[0].id;
   const { t } = useTranslation();
   const ROLE = "student";
+  // Pagination options
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(10);
+  const [totalCount, setTotalCount] = useState(0);
 
 
   useEffect(() => {
     fetchStudentsBySchool();
-  }, [isDialogOpen]);
+  }, [isDialogOpen, currentPage, pageSize]);
 
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  }
 
   const fetchStudentsBySchool = async () => {
     if (token) {
+      const skip = (currentPage - 1)*pageSize;
+      const take = pageSize;
       const schoolId = parseToken(token).schools[0].id;
-      const data = await getStudentBySchoolId(token, schoolId);
-      setStudents(data);
+      const data = await getStudentBySchoolId(token, schoolId, skip, take);
+      setStudents(data.data);
+      setTotalCount(data.totalCount);
     } else {
       throw new Error("You are not authenticated");
     }
@@ -49,43 +59,43 @@ const Students = () => {
 
 
   const handleStudentDelete = async (studentId: string) => {
-        try {
-          if (!token) throw new Error("Not authenticated");
-          await deleteStudent(token, studentId);
-          toaster.create({
-            title: "Success",
-            description: "Student deleted successfully",
-            type: "success",
-          });
-          setStudents((prev) => prev.filter((student) => student.id?.toString() !== studentId));
-        } catch {
-          toaster.create({
-            title: "Error",
-            description: "Failed to delete srudent",
-            type: "error",
-          });
-        }
-      };
+    try {
+      if (!token) throw new Error("Not authenticated");
+      await deleteStudent(token, studentId);
+      toaster.create({
+        title: "Success",
+        description: "Student deleted successfully",
+        type: "success",
+      });
+      setStudents((prev) => prev.filter((student) => student.id?.toString() !== studentId));
+    } catch {
+      toaster.create({
+        title: "Error",
+        description: "Failed to delete srudent",
+        type: "error",
+      });
+    }
+  };
 
   const handleStudentEdit = (student: FlattenedStudent) => {
-        try {
-          if (!student) throw new Error("Student not found");
-          // Populate form fields for editing.
-          setFullName(student.name || "");
-          setEmail(student.email || "");
-          setGradeLevel(student.gradeLevel.toString() || "0.00");
-          setEditingStudent(student);
-          setIsDialogOpen(true);
-        } catch {
-          toaster.create({
-            title: "Error",
-            description: "Failed to edit student",
-            type: "error",
-          });
-        }
-      };
+    try {
+      if (!student) throw new Error("Student not found");
+      // Populate form fields for editing.
+      setFullName(student.name || "");
+      setEmail(student.email || "");
+      setGradeLevel(student.gradeLevel.toString() || "0.00");
+      setEditingStudent(student);
+      setIsDialogOpen(true);
+    } catch {
+      toaster.create({
+        title: "Error",
+        description: "Failed to edit student",
+        type: "error",
+      });
+    }
+  };
 
-    
+
   const handleSaveStudent = async () => {
     if (!token) {
       throw new Error("You are not authenticated");
@@ -141,7 +151,7 @@ const Students = () => {
     }
   }
 
-  
+
   const onClose = () => {
     setFullName("");
     setEmail("");
@@ -179,10 +189,14 @@ const Students = () => {
         }}
         onDelete={handleStudentDelete}
         onEdit={(item) => handleStudentEdit(item as unknown as FlattenedStudent)}
+        currentPage={currentPage}
+        pageSize={pageSize}
+        onPageChange={handlePageChange}
+        totalCount={totalCount}
       />
       <DialogRoot open={isDialogOpen} onOpenChange={(isOpen) => !isOpen && onClose()}>
         <DialogContent>
-        <DialogHeader>{editingStudent ? t('edit_student') : t('add_new_student')}</DialogHeader>
+          <DialogHeader>{editingStudent ? t('edit_student') : t('add_new_student')}</DialogHeader>
           <DialogBody pb="4">
             <Stack>
               <Input
@@ -203,22 +217,22 @@ const Students = () => {
               />
               {!editingStudent && (
                 <>
-                <Input
-                  type="password"
-                  placeholder={t('password')}
-                  name="password"
-                  value={password}
-                  required={true}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-                <Input
-                  type="password"
-                  placeholder={t('confirm_password')}
-                  name="confirmPassword"
-                  value={confirmPassword}
-                  required={true}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                />
+                  <Input
+                    type="password"
+                    placeholder={t('password')}
+                    name="password"
+                    value={password}
+                    required={true}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <Input
+                    type="password"
+                    placeholder={t('confirm_password')}
+                    name="confirmPassword"
+                    value={confirmPassword}
+                    required={true}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                  />
                 </>
               )}
               <Box>
