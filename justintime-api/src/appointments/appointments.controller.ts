@@ -6,7 +6,7 @@ import {
   Patch,
   Param,
   Delete,
-  UseGuards,
+  UseGuards, ConflictException, InternalServerErrorException,
 } from '@nestjs/common';
 import { AppointmentsService } from './appointments.service';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
@@ -17,6 +17,7 @@ import {
   ApiOkResponse,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { TeacherUnavailableError } from './errors/teacher-unavilable.error';
 
 @Controller('appointments')
 export class AppointmentsController {
@@ -30,7 +31,14 @@ export class AppointmentsController {
   @UseGuards(JwtAuthGuard)
   @Post()
   create(@Body() createAppointmentDto: CreateAppointmentDto) {
-    return this.appointmentsService.create(createAppointmentDto);
+    try {
+      return this.appointmentsService.create(createAppointmentDto);
+    } catch (error) {
+      if (error instanceof TeacherUnavailableError) {
+        throw new ConflictException(error.message);
+      }
+      throw new InternalServerErrorException(error.message);
+    }
   }
 
   @ApiOkResponse({ description: 'Appointments successfully retrieved' })

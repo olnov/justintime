@@ -2,32 +2,62 @@ import { APILesson } from "@/types/transformation.types";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
-export const bookLesson = async (token:string, lesson: APILesson) => {
+export const bookLesson = async (token: string, lesson: APILesson) => {
     const requestOptions = {
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${token}`, 
-            'Content-Type': 'application/json' 
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify(lesson)
     };
+
     const response = await fetch(`${BACKEND_URL}/appointments`, requestOptions);
+    const data = await response.json();
+
     if (!response.ok) {
-        throw new Error("Failed to book lesson");
+        const error = data.message
+            ? Array.isArray(data.message)
+                ? data.message.join(", ")
+                : data.message
+            : response.statusText;
+        throw new Error(error);
     }
 
-    const data = await response.json();
     return data;
+};
 
+export const updateBooking = async (token: string, lessonId: string, lesson: APILesson) => {
+    const requestOptions = {
+        method: 'PATCH',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(lesson)
+    };
+    const response = await fetch(`${BACKEND_URL}/appointments/${lessonId}`, requestOptions);
+    const data = await response.json();
+    
+    if (!response.ok) {
+        const error = data.message
+            ? Array.isArray(data.message)
+                ? data.message.join(", ")
+                : data.message
+            : response.statusText;
+        throw new Error(error);
+    }
+
+    return data;
 };
 
 
-export const getScheduleBySchoolId = async (token:string, userSchoolId: string) => {
+export const getScheduleBySchoolId = async (token: string, userSchoolId: string) => {
     const requestOptions = {
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`, 
-            'Content-Type': 'application/json' 
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
         }
     };
     const response = await fetch(`${BACKEND_URL}/appointments/school/${userSchoolId}`, requestOptions);
@@ -40,12 +70,12 @@ export const getScheduleBySchoolId = async (token:string, userSchoolId: string) 
 
 };
 
-export const getScheduleBySchooIdAndTeacherId = async (token:string, schoolId: string, teacherId: string) => {
+export const getScheduleBySchooIdAndTeacherId = async (token: string, schoolId: string, teacherId: string) => {
     const requestOptions = {
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`, 
-            'Content-Type': 'application/json' 
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
         }
     };
     const response = await fetch(`${BACKEND_URL}/appointments/school/${schoolId}/teacher/${teacherId}`, requestOptions);
@@ -55,5 +85,21 @@ export const getScheduleBySchooIdAndTeacherId = async (token:string, schoolId: s
 
     const data = await response.json();
     return data;
-    
+
+}
+
+export const deleteLesson = async (token: string,lessonId: string) => {
+    const requestOptions = {
+        method: 'DELETE',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        }
+    };
+    const response = await fetch(`${BACKEND_URL}/appointments/${lessonId}`, requestOptions);
+    if (!response.ok) {
+        throw new Error("Failed to delete lesson");
+    }
+    const data = await response.json();
+    return data;
 }
