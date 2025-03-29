@@ -39,6 +39,7 @@ export class AuthService {
             school: true,
             roles: {
               select: {
+                userSchoolId: true,
                 role: true,
               },
             },

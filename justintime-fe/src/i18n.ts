@@ -84,6 +84,7 @@ const resources = {
       "no_such_student": "There is no such a student. Please select a student from the suggestion list.",
       "fill_all_fields": "Please fill in all required fields",
       "lesson_updated_successfully": "Lesson updated successfully",
+      "start_must_be_before_end": "Start time must be before end time",
       
     }
   },
@@ -167,6 +168,7 @@ const resources = {
       "no_such_student": "Такого студента нет. Пожалуйста, выберите студента из списка.",
       "fill_all_fields": "Пожалуйста, заполните все обязательные поля",
       "lesson_updated_successfully": "Урок успешно обновлен",
+      "start_must_be_before_end": "Время начала должно быть раньше времени окончания",
     }
   },
 };

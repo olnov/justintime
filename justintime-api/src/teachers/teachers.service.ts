@@ -123,4 +123,10 @@ export class TeachersService {
       },
     });
   }
+
+  async findByUserSchoolId(userSchoolId: string) {
+    return this.prismaService.teacher.findUnique({
+      where: { userSchoolId },
+    });
+  }
 }

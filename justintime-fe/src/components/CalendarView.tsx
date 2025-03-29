@@ -32,7 +32,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { toaster } from "@/components/ui/toaster"
-import { getTeacherBySchoolId } from "@/services/TeacherService";
+import { getTeacherBySchoolId, getTeacherByUserSchoolId } from "@/services/TeacherService";
 import {
   getScheduleBySchoolId,
   getScheduleBySchooIdAndTeacherId,
@@ -49,9 +49,14 @@ import { Student } from "@/types/student.types";
 import { Email } from "@/types/email.types";
 import { sendEmail } from "@/services/EmailNotificationService";
 import { useTranslation } from "react-i18next";
+import { parseToken } from "@/services/AuthService";
+import { useNavigate } from "react-router-dom";
+import { UserSchool } from "@/types/user.types";
 
 
 const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
+  const navigate = useNavigate();
+  const token = localStorage.getItem("token");
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [teachers, setTeachers] = useState(
     createListCollection<{ label: string; value: string }>({ items: [] })
@@ -66,6 +71,11 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [editingLessonId, setEditingLessonId] = useState<string | null>(null);
   const [deletingLessonId, setDeletingLessonId] = useState<string | null>(null);
+  // A custom state for the dialog
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
+  // RBAC management
+  // const [teacherId, setTeacherId] = useState<string>("");
 
   const statusCollection = createListCollection({
     items: [
@@ -85,10 +95,7 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
     status: "",
   });
 
-  // A custom state for the dialog
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
-
+  // Loading nessesary data on component mount 
   useEffect(() => {
     fetchTeachers();
     if (selectedStudent.length >= 3) {
@@ -98,6 +105,51 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
     }
     fetchAppointments();
   }, [selectedStudent, selectedTeacher, isDialogOpen]);
+
+  // Check if user is authenticated. 
+  useEffect(() => {
+    if (!token) {
+      navigate("/login");
+    }
+  }, [navigate]);
+
+  useEffect(() => {
+    if (!token) return;
+
+    const userInfo = parseToken(token);
+    const roles = userInfo.schools.flatMap((school: UserSchool) => school.roles);
+
+    switch (roles[0]) {
+      case "admin":
+        fetchAppointments();
+        fetchTeachers();
+        fetchStudents();
+        break;
+      case "teacher":
+        fetchTeacherByUserSchoolId().then((teacher) => {
+          // setTeacherId(teacher.id); 
+          setSelectedTeacher(teacher.id);
+          fetchAppointmentsByTeacher(teacher.id); 
+        });
+        break;
+      case "student":
+        setSelectedStudent(userInfo.id);
+        break;
+      default:
+        navigate("/login");
+    }
+  }, [token, navigate]);
+
+  if (!token) return null;
+
+  // TBD: Consider db schema refactoring.
+  const fetchTeacherByUserSchoolId = async () => {
+    const token = localStorage.getItem("token");
+    const userInfo = parseToken(token!);
+    const data = await getTeacherByUserSchoolId(token!, userInfo.schools[0].userSchoolId);
+    return data;
+  }
+
 
   // Fetching calendar data filtered by teacher and school
   const fetchAppointmentsByTeacher = async (teacherId: string) => {
@@ -369,6 +421,15 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
       return;
     }
 
+    if (formData.start >= formData.end) {
+      toaster.create({
+        title: t('error'),
+        description: t('start_must_be_before_end'),
+        type: "error",
+      });
+      return;
+    }
+
     const apiLesson: APILesson = {
       id: updatedLesson.id,
       teacherId: updatedLesson.teacher.id,
@@ -483,6 +544,9 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
     setStudents([]);
   };
 
+  const userInfo = parseToken(token);
+  console.log(userInfo);
+  const roles = userInfo.schools.flatMap((school: UserSchool) => school.roles);
   return (
     <>
       <Box
@@ -490,14 +554,20 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
         bg="white"
         boxShadow="md"
         borderRadius="lg"
-        width={["100%", "100%", "120%"]}
-        mx={[-5, -5, "-10%"]}
+        // width={"85%"}
+        alignItems={"center"}
+        alignContent={"center"}
+        textAlign={"center"}
+        width={["85%", "85%", "95%"]}
+        mx={[0, 0, "2%"]}
       >
         <Text fontSize="lg" fontWeight="bold" mb={4}>
           {t('weekly_schedule_title')}
         </Text>
         <Stack direction={"row"} h={10} mb={4} align={"flex-start"}>
-          {/* Teacher Filter */}
+          {/* Teacher Filter for admin only */}
+          {roles[0] === "admin" && (
+            <>
           <SelectRoot
             collection={teachers}
             key={teachers.items.length ? teachers.items[0].value : "empty"}
@@ -521,6 +591,9 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
             </SelectContent>
           </SelectRoot>
           <Button onClick={() => handleFilterReset()} size={"sm"} bgColor={"blue.500"}>{t('reset')}</Button>
+          </>
+          )} 
+          {/* Delete lesson button */}
         </Stack>
 
         {/* FullCalendar Component */}
@@ -536,7 +609,7 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
           timeZone="local"
           slotMinTime="08:00:00"
           slotMaxTime="18:00:00"
-          weekends={false}
+          weekends={true}
           allDaySlot={false}
           events={lessons.map((lesson) => ({
             id: lesson.id,
@@ -727,6 +800,7 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
                   collection={teachers}
                   key={teachers.items.length ? teachers.items[0].value : "empty"}
                   value={[formData.teacher]}
+                  disabled={roles[0] === 'teacher'}
                   required={true}
                   mb={4}
                 >
@@ -754,6 +828,7 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
                   collection={statusCollection}
                   key={statusCollection.items.length ? statusCollection.items[0].value : "empty"}
                   value={[formData.status]}
+                  disabled={roles[0] === 'srtudent'}
                   required={true}
                 >
                   <SelectTrigger>
@@ -774,7 +849,7 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
                 {t('save')}
               </Button>
               {isEditing && (
-                <Button variant={"outline"} bgColor="orange.300" onClick={()=>handleDelete(editingLessonId!)}>
+                <Button variant={"outline"} bgColor="orange.300" onClick={() => handleDelete(editingLessonId!)}>
                   {t('delete')}
                 </Button>
               )}

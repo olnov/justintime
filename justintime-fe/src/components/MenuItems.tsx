@@ -26,12 +26,12 @@ const MenuItems = () => {
       { to: "/school/:schoolId/schedule", label: t('schedule'), icon: FaChalkboardTeacher },
     ],
     teacher: [
-      { to: "/profile", label: t('profile'), icon: CgUser },
-      { to: "/schedule", label: "My schedule", icon: FaChalkboardTeacher },
+      { to: "/school/:schoolId/profile", label: t('profile'), icon: CgUser },
+      { to: "/school/:schoolId/schedule", label: t('schedule'), icon: FaChalkboardTeacher },
     ],
     student: [
-      { to: "/profile", label: "Profile", icon: CgUser },
-      { to: "/schedule", label: "Book a lesson", icon: FaChalkboardTeacher },
+      { to: "/profile", label: t('profile'), icon: CgUser },
+      { to: "/schedule", label: t('schedule'), icon: FaChalkboardTeacher },
     ],
   };
 

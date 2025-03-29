@@ -110,3 +110,20 @@ export const updateTeacher = async (token:string, updateTeacherPayload: updateTe
     const data = await response.json();
     return data;
 }
+
+export const getTeacherByUserSchoolId = async (token:string, userSchoolId: string) => {
+    const requestOptions = {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`, 
+            'Content-Type': 'application/json' 
+        }
+    };
+    const response = await fetch(`${BACKEND_URL}/teachers/userschool/${userSchoolId}`, requestOptions);
+    if (!response.ok) {
+        throw new Error("Failed to fetch teacher");
+    }
+
+    const data = await response.json();
+    return data;
+}

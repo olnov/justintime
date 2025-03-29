@@ -91,6 +91,12 @@ export class TeachersController {
     return teacher;
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('/userschool/:id')
+  async findByUserSchoolId(@Param('id') id: string) {
+    return this.teachersService.findByUserSchoolId(id);
+  }
+
   @ApiOkResponse({ description: 'Teacher successfully updated' })
   @ApiNotFoundResponse({ description: 'Teacher not found' })
   @ApiInternalServerErrorResponse({

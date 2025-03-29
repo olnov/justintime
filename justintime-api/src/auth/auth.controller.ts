@@ -62,6 +62,7 @@ export class AuthController {
     const schools = userWithDetails.UserSchools.map((userSchool)=>({
       id: userSchool.school.id,
       name: userSchool.school.name,
+      userSchoolId: userSchool.id,
       roles: userSchool.roles.map((roleAssignment) => roleAssignment.role),
     }));
 
