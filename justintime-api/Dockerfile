@@ -21,6 +21,7 @@ COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 EXPOSE 3000
 
 ENV DATABASE_URL=$DATABASE_URL
+ENV MAILGUN_API_KEY=$MAILGUN_API_KEY
 
 # Start the application
 CMD ["node", "dist/main.js"]
