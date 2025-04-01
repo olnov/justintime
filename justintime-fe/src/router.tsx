@@ -9,49 +9,107 @@ import Schools from "@/pages/Schools";
 import Teachers from "@/pages/Teachers";
 import Dashboard from "@/pages/Dashboard";
 import Students from "@/pages/Students";
-import Schedule from "./pages/Schedule";
-import GlobalAdminDashboard from "./pages/GlobalAdmin/GlobalAdminDashboard";
-import StudentDashboard from "./pages/Student/StudentDashboard";
-import StudentProfile from "./pages/Student/StudentProfile";
+import Schedule from "@/pages/Schedule";
+import GlobalAdminDashboard from "@/pages/GlobalAdmin/GlobalAdminDashboard";
+import StudentDashboard from "@/pages/Student/StudentDashboard";
+import StudentProfile from "@/pages/Student/StudentProfile";
+import TeacherProfile from "@/pages/Teacher/TeacherProfile";
 import "./App.css";
-import TeacherProfile from "./pages/Teacher/TeacherProfile";
+import AccessDenied from "./pages/AccessDenided";
 
 const router = createBrowserRouter([
-  // ✅ Public Routes (Login, No Navbar)
+  // ✅ Public Routes
   {
     path: "/",
-    element: <LayoutWithoutNavbar />, // ✅ Wraps Login Pages
+    element: <LayoutWithoutNavbar />,
     children: [
       { path: "/", element: <Login /> },
       { path: "/login", element: <Login /> },
     ],
   },
 
-  // ✅ Global Admin Routes
+  // ✅ Protected Admin Layout
   {
     path: "/admin",
-    element: <AdminPanel />, // ✅ Wraps Admin Pages
+    element: (
+      <ProtectedRoute globalAdminOnly={true}>
+        <AdminPanel />
+      </ProtectedRoute>
+    ),
     children: [
-      { path: "dashboard", element: <ProtectedRoute element={<GlobalAdminDashboard />} globalAdminOnly={true} /> },
-      { path: "users", element: <ProtectedRoute element={<Users />} globalAdminOnly={true} /> },
-      { path: "schools", element: <ProtectedRoute element={<Schools />} globalAdminOnly={true} /> },
+      { path: "dashboard", element: <GlobalAdminDashboard /> },
+      { path: "users", element: <Users /> },
+      { path: "schools", element: <Schools /> },
     ],
   },
 
-  // ✅ School-Specific Routes (Dynamic)
+   // ✅ Protected School Layout
   {
     path: "/school/:schoolId",
-    element: <SchoolPanel />, // ✅ Wraps School Pages
+    element: <SchoolPanel />,
     children: [
-      { path: "dashboard", element: <ProtectedRoute element={<Dashboard />} allowedRoles={["admin", "teacher"]} /> },
-      { path: "student/dashboard", element: <ProtectedRoute element={<StudentDashboard />} allowedRoles={["student"]} /> },
-      { path: "student/profile", element: <ProtectedRoute element={<StudentProfile />} allowedRoles={["student"]} /> },
-      { path: "teacher/profile", element: <ProtectedRoute element={<TeacherProfile />} allowedRoles={["admin", "teacher"]} /> },
-      { path: "teachers", element: <ProtectedRoute element={<Teachers />} allowedRoles={["admin", "teacher"]} /> },
-      { path: "students", element: <ProtectedRoute element={<Students />} allowedRoles={["admin", "teacher"]} /> },
-      { path: "schedule", element: <ProtectedRoute element={<Schedule />} allowedRoles={["admin","teacher","student"]} />},
+      {
+        path: "dashboard",
+        element: (
+          <ProtectedRoute allowedRoles={["admin", "teacher"]}>
+            <Dashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "student/dashboard",
+        element: (
+          <ProtectedRoute allowedRoles={["student"]}>
+            <StudentDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "student/profile",
+        element: (
+          <ProtectedRoute allowedRoles={["student"]}>
+            <StudentProfile />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "teacher/profile",
+        element: (
+          <ProtectedRoute allowedRoles={["admin", "teacher"]}>
+            <TeacherProfile />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "teachers",
+        element: (
+          <ProtectedRoute allowedRoles={["admin", "teacher"]}>
+            <Teachers />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "students",
+        element: (
+          <ProtectedRoute allowedRoles={["admin", "teacher"]}>
+            <Students />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "schedule",
+        element: (
+          <ProtectedRoute allowedRoles={["admin", "teacher", "student"]}>
+            <Schedule />
+          </ProtectedRoute>
+        ),
+      },
     ],
   },
+  {
+    path: "/403",
+    element: <AccessDenied />,
+  },  
 ]);
 
 export default router;

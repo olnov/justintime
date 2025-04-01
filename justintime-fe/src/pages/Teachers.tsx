@@ -36,7 +36,7 @@ const Teachers = () => {
   const schoolId = parseToken(token as string).schools[0].id;
   // Pagination options
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize] = useState(10);
+  const [pageSize] = useState(7);
   const [totalCount, setTotalCount] = useState(0);
 
   useEffect(() => {

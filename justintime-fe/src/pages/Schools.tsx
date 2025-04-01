@@ -25,7 +25,7 @@ const Schools = () => {
   const { t } = useTranslation();
   // Pagination options
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize] = useState(10);
+  const [pageSize] = useState(7);
   const [totalCount, setTotalCount] = useState(0);
 
   useEffect(() => {

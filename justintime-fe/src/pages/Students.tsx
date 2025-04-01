@@ -32,7 +32,7 @@ const Students = () => {
   const ROLE = "student";
   // Pagination options
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize] = useState(10);
+  const [pageSize] = useState(7);
   const [totalCount, setTotalCount] = useState(0);
 
 

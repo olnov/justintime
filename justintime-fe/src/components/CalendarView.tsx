@@ -129,7 +129,7 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
         fetchTeacherByUserSchoolId().then((teacher) => {
           // setTeacherId(teacher.id); 
           setSelectedTeacher(teacher.id);
-          fetchAppointmentsByTeacher(teacher.id); 
+          fetchAppointmentsByTeacher(teacher.id);
         });
         break;
       case "student":
@@ -149,7 +149,6 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
     const data = await getTeacherByUserSchoolId(token!, userInfo.schools[0].userSchoolId);
     return data;
   }
-
 
   // Fetching calendar data filtered by teacher and school
   const fetchAppointmentsByTeacher = async (teacherId: string) => {
@@ -545,8 +544,8 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
   };
 
   const userInfo = parseToken(token);
-  console.log(userInfo);
   const roles = userInfo.schools.flatMap((school: UserSchool) => school.roles);
+
   return (
     <>
       <Box width={"auto"}>
@@ -557,31 +556,31 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
           {/* Teacher Filter for admin only */}
           {roles[0] === "admin" && (
             <>
-          <SelectRoot
-            collection={teachers}
-            key={teachers.items.length ? teachers.items[0].value : "empty"}
-            value={selectedTeacher ? [selectedTeacher] : []}
-            size="sm"
-            mb={4}
-          >
-            <SelectTrigger>
-              <SelectValueText placeholder={t('select_teacher')} />
-            </SelectTrigger>
-            <SelectContent>
-              {teachers.items.map((teacher: { label: string; value: string }) => (
-                <SelectItem
-                  item={teacher}
-                  key={teacher.value}
-                  onClick={() => handleFilterTeacherChange(teacher.value)}
-                >
-                  <SelectLabel>{teacher.label}</SelectLabel>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </SelectRoot>
-          <Button onClick={() => handleFilterReset()} size={"sm"} bgColor={"blue.500"}>{t('reset')}</Button>
-          </>
-          )} 
+              <SelectRoot
+                collection={teachers}
+                key={teachers.items.length ? teachers.items[0].value : "empty"}
+                value={selectedTeacher ? [selectedTeacher] : []}
+                size="sm"
+                mb={4}
+              >
+                <SelectTrigger>
+                  <SelectValueText placeholder={t('select_teacher')} />
+                </SelectTrigger>
+                <SelectContent>
+                  {teachers.items.map((teacher: { label: string; value: string }) => (
+                    <SelectItem
+                      item={teacher}
+                      key={teacher.value}
+                      onClick={() => handleFilterTeacherChange(teacher.value)}
+                    >
+                      <SelectLabel>{teacher.label}</SelectLabel>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </SelectRoot>
+              <Button onClick={() => handleFilterReset()} size={"sm"} bgColor={"blue.500"}>{t('reset')}</Button>
+            </>
+          )}
           {/* Delete lesson button */}
         </Stack>
 

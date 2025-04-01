@@ -58,7 +58,7 @@ const Users = () => {
   const token = localStorage.getItem("token");
   // Pagination options
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize] = useState(10);
+  const [pageSize] = useState(7);
   const [totalCount, setTotalCount] = useState(0);
   const { t } = useTranslation();
 
@@ -193,8 +193,6 @@ const Users = () => {
     isGlobalAdmin: user.isGlobalAdmin ? "Yes" : "No",
     school: user.UserSchools.map((schoolUser) => schoolUser.school.name).join(", ") || "N/A",
     role: user.UserSchools.flatMap((schoolUser) => schoolUser.roles.map((schoolRole) => schoolRole.role)).join(", ") || "N/A",
-    // school: user.UserSchools.map((schoolUser) => schoolUser.name).join(", ") || "N/A",
-    // role: user.UserSchools.flatMap((schoolUser) => schoolUser.roles).join(", ") || "N/A",
   }));
 
 

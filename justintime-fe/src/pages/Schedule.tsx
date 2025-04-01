@@ -1,5 +1,7 @@
-import CalendarView from "@/components/CalendarView";
 import { parseToken } from "@/services/AuthService";
+import { lazy, Suspense } from "react";
+import { Center, Spinner } from "@chakra-ui/react";
+const CalendarView = lazy(() => import("@/components/CalendarView"));
 
 
 const Schedule = () => {
@@ -8,7 +10,15 @@ const Schedule = () => {
 
     return (
         <>
-            <CalendarView schoolId={schoolId} />
+            <Suspense
+                fallback={
+                    <Center h="80vh">
+                        <Spinner size="xl" color="blue.500" />
+                    </Center>
+                }
+            >
+                <CalendarView schoolId={schoolId} />
+            </Suspense>
         </>
     );
 }
