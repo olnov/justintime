@@ -1,110 +1,94 @@
-// import { Box, Heading, Card, Button, HStack, Text } from "@chakra-ui/react";
-import { Box, Button, Card, Text } from "@chakra-ui/react";
-// import { getSchools } from "@/services/SchoolService";
-// import { getUsers } from "@/services/UserService";
-// import { getTeachers } from "@/services/TeacherService";
-// import { useState, useEffect } from "react";
+import { Box, Card, HStack, Text } from "@chakra-ui/react";
+import { useState, useEffect } from "react";
+import { getScheduleBySchoolId } from "@/services/ScheduleService";
 import { parseToken } from "@/services/AuthService";
+import { Chart } from "react-google-charts";
 import { useTranslation } from 'react-i18next';
+import { Lesson } from "@/types/lesson.types";
 
 const Dashboard = () => {
-    // const [schools, setSchools] = useState<unknown[]>([]);
-    // const [users, setUsers] = useState<unknown[]>([]);
-    // const [teachers, setTeachers] = useState<unknown[]>([]);
-    // const token = localStorage.getItem("token");
+    const [lessons, setLessons] = useState<Lesson[]>([]);
+    const token = localStorage.getItem("token");
     const schoolName = parseToken(localStorage.getItem("token") as string).schools.map((sName: { name: string; }) => sName.name).join(", ");
     const { t } = useTranslation();
 
-    // useEffect(() => {
-    //     fetchSchools();
-    //     fetchUsers();
-    //     fetchTeachers();
-    // });
+    useEffect(() => {
+        fetchScheduleBySchoolId();
+    },[]);
 
-    // const fetchSchools = async () => {
-    //     if (token) {
-    //         const data = await getSchools(token);
-    //         setSchools(data);
-    //     } else {
-    //         throw new Error("You are not authenticated");
-    //     }
-    // };
+    const fetchScheduleBySchoolId = async () => {
+        if (!token) {
+            throw new Error("You are not authenticated");
+        }
+        const schoolId = parseToken(token).schools[0].id;
+        const data = await getScheduleBySchoolId(token, schoolId);
+        console.log("Schedule Data:", data);
+        setLessons(data);
+    };
 
-    // const fetchUsers = async () => {
-    //     if (token) {
-    //         const data = await getUsers(token);
-    //         setUsers(data);
-    //     } else {
-    //         throw new Error("You are not authenticated");
-    //     }
-    // };
+    
+    const scheduledLessons = lessons.filter((lesson) => lesson.status === "scheduled").length;
+    const cancelledLessons = lessons.filter((lesson) => lesson.status === "cancelled").length;
+    const completedLessons = lessons.filter((lesson) => lesson.status === "completed").length;
+    const totalLessons = scheduledLessons + cancelledLessons + completedLessons;
 
-    // const fetchTeachers = async () => {
-    //     if (token) {
-    //         const data = await getTeachers(token);
-    //         setTeachers(data);
-    //     } else {
-    //         throw new Error("You are not authenticated");
-    //     }
-    // }
+    const data = [
+        ["Total lessons", "Cancelled lessons"],
+        ["Total", totalLessons],
+        ["Cancelled", cancelledLessons],
+    ];
 
+    const options = {
+        pieHole: 0.4,
+        is3D: false,
+        chartArea: { width: '100%', height: '80%' },
+        legend: {
+            position: "bottom",
+            alignment: "center",
+            textStyle: {
+                color: "#000",
+                fontSize: 16,
+            },
+        }
+    };
 
     return (
         <>
-        <Box p={4}>
-            <Text fontSize="3xl">{t('welcome')} {schoolName}</Text>
-        </Box>
-        <Card.Root width="320px">
-            <Card.Body gap="2">
-                <Card.Title mt="2">Not confirmed lessons</Card.Title>
-                <Card.Description>
-                    <Text fontSize="3xl">You have 3 non confirmed lessons</Text>
-                </Card.Description>
-            </Card.Body>
-            <Card.Footer justifyContent="flex-end">
-                <Button variant="outline">Details</Button>
-            </Card.Footer>
-        </Card.Root>
-        {/* <Box p={4}>
-            <Heading>{schoolName} dashboard</Heading>
-            <Box mt={4}>
-                <HStack>
-                <Card.Root width="320px">
-                    <Card.Body gap="2">
-                      <Card.Title mt="2">Total schools</Card.Title>
-                        <Card.Description>
-                            <Text fontSize="3xl">{schools.length}</Text>
-                        </Card.Description>
-                    </Card.Body>
-                    <Card.Footer justifyContent="flex-end">
-                        <Button variant="outline">Details</Button>
-                    </Card.Footer>
-                </Card.Root>
-                <Card.Root width="320px">
-                    <Card.Body gap="2">
-                        <Card.Title mt="2">Total users</Card.Title>
-                        <Card.Description>
-                            <Text fontSize="3xl">{users.length}</Text>
-                        </Card.Description>
-                    </Card.Body>
-                    <Card.Footer justifyContent="flex-end">
-                        <Button variant="outline">Details</Button>
-                    </Card.Footer>
-                </Card.Root>
-                <Card.Root width="320px">
-                    <Card.Body gap="2">
-                        <Card.Title mt="2">Total teachers</Card.Title>
-                        <Card.Description>
-                            <Text fontSize="3xl">{teachers.length}</Text>
-                        </Card.Description>
-                    </Card.Body>
-                    <Card.Footer justifyContent="flex-end">
-                        <Button variant="outline">Details</Button>
-                    </Card.Footer>
-                </Card.Root>
+            <Box alignItems={"center"} justifyContent="center" display="flex" flexDirection="column">
+                <Text fontSize="3xl">{t('welcome')} {schoolName}</Text>
+                <HStack mt={4} gap="4" justifyContent="center" alignItems="center">
+                <Card.Root width="30vw" height="60vh" alignItems="center" justifyContent="center">
+                        <Card.Body gap="2">
+                            <Card.Title mt="2">{t('school_stats')}</Card.Title>
+                            <Card.Description>
+                                <Box as="ul" listStyleType="circle" paddingLeft="0">
+                                    <li>
+                                    <Text fontSize="">You have {scheduledLessons} non confirmed lessons</Text>
+                                    </li>
+                                    <li>
+                                    <Text fontSize="">You have {completedLessons} completed lessons</Text>
+                                    </li>
+                                </Box>
+                            </Card.Description>
+                        </Card.Body>
+                    </Card.Root>
+                    <Card.Root width="30vw" height="60vh" alignItems="center" justifyContent="center">
+                        <Card.Body gap="2">
+                            <Card.Title mt="2">{t('attendance_stats')}</Card.Title>
+                            <Card.Description>
+                                <Text fontSize="">Total number of booked lessons vs cancelled</Text>
+                                <Chart
+                                    chartType="PieChart"
+                                    width="100%"
+                                    height="40vh"
+                                    data={data}
+                                    options={options}
+                                />
+                            </Card.Description>
+                        </Card.Body>
+                    </Card.Root>
                 </HStack>
             </Box>
-        </Box> */}
         </>
     );
 };

@@ -1,12 +1,12 @@
 #root {
-  max-width: 85%;
+  /* max-width: 85%; */
   margin: 0 auto;
-  padding: 2rem;
+  /* padding: 2rem; */
   text-align: center;
   width: auto;
 }
 
-.logo {
+/* .logo {
   height: 6em;
   padding: 1.5em;
   will-change: filter;
@@ -40,4 +40,4 @@
 
 .read-the-docs {
   color: #888;
-}
+} */

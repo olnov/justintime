@@ -191,110 +191,112 @@ const Teachers = () => {
 
   return (
     <>
-      <Heading>{t('teachers')}</Heading>
-      <TableComponent
-        title="Teacher"
-        data={flattenedTeachers}
-        columns={[
-          { key: "name", label: t('teacher_name'), sortable: true },
-          { key: "school", label: t('school'), sortable: true },
-          { key: "email", label: t('email'), sortable: true },
-          { key: "specialisation", label: t('specialization'), sortable: true },
-          { key: "bio", label: t('bio'), sortable: true },
-          { key: "rating", label: t('rating'), sortable: true },
-        ]}
-        onAdd={() => {
-          // Open the dialog in add mode.
-          setEditingTeacher(null);
-          setIsDialogOpen(true);
-        }}
-        onDelete={handleTeacherDelete}
-        onEdit={(item) => handleTeachersEdit(item as unknown as FlattenedTeacher)}
-        pageSize={pageSize}
-        onPageChange={handlePageChange}
-        totalCount={totalCount}
-      />
-      <DialogRoot open={isDialogOpen} onOpenChange={(isOpen) => { if (!isOpen) onClose(); }}>
-        <DialogContent>
-          <DialogHeader>{editingTeacher ? t('edit_teacher') : t('add_new_teacher')}</DialogHeader>
-          <DialogBody pb="4">
-            <Stack>
-              <Input
-                type="text"
-                placeholder={t('full_name')}
-                name="name"
-                value={fullName}
-                required
-                onChange={(e) => setFullName(e.target.value)}
-              />
-              <Input
-                type="email"
-                placeholder={t('email')}
-                name="email"
-                value={email}
-                required
-                onChange={(e) => setEmail(e.target.value)}
-              />
-              {/* Show password fields only in add mode */}
-              {!editingTeacher && (
-                <>
-                  <Input
-                    type="password"
-                    placeholder={t('password')}
-                    name="password"
-                    value={password}
-                    required
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                  <Input
-                    type="password"
-                    placeholder={t('confirm_password')}
-                    name="confirmPassword"
-                    value={confirmPassword}
-                    required
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                  />
-                </>
-              )}
-              <Textarea
-                placeholder={t('specialization')}
-                name="specialization"
-                value={specialization}
-                onChange={(e) => setSpecialization(e.target.value)}
-              />
-              <Textarea
-                placeholder={t('bio')}
-                name="bio"
-                value={bio}
-                onChange={(e) => setBio(e.target.value)}
-              />
-              <Box>
-                <Text>{t('rating')}</Text>
-                <NumberInputRoot
-                  step={0.1}
-                  max={5}
-                  min={0}
-                  formatOptions={{ style: "decimal", minimumFractionDigits: 2 }}
-                  value={rating}
-                  onValueChange={(e) => setRating(e.value)}
-                >
-                  <NumberInputField
-                    name="rating"
-                  />
-                </NumberInputRoot>
-              </Box>
-            </Stack>
-          </DialogBody>
-          <DialogFooter>
-            <Button variant="outline" bgColor="green.300" onClick={handleSaveTeacher}>
-              {t('save')}
-            </Button>
-            <Button variant="outline" bgColor="red.300" onClick={onClose}>
-              {t('cancel')}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </DialogRoot>
+      <Box bgColor={"white"} borderRadius="xs" boxShadow="xs" p={4}>
+        <Heading>{t('teachers')}</Heading>
+        <TableComponent
+          title="Teacher"
+          data={flattenedTeachers}
+          columns={[
+            { key: "name", label: t('teacher_name'), sortable: true },
+            { key: "school", label: t('school'), sortable: true },
+            { key: "email", label: t('email'), sortable: true },
+            { key: "specialisation", label: t('specialization'), sortable: true },
+            { key: "bio", label: t('bio'), sortable: true },
+            { key: "rating", label: t('rating'), sortable: true },
+          ]}
+          onAdd={() => {
+            // Open the dialog in add mode.
+            setEditingTeacher(null);
+            setIsDialogOpen(true);
+          }}
+          onDelete={handleTeacherDelete}
+          onEdit={(item) => handleTeachersEdit(item as unknown as FlattenedTeacher)}
+          pageSize={pageSize}
+          onPageChange={handlePageChange}
+          totalCount={totalCount}
+        />
+        <DialogRoot open={isDialogOpen} onOpenChange={(isOpen) => { if (!isOpen) onClose(); }}>
+          <DialogContent>
+            <DialogHeader>{editingTeacher ? t('edit_teacher') : t('add_new_teacher')}</DialogHeader>
+            <DialogBody pb="4">
+              <Stack>
+                <Input
+                  type="text"
+                  placeholder={t('full_name')}
+                  name="name"
+                  value={fullName}
+                  required
+                  onChange={(e) => setFullName(e.target.value)}
+                />
+                <Input
+                  type="email"
+                  placeholder={t('email')}
+                  name="email"
+                  value={email}
+                  required
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+                {/* Show password fields only in add mode */}
+                {!editingTeacher && (
+                  <>
+                    <Input
+                      type="password"
+                      placeholder={t('password')}
+                      name="password"
+                      value={password}
+                      required
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                    <Input
+                      type="password"
+                      placeholder={t('confirm_password')}
+                      name="confirmPassword"
+                      value={confirmPassword}
+                      required
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                    />
+                  </>
+                )}
+                <Textarea
+                  placeholder={t('specialization')}
+                  name="specialization"
+                  value={specialization}
+                  onChange={(e) => setSpecialization(e.target.value)}
+                />
+                <Textarea
+                  placeholder={t('bio')}
+                  name="bio"
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
+                />
+                <Box>
+                  <Text>{t('rating')}</Text>
+                  <NumberInputRoot
+                    step={0.1}
+                    max={5}
+                    min={0}
+                    formatOptions={{ style: "decimal", minimumFractionDigits: 2 }}
+                    value={rating}
+                    onValueChange={(e) => setRating(e.value)}
+                  >
+                    <NumberInputField
+                      name="rating"
+                    />
+                  </NumberInputRoot>
+                </Box>
+              </Stack>
+            </DialogBody>
+            <DialogFooter>
+              <Button variant="outline" bgColor="green.300" onClick={handleSaveTeacher}>
+                {t('save')}
+              </Button>
+              <Button variant="outline" bgColor="red.300" onClick={onClose}>
+                {t('cancel')}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </DialogRoot>
+      </Box>
     </>
   );
 };

@@ -46,7 +46,7 @@ const Students = () => {
 
   const fetchStudentsBySchool = async () => {
     if (token) {
-      const skip = (currentPage - 1)*pageSize;
+      const skip = (currentPage - 1) * pageSize;
       const take = pageSize;
       const schoolId = parseToken(token).schools[0].id;
       const data = await getStudentBySchoolId(token, schoolId, skip, take);
@@ -173,96 +173,98 @@ const Students = () => {
 
   return (
     <>
-      <Heading>{t('students')}</Heading>
-      <TableComponent
-        title="Students"
-        data={flattenedSudents}
-        columns={[
-          { key: "name", label: t('student_name'), sortable: true },
-          { key: "school", label: t('school'), sortable: true },
-          { key: "email", label: t('email'), sortable: true },
-          { key: "gradeLevel", label: t('grade_level'), sortable: true },
-        ]}
-        onAdd={() => {
-          setEditingStudent(null);
-          setIsDialogOpen(true);
-        }}
-        onDelete={handleStudentDelete}
-        onEdit={(item) => handleStudentEdit(item as unknown as FlattenedStudent)}
-        currentPage={currentPage}
-        pageSize={pageSize}
-        onPageChange={handlePageChange}
-        totalCount={totalCount}
-      />
-      <DialogRoot open={isDialogOpen} onOpenChange={(isOpen) => !isOpen && onClose()}>
-        <DialogContent>
-          <DialogHeader>{editingStudent ? t('edit_student') : t('add_new_student')}</DialogHeader>
-          <DialogBody pb="4">
-            <Stack>
-              <Input
-                type="text"
-                placeholder={t('full_name')}
-                name="name"
-                value={fullName}
-                required={true}
-                onChange={(e) => setFullName(e.target.value)}
-              />
-              <Input
-                type="email"
-                placeholder={t('email')}
-                name="email"
-                value={email}
-                required={true}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-              {!editingStudent && (
-                <>
-                  <Input
-                    type="password"
-                    placeholder={t('password')}
-                    name="password"
-                    value={password}
-                    required={true}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                  <Input
-                    type="password"
-                    placeholder={t('confirm_password')}
-                    name="confirmPassword"
-                    value={confirmPassword}
-                    required={true}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                  />
-                </>
-              )}
-              <Box>
-                <Text>{t('grade_level')}</Text>
-                <NumberInputRoot
-                  step={0.1}
-                  max={5}
-                  min={0}
-                  formatOptions={{ style: "decimal", minimumFractionDigits: 2 }}
-                  value={gradeLevel}
-                  onValueChange={(e) => setGradeLevel(e.value)}
-                >
-                  {/* <NumberInputLabel>Grade Level</NumberInputLabel> */}
-                  <NumberInputField
-                    name="gradeLevel"
-                  />
-                </NumberInputRoot>
-              </Box>
-            </Stack>
-          </DialogBody>
-          <DialogFooter>
-            <Button variant={"outline"} bgColor="green.300" onClick={handleSaveStudent}>
-              {t('save')}
-            </Button>
-            <Button variant="outline" bgColor={"red.300"} onClick={onClose}>
-              {t('cancel')}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </DialogRoot>
+      <Box bgColor={"white"} borderRadius="xs" boxShadow="xs" p={4}>
+        <Heading>{t('students')}</Heading>
+        <TableComponent
+          title="Students"
+          data={flattenedSudents}
+          columns={[
+            { key: "name", label: t('student_name'), sortable: true },
+            { key: "school", label: t('school'), sortable: true },
+            { key: "email", label: t('email'), sortable: true },
+            { key: "gradeLevel", label: t('grade_level'), sortable: true },
+          ]}
+          onAdd={() => {
+            setEditingStudent(null);
+            setIsDialogOpen(true);
+          }}
+          onDelete={handleStudentDelete}
+          onEdit={(item) => handleStudentEdit(item as unknown as FlattenedStudent)}
+          currentPage={currentPage}
+          pageSize={pageSize}
+          onPageChange={handlePageChange}
+          totalCount={totalCount}
+        />
+        <DialogRoot open={isDialogOpen} onOpenChange={(isOpen) => !isOpen && onClose()}>
+          <DialogContent>
+            <DialogHeader>{editingStudent ? t('edit_student') : t('add_new_student')}</DialogHeader>
+            <DialogBody pb="4">
+              <Stack>
+                <Input
+                  type="text"
+                  placeholder={t('full_name')}
+                  name="name"
+                  value={fullName}
+                  required={true}
+                  onChange={(e) => setFullName(e.target.value)}
+                />
+                <Input
+                  type="email"
+                  placeholder={t('email')}
+                  name="email"
+                  value={email}
+                  required={true}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+                {!editingStudent && (
+                  <>
+                    <Input
+                      type="password"
+                      placeholder={t('password')}
+                      name="password"
+                      value={password}
+                      required={true}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                    <Input
+                      type="password"
+                      placeholder={t('confirm_password')}
+                      name="confirmPassword"
+                      value={confirmPassword}
+                      required={true}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                    />
+                  </>
+                )}
+                <Box>
+                  <Text>{t('grade_level')}</Text>
+                  <NumberInputRoot
+                    step={0.1}
+                    max={5}
+                    min={0}
+                    formatOptions={{ style: "decimal", minimumFractionDigits: 2 }}
+                    value={gradeLevel}
+                    onValueChange={(e) => setGradeLevel(e.value)}
+                  >
+                    {/* <NumberInputLabel>Grade Level</NumberInputLabel> */}
+                    <NumberInputField
+                      name="gradeLevel"
+                    />
+                  </NumberInputRoot>
+                </Box>
+              </Stack>
+            </DialogBody>
+            <DialogFooter>
+              <Button variant={"outline"} bgColor="green.300" onClick={handleSaveStudent}>
+                {t('save')}
+              </Button>
+              <Button variant="outline" bgColor={"red.300"} onClick={onClose}>
+                {t('cancel')}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </DialogRoot>
+      </Box>
     </>
   );
 };

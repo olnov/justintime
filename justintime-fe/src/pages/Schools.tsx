@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { getSchools, createSchool } from "@/services/SchoolService";
 import TableComponent from "@/components/Table/Table";
-import { Heading, Button, Input, Stack } from "@chakra-ui/react";
+import { Heading, Button, Input, Stack, Box } from "@chakra-ui/react";
 import {
   DialogBody,
   DialogContent,
@@ -71,67 +71,69 @@ const Schools = () => {
 
   return (
     <>
-      <Heading>{t('schools')}</Heading>
-      <TableComponent
-        title="Schools"
-        data={schools}
-        columns={[
-          { key: "name", label: t('school'), sortable: true },
-          { key: "address", label: t('address'), sortable: true },
-          { key: "phone", label: t('phone'), sortable: true },
-        ]}
-        onAdd={() => setIsFormOpen(true)}
-        actions={
-          <>
-            <Button variant={"outline"}>Delete</Button>
-            <Button variant={"outline"}>Edit</Button>
-          </>
-        }
-        currentPage={currentPage}
-        pageSize={pageSize}
-        onPageChange={handlePageChange}
-        totalCount={totalCount}
-      />
-      <DialogRoot open={isFormOpen} onOpenChange={(isOpen) => !isOpen && onClose()}>
-        <DialogContent>
-          <DialogHeader>{t('add_new_school')}</DialogHeader>
-          <DialogBody pb="4">
-            <Stack>
-              <Input
-                type="text"
-                placeholder={t('school_name')}
-                name="name"
-                value={schoolName}
-                required={true}
-                onChange={(e) => setSchoolName(e.target.value)}
-              />
-              <Input
-                type="text"
-                placeholder={t('address')}
-                name="address"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-              />
-              <Input
-                type="phone"
-                placeholder="9(999)999-9999"
-                ref={withMask("9(999)999-9999")}
-                name="phone"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-              />
-            </Stack>
-          </DialogBody>
-          <DialogFooter>
-            <Button variant={"outline"} bgColor="green.300" onClick={handleSave}>
-              {t('save')}
-            </Button>
-            <Button variant="outline" bgColor={"red.300"} onClick={onClose}>
-              {t('cancel')}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </DialogRoot>
+      <Box bgColor={"white"} borderRadius="xs" boxShadow="xs" p={4}>
+        <Heading>{t('schools')}</Heading>
+        <TableComponent
+          title="Schools"
+          data={schools}
+          columns={[
+            { key: "name", label: t('school'), sortable: true },
+            { key: "address", label: t('address'), sortable: true },
+            { key: "phone", label: t('phone'), sortable: true },
+          ]}
+          onAdd={() => setIsFormOpen(true)}
+          actions={
+            <>
+              <Button variant={"outline"}>Delete</Button>
+              <Button variant={"outline"}>Edit</Button>
+            </>
+          }
+          currentPage={currentPage}
+          pageSize={pageSize}
+          onPageChange={handlePageChange}
+          totalCount={totalCount}
+        />
+        <DialogRoot open={isFormOpen} onOpenChange={(isOpen) => !isOpen && onClose()}>
+          <DialogContent>
+            <DialogHeader>{t('add_new_school')}</DialogHeader>
+            <DialogBody pb="4">
+              <Stack>
+                <Input
+                  type="text"
+                  placeholder={t('school_name')}
+                  name="name"
+                  value={schoolName}
+                  required={true}
+                  onChange={(e) => setSchoolName(e.target.value)}
+                />
+                <Input
+                  type="text"
+                  placeholder={t('address')}
+                  name="address"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                />
+                <Input
+                  type="phone"
+                  placeholder="9(999)999-9999"
+                  ref={withMask("9(999)999-9999")}
+                  name="phone"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                />
+              </Stack>
+            </DialogBody>
+            <DialogFooter>
+              <Button variant={"outline"} bgColor="green.300" onClick={handleSave}>
+                {t('save')}
+              </Button>
+              <Button variant="outline" bgColor={"red.300"} onClick={onClose}>
+                {t('cancel')}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </DialogRoot>
+      </Box>
     </>
   );
 

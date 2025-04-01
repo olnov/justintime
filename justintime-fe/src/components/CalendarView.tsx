@@ -549,18 +549,7 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
   const roles = userInfo.schools.flatMap((school: UserSchool) => school.roles);
   return (
     <>
-      <Box
-        p={5}
-        bg="white"
-        boxShadow="md"
-        borderRadius="lg"
-        // width={"85%"}
-        alignItems={"center"}
-        alignContent={"center"}
-        textAlign={"center"}
-        width={["85%", "85%", "95%"]}
-        mx={[0, 0, "2%"]}
-      >
+      <Box width={"auto"}>
         <Text fontSize="lg" fontWeight="bold" mb={4}>
           {t('weekly_schedule_title')}
         </Text>

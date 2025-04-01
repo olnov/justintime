@@ -1,4 +1,4 @@
-import { deleteUser, getUsersWithDetails} from "@/services/UserService";
+import { deleteUser, getUsersWithDetails } from "@/services/UserService";
 import { getSchools } from "@/services/SchoolService";
 import { useEffect, useState } from "react";
 import TableComponent from "@/components/Table/Table";
@@ -80,7 +80,7 @@ const Users = () => {
       const skip = (currentPage - 1) * pageSize;
       const take = pageSize;
       const data = await getUsersWithDetails(token, skip, take);
-      setTotalCount(data.totalCount); 
+      setTotalCount(data.totalCount);
       setUsers(data.data);
     } else {
       throw new Error("You are not authenticated");
@@ -91,7 +91,7 @@ const Users = () => {
     if (token) {
       setLoading(true);
       const data = await getSchools(token);
-      const filteredData = data.filter((school: { name: string; }) => school.name.toLowerCase().includes(selectedSchoolName.toLowerCase()));
+      const filteredData = data.data.filter((school: { name: string; }) => school.name.toLowerCase().includes(selectedSchoolName.toLowerCase()));
       setResults(filteredData);
       setLoading(false);
     } else {
@@ -99,7 +99,7 @@ const Users = () => {
     }
   };
 
-  const handleSelectSchool = (school: {id: string, name: string;}) => {
+  const handleSelectSchool = (school: { id: string, name: string; }) => {
     setSchoolId(school.id);
     setSelectedSchoolName(school.name);
     setResults([]);
@@ -190,148 +190,150 @@ const Users = () => {
     id: user.id,
     name: user.name || "N/A",
     email: user.email || "N/A",
-    isGlobalAdmin: user.isGlobalAdmin ? "Yes" : "No", 
+    isGlobalAdmin: user.isGlobalAdmin ? "Yes" : "No",
     school: user.UserSchools.map((schoolUser) => schoolUser.school.name).join(", ") || "N/A",
     role: user.UserSchools.flatMap((schoolUser) => schoolUser.roles.map((schoolRole) => schoolRole.role)).join(", ") || "N/A",
   }));
-  
+
 
   return (
     <>
-      <Heading>{t('users')}</Heading>
-      <TableComponent
-        title="Users"
-        data={flattenedUsers}
-        columns={[
-          { key: "name", label: t('name'), sortable: true },
-          { key: "email", label: t('email'), sortable: true },
-          { key: "isGlobalAdmin", label: t('global_admin'), sortable: true },
-          { key: "school", label: t('school'), sortable: true },
-          { key: "role", label: t('role'), sortable: true },
-        ]}
-        onAdd={() => setIsDialogOpen(true)} // Open the form
-        onEdit={(item)=>hadnleUserEdit(item as unknown as FlattenedUser)}
-        onDelete={handleUserDelete}
-        currentPage={currentPage}
-        pageSize={pageSize}
-        onPageChange={handlePageChange}
-        totalCount={totalCount}
-      />
-      <DialogRoot open={isDialogOpen} onOpenChange={(isOpen) => !isOpen && onClose()}>
-        <DialogContent>
-          <DialogHeader>{edititngUser ? t('edit_user') : t('add_new_user')}</DialogHeader>
-          <DialogBody pb="4">
-            <Stack>
-              <Input
-                type="text"
-                placeholder={t('full_name')}
-                name="name"
-                value={fullName}
-                required={true}
-                onChange={(e) => setFullName(e.target.value)}
-              />
-              <Input
-                type="email"
-                placeholder={t('email')}
-                name="email"
-                value={email}
-                required={true}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-              <Input
-                type="password"
-                placeholder={t('password')}
-                name="password"
-                value={password}
-                required={true}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-              <Input
-                type="password"
-                placeholder={t('confirm_password')}
-                name="confirmPassword"
-                value={confirmPassword}
-                required={true}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-              />
-              <Box position="relative" width="100%">
+      <Box bgColor={"white"} borderRadius="xs" boxShadow="xs" p={4}>
+        <Heading textAlign={"center"}>{t('users')}</Heading>
+        <TableComponent
+          title="Users"
+          data={flattenedUsers}
+          columns={[
+            { key: "name", label: t('name'), sortable: true },
+            { key: "email", label: t('email'), sortable: true },
+            { key: "isGlobalAdmin", label: t('global_admin'), sortable: true },
+            { key: "school", label: t('school'), sortable: true },
+            { key: "role", label: t('role'), sortable: true },
+          ]}
+          onAdd={() => setIsDialogOpen(true)} // Open the form
+          onEdit={(item) => hadnleUserEdit(item as unknown as FlattenedUser)}
+          onDelete={handleUserDelete}
+          currentPage={currentPage}
+          pageSize={pageSize}
+          onPageChange={handlePageChange}
+          totalCount={totalCount}
+        />
+        <DialogRoot open={isDialogOpen} onOpenChange={(isOpen) => !isOpen && onClose()}>
+          <DialogContent>
+            <DialogHeader>{edititngUser ? t('edit_user') : t('add_new_user')}</DialogHeader>
+            <DialogBody pb="4">
+              <Stack>
                 <Input
                   type="text"
-                  placeholder={t('school_name')}
-                  name="schoolId"
-                  value={selectedSchoolName}
-                  onChange={(e) => setSelectedSchoolName(e.target.value)}
+                  placeholder={t('full_name')}
+                  name="name"
+                  value={fullName}
+                  required={true}
+                  onChange={(e) => setFullName(e.target.value)}
                 />
-                {selectedSchoolName.length >= 3 && results.length > 0 && (
-                  <Box
-                    position="absolute"
-                    top="100%"
-                    left="0"
-                    width="100%"
-                    bgColor="white"
-                    border="1px solid"
-                    borderColor="gray.200"
-                    borderRadius={4}
-                    zIndex={1500}
-                  >
-                    {loading ? (
-                      <Box p="4" textAlign="center">
-                        <Spinner size="sm" />
-                        <Text>Loading...</Text>
-                      </Box>
-                    ) : results.length > 0 ? (
-                      <List.Root>
-                        {results.map((result) => (
-                          <List.Item
-                            key={result.id}
-                            p="2"
-                            _hover={{ bg: "gray.100", cursor: "pointer" }}
-                            onClick={() => handleSelectSchool(result)}
-                          >
-                            {result.name}
-                          </List.Item>
-                        ))}
-                      </List.Root>
-                    ) : (
-                      <Box p="4" textAlign="center" color="gray.500">
-                        No results found
-                      </Box>
-                    )}
-                  </Box>
-                )}
-              </Box>
-              <SelectRoot variant={"outline"} collection={roles}>
-                <SelectLabel>{t('select_role')}</SelectLabel>
-                <SelectTrigger>
-                  <SelectValueText placeholder="Select role" />
-                </SelectTrigger>
-                <Portal>
-                  <SelectContent
-                    style={{
-                      zIndex: 1500,
-                    }}
-                  >
-                    {roles.items.map((roleItem) => (
-                      <SelectItem item={roleItem} key={roleItem.value} onClick={() => setRole(roleItem.value)}>
-                        {roleItem.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Portal>
-              </SelectRoot>
-            </Stack>
+                <Input
+                  type="email"
+                  placeholder={t('email')}
+                  name="email"
+                  value={email}
+                  required={true}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+                <Input
+                  type="password"
+                  placeholder={t('password')}
+                  name="password"
+                  value={password}
+                  required={true}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <Input
+                  type="password"
+                  placeholder={t('confirm_password')}
+                  name="confirmPassword"
+                  value={confirmPassword}
+                  required={true}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                />
+                <Box position="relative" width="100%">
+                  <Input
+                    type="text"
+                    placeholder={t('school_name')}
+                    name="schoolId"
+                    value={selectedSchoolName}
+                    onChange={(e) => setSelectedSchoolName(e.target.value)}
+                  />
+                  {selectedSchoolName.length >= 3 && results.length > 0 && (
+                    <Box
+                      position="absolute"
+                      top="100%"
+                      left="0"
+                      width="100%"
+                      bgColor="white"
+                      border="1px solid"
+                      borderColor="gray.200"
+                      borderRadius={4}
+                      zIndex={1500}
+                    >
+                      {loading ? (
+                        <Box p="4" textAlign="center">
+                          <Spinner size="sm" />
+                          <Text>Loading...</Text>
+                        </Box>
+                      ) : results.length > 0 ? (
+                        <List.Root>
+                          {results.map((result) => (
+                            <List.Item
+                              key={result.id}
+                              p="2"
+                              _hover={{ bg: "gray.100", cursor: "pointer" }}
+                              onClick={() => handleSelectSchool(result)}
+                            >
+                              {result.name}
+                            </List.Item>
+                          ))}
+                        </List.Root>
+                      ) : (
+                        <Box p="4" textAlign="center" color="gray.500">
+                          No results found
+                        </Box>
+                      )}
+                    </Box>
+                  )}
+                </Box>
+                <SelectRoot variant={"outline"} collection={roles}>
+                  <SelectLabel>{t('select_role')}</SelectLabel>
+                  <SelectTrigger>
+                    <SelectValueText placeholder="Select role" />
+                  </SelectTrigger>
+                  <Portal>
+                    <SelectContent
+                      style={{
+                        zIndex: 1500,
+                      }}
+                    >
+                      {roles.items.map((roleItem) => (
+                        <SelectItem item={roleItem} key={roleItem.value} onClick={() => setRole(roleItem.value)}>
+                          {roleItem.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Portal>
+                </SelectRoot>
+              </Stack>
 
-          </DialogBody>
-          <DialogFooter>
-            <Button variant={"outline"} bgColor="green.300" onClick={handleSaveUser}>
-              {t('save')}
-            </Button>
-            <Button variant="outline" bgColor={"red.300"} onClick={onClose}>
-              {t('cancel')}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </DialogRoot>
+            </DialogBody>
+            <DialogFooter>
+              <Button variant={"outline"} bgColor="green.300" onClick={handleSaveUser}>
+                {t('save')}
+              </Button>
+              <Button variant="outline" bgColor={"red.300"} onClick={onClose}>
+                {t('cancel')}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </DialogRoot>
+      </Box>
     </>
   );
 };

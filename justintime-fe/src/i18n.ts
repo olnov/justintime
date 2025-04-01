@@ -85,6 +85,9 @@ const resources = {
       "fill_all_fields": "Please fill in all required fields",
       "lesson_updated_successfully": "Lesson updated successfully",
       "start_must_be_before_end": "Start time must be before end time",
+      "required_atention": "Required attention",
+      "attendance_stats": "Attendance Statistics",
+      "school_stats": "School Statistics",
       
     }
   },
@@ -169,6 +172,9 @@ const resources = {
       "fill_all_fields": "Пожалуйста, заполните все обязательные поля",
       "lesson_updated_successfully": "Урок успешно обновлен",
       "start_must_be_before_end": "Время начала должно быть раньше времени окончания",
+      "required_atention": "Требуется внимание",
+      "attendance_stats": "Статистика посещаемости",
+      "school_stats": "Статистика школы",
     }
   },
 };
