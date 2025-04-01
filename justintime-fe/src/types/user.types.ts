@@ -1,4 +1,5 @@
 export interface UserSchool {
+    id: string;
     school: { name: string };
     roles: { role: string }[];
 }
@@ -30,3 +31,20 @@ export interface FlattenedUser {
     school: string [];
     role: string [];
 }
+
+// TBD: Need to reconcile with the UserToken interface
+export interface RawUser {
+    id: string;
+    username: string;
+    email: string;
+    isGlobalAdmin: boolean;
+    schools: [{
+        id: string;
+        name: string;
+        userSchoolId: string;
+        roles: string[]; 
+    }]
+    iat: number;
+    exp: number;
+}
+  

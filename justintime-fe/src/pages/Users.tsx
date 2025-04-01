@@ -193,6 +193,8 @@ const Users = () => {
     isGlobalAdmin: user.isGlobalAdmin ? "Yes" : "No",
     school: user.UserSchools.map((schoolUser) => schoolUser.school.name).join(", ") || "N/A",
     role: user.UserSchools.flatMap((schoolUser) => schoolUser.roles.map((schoolRole) => schoolRole.role)).join(", ") || "N/A",
+    // school: user.UserSchools.map((schoolUser) => schoolUser.name).join(", ") || "N/A",
+    // role: user.UserSchools.flatMap((schoolUser) => schoolUser.roles).join(", ") || "N/A",
   }));
 
 
@@ -206,7 +208,7 @@ const Users = () => {
           columns={[
             { key: "name", label: t('name'), sortable: true },
             { key: "email", label: t('email'), sortable: true },
-            { key: "isGlobalAdmin", label: t('global_admin'), sortable: true },
+            { key: "isGlobalAdmin", label: t('global_admin'), sortable: true},
             { key: "school", label: t('school'), sortable: true },
             { key: "role", label: t('role'), sortable: true },
           ]}

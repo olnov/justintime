@@ -81,8 +81,8 @@ const Navbar = () => {
             </VStack>
           </MenuTrigger>
           <MenuContent>
-            <MenuItem value="profile" fontSize={"md"}>{t('profile')}</MenuItem>
-            <MenuItem value="settings" fontSize={"md"}>{t('settings')}</MenuItem>
+            {/* <MenuItem value="profile" fontSize={"md"}>{t('profile')}</MenuItem> */}
+            {/* <MenuItem value="settings" fontSize={"md"}>{t('settings')}</MenuItem> */}
             <MenuItem value="logout" fontSize={"md"} onClick={handleLogout}>
               {t('logout')}
             </MenuItem>

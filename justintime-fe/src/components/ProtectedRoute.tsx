@@ -14,10 +14,11 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ element, allowedRoles =
   const userInfo = parseToken(token);
   const isGlobalAdmin = userInfo.isGlobalAdmin;
   const schoolRoles = userInfo.schools?.flatMap((school: { roles: string[] }) => school.roles) || [];
+  const schoolId = userInfo.schools?.[0]?.id || null;
 
   if (!isAuthenticated()) return <Navigate to="/login" />;
-  if (globalAdminOnly && !isGlobalAdmin) return <Navigate to="/dashboard" />;
-  if (allowedRoles.length > 0 && !allowedRoles.some(role => schoolRoles.includes(role))) return <Navigate to="/dashboard" />;
+  if (globalAdminOnly && !isGlobalAdmin) return <Navigate to="/admin/dashboard" />;
+  if (allowedRoles.length > 0 && !allowedRoles.some(role => schoolRoles.includes(role))) return <Navigate to={`/${schoolId}/dashboard`} />;
 
   return element;
 };

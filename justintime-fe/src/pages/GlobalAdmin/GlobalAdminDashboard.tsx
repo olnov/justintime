@@ -6,10 +6,10 @@ import { Chart } from "react-google-charts";
 import { useTranslation } from 'react-i18next';
 import { Lesson } from "@/types/lesson.types";
 
-const Dashboard = () => {
+const GlobalAdminDashboard = () => {
     const [lessons, setLessons] = useState<Lesson[]>([]);
     const token = localStorage.getItem("token");
-    const schoolName = parseToken(localStorage.getItem("token") as string).schools.map((sName: { name: string; }) => sName.name).join(", ");
+    // const schoolName = parseToken(localStorage.getItem("token") as string).schools.map((sName: { name: string; }) => sName.name).join(", ");
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -54,7 +54,7 @@ const Dashboard = () => {
     return (
         <>
             <Box alignItems={"center"} justifyContent="center" display="flex" flexDirection="column">
-                <Text fontSize="3xl">{t('welcome')} {schoolName}</Text>
+                <Text fontSize="3xl">Global Admin Dashboard</Text>
                 <HStack mt={4} gap="4" justifyContent="center" alignItems="center">
                 <Card.Root width="30vw" height="60vh" alignItems="center" justifyContent="center">
                         <Card.Body gap="2">
@@ -92,4 +92,4 @@ const Dashboard = () => {
     );
 };
 
-export default Dashboard;
+export default GlobalAdminDashboard;
