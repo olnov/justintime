@@ -82,7 +82,7 @@ enum Role {
 model Teacher {
   id             String  @id @default(uuid())
   userSchoolId   String  @unique @map("user_school_id")
-  specialization String
+  specialization String?
   bio            String?
   rating         Float   @default(0.0)
 
