@@ -3,7 +3,6 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 
 export const sendEmail = async(token: string, email: Email) => {
-    console.log(email);
     const requestOptions = {
         method: 'POST',
         headers: {

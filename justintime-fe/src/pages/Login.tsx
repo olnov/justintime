@@ -61,7 +61,7 @@ const Login = () => {
             localStorage.setItem("token", loggedInUser.accessToken);
 
             const userInfo = parseToken(loggedInUser.accessToken);
-            console.log("User info:", userInfo);
+            // console.log("User info:", userInfo);
             redirectUser(userInfo);
         } catch (error) {
             toaster.create({

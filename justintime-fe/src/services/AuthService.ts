@@ -16,24 +16,56 @@ export const login = async (email:string, passsword:string) => {
     }
 };
 
-export const isAuthenticated = () => {
-    const token = localStorage.getItem("token"); 
-    if (token) {
-      try {
-        const payload = JSON.parse(atob(token.split(".")[1])); // Decode token payload
-        const currentTime = Date.now() / 1000; // Get current time in seconds
-        return payload.exp > currentTime; // Check if token is expired
-      } catch (error) {
-        console.error("Error: ", error);
-        return false;
-      }
-    }
-    return false;
-  };
 
-export const parseToken = (token:string) => {
-    if (token) {
-        return JSON.parse(atob(token.split(".")[1]));
+export const isAuthenticated = () => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    try {
+      const payloadStr = base64UrlDecodeToString(token.split(".")[1]);
+      const payload = JSON.parse(payloadStr);
+      const currentTime = Date.now() / 1000;
+      return payload.exp > currentTime;
+    } catch (error) {
+      console.error("Error decoding token:", error);
+      return false;
     }
-    return null;
+  }
+  return false;
 };
+
+export const parseToken = (token: string) => {
+  if (!token) return null;
+
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) {
+      console.error("Invalid JWT format");
+      return null;
+    }
+
+    const payloadJson = base64UrlDecodeToString(parts[1]);
+    return JSON.parse(payloadJson);
+  } catch (error) {
+    console.error("Error decoding token:", error);
+    return null;
+  }
+};
+
+
+// Polyfill for base64url decoding
+function base64UrlDecodeToString(base64Url: string): string {
+  const base64 = base64Url
+    .replace(/-/g, '+')
+    .replace(/_/g, '/')
+    .padEnd(Math.ceil(base64Url.length / 4) * 4, '=');
+
+  const raw = window
+    .atob(base64)
+    .split('')
+    .map(char => char.charCodeAt(0));
+
+  const byteArray = new Uint8Array(raw);
+  const decoder = new TextDecoder('utf-8');
+  return decoder.decode(byteArray);
+}
+

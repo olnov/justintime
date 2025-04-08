@@ -103,6 +103,7 @@ const Teachers = () => {
         });
         return;
       }
+      console.log('Specialization:', specialization);
       const newTeacher = await createTeacherAdmin(token, fullName, email, password, schoolId, ROLE, specialization, parseFloat(rating), bio);
       if (!newTeacher) {
         toaster.create({
