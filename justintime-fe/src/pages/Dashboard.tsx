@@ -25,7 +25,7 @@ const Dashboard = () => {
         setLessons(data);
     };
 
-    
+    const notConfirmedLessons = lessons.filter((lesson) => lesson.status === "planned").length;
     const scheduledLessons = lessons.filter((lesson) => lesson.status === "scheduled").length;
     const cancelledLessons = lessons.filter((lesson) => lesson.status === "cancelled").length;
     const completedLessons = lessons.filter((lesson) => lesson.status === "completed").length;
@@ -62,7 +62,7 @@ const Dashboard = () => {
                             <Card.Description>
                                 <Box as="ul" listStyleType="circle" paddingLeft="0">
                                     <li>
-                                    <Text fontSize="">You have {scheduledLessons} non confirmed lessons</Text>
+                                    <Text fontSize="">You have {notConfirmedLessons} non confirmed lessons</Text>
                                     </li>
                                     <li>
                                     <Text fontSize="">You have {completedLessons} completed lessons</Text>
