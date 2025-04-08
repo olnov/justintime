@@ -12,7 +12,7 @@ import {
   ApiOkResponse,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { CreateUserAdminDto } from '../users-admin/dto/create-user-admin.dto';
+import { CreateTeacherAdminDto } from './dto/teachers-admin-create.dto';
 
 @Controller('teachers-admin')
 export class TeachersAdminController {
@@ -27,9 +27,11 @@ export class TeachersAdminController {
   })
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
-  async create(@Body() createUserAdminDto: CreateUserAdminDto) {
+  async create(@Body() createTeacherAdminDto: CreateTeacherAdminDto) {
     try {
-      return this.teachersAdminService.createTeacherAdmin(createUserAdminDto);
+      return this.teachersAdminService.createTeacherAdmin(
+        createTeacherAdminDto,
+      );
     } catch (error) {
       throw new InternalServerErrorException(
         'Error creating teacher: ',
