@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { format } from "date-fns";
 import {
   Box,
   Text,
@@ -379,8 +380,8 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
 
   // Handle form submission from the dialog
   const handleFormSubmit = async () => {
-    const formattedStart = formData.start.toISOString().replace(/\.\d{3}Z$/, 'Z');
-    const formattedEnd = formData.end.toISOString().replace(/\.\d{3}Z$/, 'Z');
+    const formattedStart = format(formData.start, "yyyy-MM-dd'T'HH:mmXXX");
+    const formattedEnd   = format(formData.end,   "yyyy-MM-dd'T'HH:mmXXX");
 
     const teacherInfo = teachers.items.find(t => t.value === formData.teacher);
 
@@ -595,15 +596,15 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
           selectable={true}
           select={handleDateSelect}
           timeZone="local"
-          slotMinTime="08:00:00"
-          slotMaxTime="18:00:00"
+          slotMinTime="10:00:00"
+          slotMaxTime="20:00:00"
           weekends={true}
           allDaySlot={false}
           events={lessons.map((lesson) => ({
             id: lesson.id,
             title: lesson.subject,
-            start: lesson.start.toISOString(),
-            end: lesson.end.toISOString(),
+            start: format(lesson.start, "yyyy-MM-dd'T'HH:mmXXX"),
+            end: format(lesson.end, "yyyy-MM-dd'T'HH:mmXXX"),
             extendedProps: {
               student: lesson.student.name,
               studentId: lesson.student.id,
@@ -753,7 +754,7 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
                   type="datetime-local"
                   name="start"
                   required={true}
-                  value={formData.start.toISOString().slice(0, 16)}
+                  value={format(formData.start, "yyyy-MM-dd'T'HH:mm")}
                   onChange={(e) =>
                     setFormData((prev) => ({
                       ...prev,
@@ -771,7 +772,7 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
                   type="datetime-local"
                   name="end"
                   required={true}
-                  value={formData.end.toISOString().slice(0, 16)}
+                  value={format(formData.end, "yyyy-MM-dd'T'HH:mm")}
                   onChange={(e) =>
                     setFormData((prev) => ({
                       ...prev,
