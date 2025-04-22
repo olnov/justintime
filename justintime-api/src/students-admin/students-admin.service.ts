@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateStudentsAdminDto } from './dto/create-students-admin.dto';
 import * as bcrypt from 'bcrypt';
-import { handlePrismaError } from '../../common/exceptions/prisma-error.helper';
+import { handlePrismaError } from '../common/exceptions/prisma-error.helper';
 
 @Injectable()
 export class StudentsAdminService {

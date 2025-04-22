@@ -3,7 +3,7 @@ import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateTeacherDto } from '../teachers/dto/update-teacher.dto';
-import { handlePrismaError } from '../../common/exceptions/prisma-error.helper';
+import { handlePrismaError } from '../common/exceptions/prisma-error.helper';
 
 @Injectable()
 export class StudentsService {

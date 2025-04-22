@@ -3,7 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
-import { handlePrismaError } from '../../common/exceptions/prisma-error.helper';
+import { handlePrismaError } from '../common/exceptions/prisma-error.helper';
 
 @Injectable()
 export class UsersService {
