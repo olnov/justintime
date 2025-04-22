@@ -3,6 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
+import { handlePrismaError } from '../../common/exceptions/prisma-error.helper';
 
 @Injectable()
 export class UsersService {
@@ -14,9 +15,13 @@ export class UsersService {
     const salt = await bcrypt.genSalt();
     const hash = await bcrypt.hash(password, salt);
 
-    return this.prismaService.user.create({
-      data: { name, email, password: hash },
-    });
+    try {
+      return this.prismaService.user.create({
+        data: { name, email, password: hash },
+      });
+    } catch (error) {
+      handlePrismaError(error);
+    }
   }
 
   async findAll() {

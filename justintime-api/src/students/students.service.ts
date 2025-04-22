@@ -3,6 +3,7 @@ import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateTeacherDto } from '../teachers/dto/update-teacher.dto';
+import { handlePrismaError } from '../../common/exceptions/prisma-error.helper';
 
 @Injectable()
 export class StudentsService {
@@ -33,13 +34,17 @@ export class StudentsService {
       });
 
       if (userData) {
-        await tx.user.update({
-          where: { id: userData.userId },
-          data: {
-            name: userData.name,
-            email: userData.email,
-          },
-        });
+        await tx.user
+          .update({
+            where: { id: userData.userId },
+            data: {
+              name: userData.name,
+              email: userData.email,
+            },
+          })
+          .catch((err) => {
+            handlePrismaError(err);
+          });
       }
       return student;
     });

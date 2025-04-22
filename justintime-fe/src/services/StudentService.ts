@@ -28,8 +28,11 @@ export const createStudent = async (token:string, userSchoolId: string, gradeLev
         },
         body: JSON.stringify({ userSchoolId, gradeLevel: gradeLevel || "" })
     };
+    
     const response = await fetch(`${BACKEND_URL}/students`, requestOptions);
     if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Error response:", errorText);
         throw new Error("Failed to create student");
     }
 
@@ -89,7 +92,12 @@ export const updateStudent = async (token:string, student: updateStudentPayload)
     };
     const response = await fetch(`${BACKEND_URL}/students/`, requestOptions);
     if (!response.ok) {
-        throw new Error("Failed to update student");
+        return {
+            status: response.status,
+            error: response.status === 409
+              ? "email_already_exists"
+              : "failed_update_student",
+          };
     }
 
     const data = await response.json();

@@ -89,6 +89,9 @@ const resources = {
       "required_atention": "Required attention",
       "attendance_stats": "Attendance Statistics",
       "school_stats": "School Statistics",
+      "email_already_exists": "Email already exists",
+      "failed_create_student": "Failed to create student",
+      "failed_update_student": "Failed to update student",
       
     }
   },
@@ -177,6 +180,9 @@ const resources = {
       "required_atention": "Требуется внимание",
       "attendance_stats": "Статистика посещаемости",
       "school_stats": "Статистика школы",
+      "email_already_exists": "Электронная почта уже существует",
+      "failed_create_student": "Не удалось создать студента",
+      "failed_update_student": "Не удалось обновить студента",
     }
   },
 };

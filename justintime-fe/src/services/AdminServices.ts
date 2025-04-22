@@ -41,7 +41,12 @@ export const createTeacherAdmin = async (
 
     const response = await fetch(`${BACKEND_URL}/teachers-admin`, requestOptions);
     if (!response.ok) {
-        throw new Error("Failed to create teacher");
+        return {
+            status: response.status,
+            error: response.status === 409
+              ? "email_already_exists"
+              : "failed_create_teacher",
+          };
     }
 
     const data = await response.json();
@@ -68,7 +73,12 @@ export const createStudentAdmin = async (
 
     const response = await fetch(`${BACKEND_URL}/students-admin`, requestOptions);
     if (!response.ok) {
-        throw new Error("Failed to create student");
+        return {
+            status: response.status,
+            error: response.status === 409
+              ? "email_already_exists"
+              : "failed_create_student",
+          };
     }
 
     const data = await response.json();

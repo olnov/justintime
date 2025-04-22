@@ -67,32 +67,39 @@ const Teachers = () => {
     }
     if (editingTeacher) {
       // Edit mode: update the teacher record.
-      try {
-        const updatedTeacher = {
-          id: editingTeacher.id,
-          specialization: specialization,
-          bio: bio,
-          rating: Number(rating),
-          userData: {
-            userId: editingTeacher.userId,
-            name: fullName,
-            email: email,
-          }
-        };
-        await updateTeacher(token, updatedTeacher);
-        toaster.create({
-          title: t('success'),
-          description: t('teacher_updated'),
-          type: "success",
-        });
-        onClose();
-      } catch {
+      const updatedTeacher = {
+        id: editingTeacher.id,
+        specialization: specialization,
+        bio: bio,
+        rating: Number(rating),
+        userData: {
+          userId: editingTeacher.userId,
+          name: fullName,
+          email: email,
+        }
+      };
+      const result = await updateTeacher(token, updatedTeacher);
+
+      if (result?.status && result.status !== 200 && result.status !== 204) {
+        const description =
+          result.status === 409
+            ? t('email_already_exists')
+            : t('failed_update_teacher');
+
         toaster.create({
           title: t('error'),
-          description: t('failed_update_teacher'),
-          type: "error",
+          description,
+          type: 'error',
         });
+        return;
       }
+
+      toaster.create({
+        title: t('success'),
+        description: t('teacher_updated'),
+        type: 'success',
+      });
+      onClose();
     } else {
       // Add mode: create a new teacher.
       if (password !== confirmPassword) {
@@ -103,22 +110,33 @@ const Teachers = () => {
         });
         return;
       }
-      console.log('Specialization:', specialization);
       const newTeacher = await createTeacherAdmin(token, fullName, email, password, schoolId, ROLE, specialization, parseFloat(rating), bio);
-      if (!newTeacher) {
+      if (newTeacher.status === 200 || newTeacher.status === 201) {
+        toaster.create({
+          title: t('success'),
+          description: t('teacher_added'),
+          type: 'success',
+        });
+        onClose();
+        return;
+      }
+
+      // Catching email already exists error
+      if (newTeacher.status === 409) {
         toaster.create({
           title: t('error'),
-          description: t('failed_create_teacher'),
-          type: "error",
+          description: t('email_already_exists'),
+          type: 'error',
         });
         return;
       }
+
       toaster.create({
-        title: t('success'),
-        description: t('teacher_added'),
-        type: "success",
+        title: t('error'),
+        description: t('failed_create_teacher'),
+        type: 'error',
       });
-      onClose();
+      return;
     }
   };
 

@@ -104,7 +104,12 @@ export const updateTeacher = async (token:string, updateTeacherPayload: updateTe
     };
     const response = await fetch(`${BACKEND_URL}/teachers/`, requestOptions);
     if (!response.ok) {
-        throw new Error("Failed to update teacher");
+        return {
+            status: response.status,
+            error: response.status === 409
+              ? "email_already_exists"
+              : "failed_update_teacher",
+          };
     }
 
     const data = await response.json();

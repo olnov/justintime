@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateStudentsAdminDto } from './dto/create-students-admin.dto';
 import * as bcrypt from 'bcrypt';
+import { handlePrismaError } from '../../common/exceptions/prisma-error.helper';
 
 @Injectable()
 export class StudentsAdminService {
@@ -19,9 +20,13 @@ export class StudentsAdminService {
     return this.prismaService.$transaction(async (tx) => {
       const salt = await bcrypt.genSalt();
       const hash = await bcrypt.hash(password, salt);
-      const newUser = await tx.user.create({
-        data: { name, email, password: hash },
-      });
+      const newUser = await tx.user
+        .create({
+          data: { name, email, password: hash },
+        })
+        .catch((error) => {
+          handlePrismaError(error);
+        });
       if (!newUser) {
         throw new Error('Failed to create user');
       }

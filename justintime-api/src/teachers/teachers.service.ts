@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateTeacherDto } from './dto/create-teacher.dto';
 import { UpdateTeacherDto } from './dto/update-teacher.dto';
 import { PrismaService } from '../prisma/prisma.service';
+import { handlePrismaError } from '../../common/exceptions/prisma-error.helper';
 
 @Injectable()
 export class TeachersService {
@@ -33,13 +34,17 @@ export class TeachersService {
       });
 
       if (userData) {
-        await tx.user.update({
-          where: { id: userData.userId },
-          data: {
-            name: userData.name,
-            email: userData.email,
-          },
-        });
+        await tx.user
+          .update({
+            where: { id: userData.userId },
+            data: {
+              name: userData.name,
+              email: userData.email,
+            },
+          })
+          .catch((err) => {
+            handlePrismaError(err);
+          });
       }
       return teacher;
     });

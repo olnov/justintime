@@ -115,39 +115,64 @@ const Students = () => {
       // Update student
       // console.log(updatedStrudent);
       const updatedStudent = await updateStudent(token, updatedStrudent);
-      if (!updatedStudent) {
+      
+      // Check if the student was created successfully
+      if (updatedStudent.status === 200 || updatedStudent.status === 201) {
         toaster.create({
-          title: "Error",
-          description: "Failed to update student",
-          type: "error",
-        });
-        return;
-      } else {
-        toaster.create({
-          title: "Success",
-          description: "Student updated successfully",
-          type: "success",
+          title: t('success'),
+          description: t('student_added'),
+          type: 'success',
         });
         onClose();
+        return;
       }
+
+      // Catching email already exists error
+      if (updatedStudent.status === 409) {
+        toaster.create({
+          title: t('error'),
+          description: t('email_already_exists'),
+          type: 'error',
+        });
+        return;
+      }
+
+      toaster.create({
+        title: t('error'),
+        description: t('failed_create_student'),
+        type: 'error',
+      });
       return;
     } else {
       // Adding mode
       const newStudent = await createStudentAdmin(token, fullName, email, password, schoolId, ROLE, gradeLevel);
-      if (!newStudent) {
+      // Check if the student was created successfully
+      if (newStudent.status === 200 || newStudent.status === 201) {
+        toaster.create({
+          title: t('success'),
+          description: t('student_added'),
+          type: 'success',
+        });
+        onClose();
+        return;
+      }
+
+      // Catching email already exists error
+      if (newStudent.status === 409) {
         toaster.create({
           title: t('error'),
-          description: t('failed_create_student'),
-          type: "error",
+          description: t('email_already_exists'),
+          type: 'error',
         });
         return;
       }
+
       toaster.create({
-        title: t('success'),
-        description: t('student_added'),
-        type: "success",
+        title: t('error'),
+        description: t('failed_create_student'),
+        type: 'error',
       });
-      onClose();
+      return;
     }
   }
 
