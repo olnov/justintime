@@ -1,4 +1,4 @@
-import { Heading, Button, Stack, Input, Box, Text } from "@chakra-ui/react";
+import { Heading, Button, Stack, Input, Box, Text, Field } from "@chakra-ui/react";
 import {
   DialogBody,
   DialogContent,
@@ -115,7 +115,7 @@ const Students = () => {
       // Update student
       // console.log(updatedStrudent);
       const updatedStudent = await updateStudent(token, updatedStrudent);
-      
+
       // Check if the student was created successfully
       if (updatedStudent.status === 200 || updatedStudent.status === 201) {
         toaster.create({
@@ -225,40 +225,60 @@ const Students = () => {
             <DialogHeader>{editingStudent ? t('edit_student') : t('add_new_student')}</DialogHeader>
             <DialogBody pb="4">
               <Stack>
-                <Input
-                  type="text"
-                  placeholder={t('full_name')}
-                  name="name"
-                  value={fullName}
-                  required={true}
-                  onChange={(e) => setFullName(e.target.value)}
-                />
-                <Input
-                  type="email"
-                  placeholder={t('email')}
-                  name="email"
-                  value={email}
-                  required={true}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
+                <Field.Root required>
+                  <Field.Label>
+                    {t('full_name')}<Field.RequiredIndicator />
+                  </Field.Label>
+                  <Input
+                    type="text"
+                    placeholder={t('full_name')}
+                    name="name"
+                    value={fullName}
+                    required={true}
+                    onChange={(e) => setFullName(e.target.value)}
+                  />
+                </Field.Root>
+                <Field.Root required>
+                  <Field.Label>
+                    {t('email')}<Field.RequiredIndicator />
+                  </Field.Label>
+                  <Input
+                    type="email"
+                    placeholder={t('email')}
+                    name="email"
+                    value={email}
+                    required={true}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </Field.Root>
                 {!editingStudent && (
                   <>
-                    <Input
-                      type="password"
-                      placeholder={t('password')}
-                      name="password"
-                      value={password}
-                      required={true}
-                      onChange={(e) => setPassword(e.target.value)}
-                    />
-                    <Input
-                      type="password"
-                      placeholder={t('confirm_password')}
-                      name="confirmPassword"
-                      value={confirmPassword}
-                      required={true}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                    />
+                    <Field.Root required>
+                      <Field.Label>
+                        {t('password')}<Field.RequiredIndicator />
+                      </Field.Label>
+                      <Input
+                        type="password"
+                        placeholder={t('password')}
+                        name="password"
+                        value={password}
+                        required={true}
+                        onChange={(e) => setPassword(e.target.value)}
+                      />
+                    </Field.Root>
+                    <Field.Root required>
+                      <Field.Label>
+                        {t('confirm_password')}<Field.RequiredIndicator />
+                      </Field.Label>
+                      <Input
+                        type="password"
+                        placeholder={t('confirm_password')}
+                        name="confirmPassword"
+                        value={confirmPassword}
+                        required={true}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                      />
+                    </Field.Root>
                   </>
                 )}
                 <Box>

@@ -1,4 +1,4 @@
-import { Heading, Button, Stack, Input, Textarea, Box, Text } from "@chakra-ui/react";
+import { Heading, Button, Stack, Input, Textarea, Box, Text, Field } from "@chakra-ui/react";
 import TableComponent from "@/components/Table/Table";
 import {
   DialogBody,
@@ -236,17 +236,25 @@ const Teachers = () => {
         />
         <DialogRoot open={isDialogOpen} onOpenChange={(isOpen) => { if (!isOpen) onClose(); }}>
           <DialogContent>
-            <DialogHeader>{editingTeacher ? t('edit_teacher') : t('add_new_teacher')}</DialogHeader>
+            <DialogHeader><Text fontSize={"md"}>{editingTeacher ? t('edit_teacher') : t('add_new_teacher')}</Text></DialogHeader>
             <DialogBody pb="4">
               <Stack>
-                <Input
-                  type="text"
-                  placeholder={t('full_name')}
-                  name="name"
-                  value={fullName}
-                  required
-                  onChange={(e) => setFullName(e.target.value)}
-                />
+                <Field.Root required>
+                  <Field.Label>
+                  {t('full_name')}<Field.RequiredIndicator />
+                  </Field.Label>
+                  <Input
+                    type="text"
+                    placeholder={t('full_name')}
+                    name="name"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                  />
+                </Field.Root>
+                <Field.Root required>
+                  <Field.Label>
+                    {t('email')}<Field.RequiredIndicator />
+                  </Field.Label>
                 <Input
                   type="email"
                   placeholder={t('email')}
@@ -255,9 +263,14 @@ const Teachers = () => {
                   required
                   onChange={(e) => setEmail(e.target.value)}
                 />
+                </Field.Root>
                 {/* Show password fields only in add mode */}
                 {!editingTeacher && (
                   <>
+                    <Field.Root required>
+                      <Field.Label>
+                        {t('password')}<Field.RequiredIndicator />
+                      </Field.Label>
                     <Input
                       type="password"
                       placeholder={t('password')}
@@ -266,6 +279,11 @@ const Teachers = () => {
                       required
                       onChange={(e) => setPassword(e.target.value)}
                     />
+                    </Field.Root>
+                    <Field.Root required>
+                      <Field.Label>
+                        {t('confirm_password')}<Field.RequiredIndicator />
+                      </Field.Label>
                     <Input
                       type="password"
                       placeholder={t('confirm_password')}
@@ -274,6 +292,7 @@ const Teachers = () => {
                       required
                       onChange={(e) => setConfirmPassword(e.target.value)}
                     />
+                    </Field.Root>
                   </>
                 )}
                 <Textarea
