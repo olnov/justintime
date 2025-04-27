@@ -24,6 +24,14 @@ export class UserSchoolService {
     });
   }
 
+  async findByUserIdSchoolId(userId: string, schoolId: string) {
+    return this.prismaService.userSchool.findUnique({
+      where: {
+        userId_schoolId: { userId, schoolId },
+      },
+    });
+  }
+
   async update(id: string, updateUserSchoolDto: UpdateUserSchoolDto) {
     return `This action updates a #${id} userSchool`;
   }

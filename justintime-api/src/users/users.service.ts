@@ -1,13 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { handlePrismaError } from '../common/exceptions/prisma-error.helper';
+import { UserSchoolService } from 'src/user-school/user-school.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly userSchoolService: UserSchoolService,
+  ) {}
 
   async create(createUserDto: CreateUserDto) {
     const { name, email, password } = createUserDto;
@@ -38,6 +42,37 @@ export class UsersService {
 
   update(id: number, updateUserDto: UpdateUserDto) {
     return `This action updates a #${id} user`;
+  }
+
+  async resetPassword(schoolId: string, email: string, password: string) {
+    const user = await this.prismaService.user.findUnique({
+      where: { email },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const userSchool = await this.userSchoolService.findByUserIdSchoolId(
+      user.id,
+      schoolId,
+    );
+
+    if (!userSchool) {
+      throw new NotFoundException('User does not belong to the school');
+    }
+
+    const salt = await bcrypt.genSalt();
+    const hash = await bcrypt.hash(password, salt);
+
+    const updatedUser = await this.prismaService.user.update({
+      where: { id: user.id },
+      data: {
+        password: hash,
+        updatedAt: new Date(),
+      },
+    });
+    delete updatedUser.password;
+    return updatedUser;
   }
 
   async remove(id: string) {
