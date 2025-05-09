@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import {Injectable, Logger} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateTeacherAdminDto } from './dto/teachers-admin-create.dto';
 import * as bcrypt from 'bcrypt';
@@ -6,6 +6,7 @@ import { handlePrismaError } from '../common/exceptions/prisma-error.helper';
 
 @Injectable()
 export class TeachersAdminService {
+  private readonly logger = new Logger(TeachersAdminService.name);
   constructor(private readonly prismaService: PrismaService) {}
 
   async createTeacherAdmin(createTeacherAdminDto: CreateTeacherAdminDto) {
@@ -19,6 +20,7 @@ export class TeachersAdminService {
       bio,
       rating,
     } = createTeacherAdminDto;
+    this.logger.debug('Received data:', createTeacherAdminDto);
     return this.prismaService.$transaction(async (tx) => {
       const salt = await bcrypt.genSalt();
       const hash = await bcrypt.hash(password, salt);

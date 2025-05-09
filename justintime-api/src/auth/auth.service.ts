@@ -1,15 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import {Injectable, InternalServerErrorException, Logger, NotFoundException} from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
-import {UsersService} from "../users/users.service";
+import { UsersService } from '../users/users.service';
+import { UserSchoolService } from '../user-school/user-school.service';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
   constructor(
     private readonly prismaService: PrismaService,
     private readonly jwtService: JwtService,
     private readonly userService: UsersService,
+    private readonly userSchoolService: UserSchoolService,
   ) {}
 
   async validateUser(email: string, password: string): Promise<any> {
@@ -43,14 +46,31 @@ export class AuthService {
     });
   }
 
-  async resetPassword(token: string, password: string): Promise<any> {
+  async setInitialPasswordByInvite(
+    token: string,
+    password: string,
+  ): Promise<any> {
     const payload: { schoolId: string; email: string } =
       this.jwtService.verify(token);
 
-    return this.userService.resetPassword(
-      payload.schoolId,
-      payload.email,
-      password,
-    );
+    // Checking if email belongs to the existing user
+    const user = await this.userService.findByEmail(payload.email);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Validating relation of user and school against schoolId in token
+    const validateUserSchool =
+      await this.userSchoolService.findByUserIdSchoolId(
+        user.id,
+        payload.schoolId,
+      );
+
+    if (!validateUserSchool) {
+      throw new InternalServerErrorException(
+        'School and user relation mismatch',
+      );
+    }
+    return this.userService.setInititalPassword(payload.email, password);
   }
 }

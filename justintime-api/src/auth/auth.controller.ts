@@ -2,7 +2,7 @@ import {
   Body,
   Controller,
   HttpCode,
-  HttpStatus,
+  HttpStatus, Logger,
   Post,
   Request,
   UseGuards,
@@ -11,10 +11,11 @@ import { AuthGuard } from '@nestjs/passport';
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto/auth.dto';
-import {PasswordResetDto} from "./dto/password-reset.dto";
+import { SetInitialPasswordDto } from './dto/set-initial-password.dto';
 
 @Controller('auth')
 export class AuthController {
+  private readonly logger = new Logger(AuthController.name);
   constructor(
     private authService: AuthService,
     private jwtService: JwtService,
@@ -52,9 +53,14 @@ export class AuthController {
     };
   }
 
-  @Post('password-reset')
-  async updatePassword(@Body() passwordResetDto: PasswordResetDto) {
-    const { token, password } = passwordResetDto;
-    await this.authService.resetPassword(token, password);
+  @Post('set-password-by-invite')
+  @HttpCode(201)
+  async updatePassword(@Body() setInitialPassword: SetInitialPasswordDto) {
+    const { inviteToken, newPassword } = setInitialPassword;
+    this.logger.log(`Received data: ${inviteToken}, ${newPassword}`);
+    return this.authService.setInitialPasswordByInvite(
+      inviteToken,
+      newPassword,
+    );
   }
 }

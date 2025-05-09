@@ -53,7 +53,7 @@ export const parseToken = (token: string) => {
 
 
 // Polyfill for base64url decoding
-function base64UrlDecodeToString(base64Url: string): string {
+const base64UrlDecodeToString = (base64Url: string): string => {
   const base64 = base64Url
     .replace(/-/g, '+')
     .replace(/_/g, '/')
@@ -69,3 +69,18 @@ function base64UrlDecodeToString(base64Url: string): string {
   return decoder.decode(byteArray);
 }
 
+export const setInitialPasswordByInvite = async (inviteToken: string, newPassword: string) => {
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ inviteToken, newPassword })
+    };
+
+    const response = await fetch(`${BACKEND_URL}/auth/set-password-by-invite`, requestOptions);
+    if (!response.ok) {
+        throw new Error('Failed to set password');
+    }else{
+        const data = await response.json();
+        return data;
+    }
+}

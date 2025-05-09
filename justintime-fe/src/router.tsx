@@ -16,19 +16,21 @@ import StudentProfile from "@/pages/Student/StudentProfile";
 import TeacherProfile from "@/pages/Teacher/TeacherProfile";
 import "./App.css";
 import AccessDenied from "./pages/AccessDenided";
+import SetPassword from "./pages/SetPassword";
 
 const router = createBrowserRouter([
-  // ✅ Public Routes
+  // Public Routes
   {
     path: "/",
     element: <LayoutWithoutNavbar />,
     children: [
       { path: "/", element: <Login /> },
       { path: "/login", element: <Login /> },
+      { path: "/invite", element: <SetPassword /> },
     ],
   },
 
-  // ✅ Protected Admin Layout
+  // Protected Admin Layout
   {
     path: "/admin",
     element: (

@@ -40,6 +40,12 @@ export class UsersService {
     });
   }
 
+  async findByEmail(email: string) {
+    return this.prismaService.user.findUnique({
+      where: { email },
+    });
+  }
+
   update(id: number, updateUserDto: UpdateUserDto) {
     return `This action updates a #${id} user`;
   }
@@ -117,5 +123,27 @@ export class UsersService {
     const data = await this.prismaService.user.findMany(queryOptions);
     const totalCount = await this.prismaService.user.count();
     return { data, totalCount };
+  }
+
+  async setInititalPassword(email: string, password: string) {
+    const user = await this.prismaService.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const salt = await bcrypt.genSalt();
+    const hash = await bcrypt.hash(password, salt);
+
+    return this.prismaService.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        password: hash,
+      },
+    });
   }
 }

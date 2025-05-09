@@ -15,6 +15,7 @@ import { toaster } from "@/components/ui/toaster";
 import { Student, FlattenedStudent } from "@/types/student.types";
 import { useTranslation } from "react-i18next";
 import { createStudentAdmin } from "@/services/AdminServices";
+import { PasswordInput } from "@/components/ui/password-input";
 
 
 const Students = () => {
@@ -257,10 +258,9 @@ const Students = () => {
                       <Field.Label>
                         {t('password')}<Field.RequiredIndicator />
                       </Field.Label>
-                      <Input
-                        type="password"
-                        placeholder={t('password')}
+                      <PasswordInput
                         name="password"
+                        placeholder={t('password')}
                         value={password}
                         required={true}
                         onChange={(e) => setPassword(e.target.value)}
@@ -270,10 +270,9 @@ const Students = () => {
                       <Field.Label>
                         {t('confirm_password')}<Field.RequiredIndicator />
                       </Field.Label>
-                      <Input
-                        type="password"
-                        placeholder={t('confirm_password')}
+                      <PasswordInput
                         name="confirmPassword"
+                        placeholder={t('confirm_password')}
                         value={confirmPassword}
                         required={true}
                         onChange={(e) => setConfirmPassword(e.target.value)}

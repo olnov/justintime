@@ -817,7 +817,7 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
                   collection={statusCollection}
                   key={statusCollection.items.length ? statusCollection.items[0].value : "empty"}
                   value={[formData.status]}
-                  disabled={roles[0] === 'srtudent'}
+                  disabled={roles[0] === 'student'}
                   required={true}
                 >
                   <SelectTrigger>

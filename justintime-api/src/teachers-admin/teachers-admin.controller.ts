@@ -1,7 +1,7 @@
 import {
   Body,
   Controller,
-  InternalServerErrorException,
+  InternalServerErrorException, Logger,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -16,6 +16,7 @@ import { CreateTeacherAdminDto } from './dto/teachers-admin-create.dto';
 
 @Controller('teachers-admin')
 export class TeachersAdminController {
+  private readonly logger = new Logger(TeachersAdminService.name);
   constructor(private readonly teachersAdminService: TeachersAdminService) {}
 
   @Post()
@@ -28,10 +29,13 @@ export class TeachersAdminController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
   async create(@Body() createTeacherAdminDto: CreateTeacherAdminDto) {
+    this.logger.debug('Received payload:', createTeacherAdminDto);
     try {
-      return this.teachersAdminService.createTeacherAdmin(
+      const result = await this.teachersAdminService.createTeacherAdmin(
         createTeacherAdminDto,
       );
+      this.logger.debug('Resulted response:', result);
+      return result;
     } catch (error) {
       throw new InternalServerErrorException(
         'Error creating teacher: ',

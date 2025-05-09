@@ -37,8 +37,6 @@ export class SchoolAdminGuard implements CanActivate {
     const request: AuthenticatedRequest = context.switchToHttp().getRequest();
     const user = request.user;
 
-    console.log('User inside guard:', JSON.stringify(user, null, 2));
-
     if (!user) {
       throw new UnauthorizedException('User does not exist');
     }

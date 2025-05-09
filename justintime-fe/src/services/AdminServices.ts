@@ -30,16 +30,20 @@ export const createTeacherAdmin = async (
     rating: number,
     bio: string,
     ) => {
+    password = password.normalize("NFC");
     const requestOptions = {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json; charset=utf-8'
         },
         body: JSON.stringify({ name, email, password, schoolId, role, specialization, rating, bio }),
     };
 
+    console.log(requestOptions.body)
+
     const response = await fetch(`${BACKEND_URL}/teachers-admin`, requestOptions);
+    console.log(response.status)
     if (!response.ok) {
         return {
             status: response.status,
@@ -50,7 +54,10 @@ export const createTeacherAdmin = async (
     }
 
     const data = await response.json();
-    return data;
+    return {
+        data,
+        status: response.status,
+    };
 }
 
 export const createStudentAdmin = async (
@@ -82,5 +89,34 @@ export const createStudentAdmin = async (
     }
 
     const data = await response.json();
-    return data;
+    return {
+        data,
+        status: response.status,
+    };
+}
+
+export const generateInvitationLink = async (token:string, schoolId: string, email: string) => {
+    const requestOptions = {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ schoolId, email }),
+    };
+
+    const response = await fetch(`${BACKEND_URL}/invite`, requestOptions);
+    if (!response.ok) {
+        return {
+            status: response.status,
+            error: response.status === 409
+                && "link_generation_failed",
+            };
+    }
+
+    const data = await response.json();
+    return {
+        data,
+        status: response.status,
+    };        
 }
