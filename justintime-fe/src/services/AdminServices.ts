@@ -23,7 +23,6 @@ export const createTeacherAdmin = async (
     token:string, 
     name: string, 
     email: string, 
-    password: string, 
     schoolId: string, 
     role: string,
     specialization: string,
@@ -34,12 +33,15 @@ export const createTeacherAdmin = async (
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json; charset=utf-8'
         },
-        body: JSON.stringify({ name, email, password, schoolId, role, specialization, rating, bio }),
+        body: JSON.stringify({ name, email, schoolId, role, specialization, rating, bio }),
     };
 
+    // console.log("[Admin service:]",requestOptions.body)
+
     const response = await fetch(`${BACKEND_URL}/teachers-admin`, requestOptions);
+    console.log(response.status)
     if (!response.ok) {
         return {
             status: response.status,
@@ -50,14 +52,16 @@ export const createTeacherAdmin = async (
     }
 
     const data = await response.json();
-    return data;
+    return {
+        data,
+        status: response.status,
+    };
 }
 
 export const createStudentAdmin = async (
     token:string,
     name: string,
     email: string,
-    password: string,
     schoolId: string,
     role: string,
     gradeLevel: string,
@@ -68,7 +72,7 @@ export const createStudentAdmin = async (
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ name, email, password, schoolId, role, gradeLevel }),
+        body: JSON.stringify({ name, email, schoolId, role, gradeLevel }),
     };
 
     const response = await fetch(`${BACKEND_URL}/students-admin`, requestOptions);
@@ -82,5 +86,34 @@ export const createStudentAdmin = async (
     }
 
     const data = await response.json();
-    return data;
+    return {
+        data,
+        status: response.status,
+    };
+}
+
+export const generateInvitationLink = async (token:string, schoolId: string, email: string) => {
+    const requestOptions = {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ schoolId, email }),
+    };
+
+    const response = await fetch(`${BACKEND_URL}/invite`, requestOptions);
+    if (!response.ok) {
+        return {
+            status: response.status,
+            error: response.status === 409
+                && "link_generation_failed",
+            };
+    }
+
+    const data = await response.json();
+    return {
+        data,
+        status: response.status,
+    };        
 }

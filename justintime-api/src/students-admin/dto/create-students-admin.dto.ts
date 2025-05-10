@@ -21,12 +21,12 @@ export class CreateStudentsAdminDto {
   @IsNotEmpty()
   email: string;
 
-  @ApiProperty({ description: "User's password", example: 'PaSSw0rd' })
-  @IsString()
-  @IsNotEmpty()
-  @MinLength(5, { message: 'Password must be at least 5 characters long.' })
-  @MaxLength(16, { message: 'Password cannot exceed 16 characters.' })
-  password: string;
+  // @ApiProperty({ description: "User's password", example: 'PaSSw0rd' })
+  // @IsString()
+  // @IsNotEmpty()
+  // @MinLength(5, { message: 'Password must be at least 5 characters long.' })
+  // @MaxLength(16, { message: 'Password cannot exceed 16 characters.' })
+  // password: string;
 
   @ApiProperty({ description: 'SchoolId UUID', example: 'UUID' })
   @IsUUID()

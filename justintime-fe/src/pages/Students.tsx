@@ -14,7 +14,7 @@ import { parseToken } from "@/services/AuthService";
 import { toaster } from "@/components/ui/toaster";
 import { Student, FlattenedStudent } from "@/types/student.types";
 import { useTranslation } from "react-i18next";
-import { createStudentAdmin } from "@/services/AdminServices";
+import { createStudentAdmin, generateInvitationLink } from "@/services/AdminServices";
 
 
 const Students = () => {
@@ -23,10 +23,9 @@ const Students = () => {
   const token = localStorage.getItem("token");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [gradeLevel, setGradeLevel] = useState<string>("0.00");
   const [editingStudent, setEditingStudent] = useState<FlattenedStudent | null>(null);
+  const [invitationLink, setInvitationLink] = useState<string>("");
   const schoolId = parseToken(token as string).schools[0].id;
   const { t } = useTranslation();
   const ROLE = "student";
@@ -56,6 +55,28 @@ const Students = () => {
       throw new Error("You are not authenticated");
     }
   }
+
+  // Generate invitation link for a student
+    const handleGenerateInvitationLink = async () => {
+      if (!token) {
+        throw new Error("You are not authenticated");
+      }
+      try {
+        const link = await generateInvitationLink(token, schoolId, email);
+        setInvitationLink(link.data);
+        toaster.create({
+          title: t('success'),
+          description: t('invitation_link_generated'),
+          type: "success",
+        });
+      } catch (error) {
+        toaster.create({
+          title: t('error'),
+          description: t('failed_generate_invitation_link') + `\n ${error}`,
+          type: "error",
+        });
+      }
+    }
 
 
   const handleStudentDelete = async (studentId: string) => {
@@ -145,7 +166,7 @@ const Students = () => {
       return;
     } else {
       // Adding mode
-      const newStudent = await createStudentAdmin(token, fullName, email, password, schoolId, ROLE, gradeLevel);
+      const newStudent = await createStudentAdmin(token, fullName, email, schoolId, ROLE, gradeLevel);
       // Check if the student was created successfully
       if (newStudent.status === 200 || newStudent.status === 201) {
         toaster.create({
@@ -180,8 +201,6 @@ const Students = () => {
   const onClose = () => {
     setFullName("");
     setEmail("");
-    setPassword("");
-    setConfirmPassword("");
     setIsDialogOpen(false);
     setEditingStudent(null);
   }
@@ -251,36 +270,6 @@ const Students = () => {
                     onChange={(e) => setEmail(e.target.value)}
                   />
                 </Field.Root>
-                {!editingStudent && (
-                  <>
-                    <Field.Root required>
-                      <Field.Label>
-                        {t('password')}<Field.RequiredIndicator />
-                      </Field.Label>
-                      <Input
-                        type="password"
-                        placeholder={t('password')}
-                        name="password"
-                        value={password}
-                        required={true}
-                        onChange={(e) => setPassword(e.target.value)}
-                      />
-                    </Field.Root>
-                    <Field.Root required>
-                      <Field.Label>
-                        {t('confirm_password')}<Field.RequiredIndicator />
-                      </Field.Label>
-                      <Input
-                        type="password"
-                        placeholder={t('confirm_password')}
-                        name="confirmPassword"
-                        value={confirmPassword}
-                        required={true}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                      />
-                    </Field.Root>
-                  </>
-                )}
                 <Box>
                   <Text>{t('grade_level')}</Text>
                   <NumberInputRoot
@@ -297,9 +286,31 @@ const Students = () => {
                     />
                   </NumberInputRoot>
                 </Box>
+                {invitationLink && (
+                  <Box mt={4}>
+                    <Text mb={1}>{t('give_this_link_to_user')}:</Text>
+                    <Input readOnly value={invitationLink} />
+                    <Button 
+                      onClick={() => navigator.clipboard.writeText(invitationLink)} 
+                      size="sm" 
+                      mt={2}
+                      variant="outline"
+                      bgColor="blue.300"
+                      >
+                      {t('copy_link')}
+                    </Button>
+                  </Box>
+                )}
               </Stack>
             </DialogBody>
             <DialogFooter>
+            {editingStudent && (
+                  <>
+                  <Button variant="outline" bgColor="blue.300" onClick={handleGenerateInvitationLink}>
+                    {t('generate_invitation_link')}
+                  </Button>
+                  </>
+                )}
               <Button variant={"outline"} bgColor="green.300" onClick={handleSaveStudent}>
                 {t('save')}
               </Button>

@@ -7,6 +7,7 @@ import {
   IsBoolean,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import {Transform} from "class-transformer";
 
 export class CreateUserDto {
   @ApiProperty({ description: "User's name", example: 'John Doe' })
@@ -21,6 +22,10 @@ export class CreateUserDto {
   @IsString()
   @MinLength(5, { message: 'Password must be at least 5 characters long.' })
   @MaxLength(16, { message: 'Password cannot exceed 16 characters.' })
+  @Transform(({ value }) => {
+    if (typeof value !== 'string') return value;
+    return value.normalize('NFC');
+  })
   password: string;
 
   @IsBoolean()

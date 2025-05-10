@@ -3,63 +3,32 @@ import {
   Controller,
   HttpCode,
   HttpStatus,
+  Logger,
   Post,
   Request,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { JwtService } from '@nestjs/jwt';
-import { AuthDto } from './dto/auth.dto';
 import { AuthService } from './auth.service';
+import { AuthDto } from './dto/auth.dto';
+import { SetInitialPasswordDto } from './dto/set-initial-password.dto';
 
 @Controller('auth')
 export class AuthController {
-  // constructor(private jwtService: JwtService) {}
-
+  private readonly logger = new Logger(AuthController.name);
   constructor(
     private authService: AuthService,
     private jwtService: JwtService,
   ) {}
 
-  // @UseGuards(AuthGuard('local'))
-  // @HttpCode(HttpStatus.OK)
-  // @Post('login')
-  // async login(@Request() req) {
-  //   const payload = { username: req.user.username, sub: req.user.id };
-  //   return {
-  //     accessToken: this.jwtService.sign(payload),
-  //   };
-  // }
-
-  // @UseGuards(AuthGuard('local'))
-  // @HttpCode(HttpStatus.OK)
-  // @Post('login')
-  // async login(@Request() req, @Body() authPayload: AuthDto ) {
-  //   const user = req.user;
-  //   const payload = {
-  //     username: user.name,
-  //     id: user.id,
-  //     globalAdmin: user.isGlobalAdmin,
-  //   };
-  //
-  //   return {
-  //     accessToken: this.jwtService.sign(payload),
-  //     user: {
-  //       id: user.id,
-  //       username: user.name,
-  //       email: user.email,
-  //       roles: user.roles,
-  //     },
-  //   };
-  // }
-
   @UseGuards(AuthGuard('local'))
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  async login(@Request() req, @Body() authPayload: AuthDto) {
+  async login(@Request() req, @Body() authDto: AuthDto) {
     const user = req.user;
     const userWithDetails = await this.authService.getUserWithDetails(user.id);
-    const schools = userWithDetails.UserSchools.map((userSchool)=>({
+    const schools = userWithDetails.UserSchools.map((userSchool) => ({
       id: userSchool.school.id,
       name: userSchool.school.name,
       userSchoolId: userSchool.id,
@@ -75,7 +44,7 @@ export class AuthController {
     };
 
     return {
-      accessToken: this.jwtService.sign(payload),
+      accessToken: this.jwtService.sign(payload, { expiresIn: '30m' }),
       user: {
         id: user.id,
         username: user.name,
@@ -83,5 +52,15 @@ export class AuthController {
         schools: schools,
       },
     };
+  }
+
+  @Post('set-password-by-invite')
+  @HttpCode(201)
+  async updatePassword(@Body() setInitialPassword: SetInitialPasswordDto) {
+    const { inviteToken, newPassword } = setInitialPassword;
+    return this.authService.setInitialPasswordByInvite(
+      inviteToken,
+      newPassword,
+    );
   }
 }

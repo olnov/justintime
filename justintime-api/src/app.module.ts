@@ -16,6 +16,7 @@ import { ConfigModule } from '@nestjs/config';
 import { UsersAdminModule } from './users-admin/users-admin.module';
 import { TeachersAdminModule } from './teachers-admin/teachers-admin.module';
 import { StudentsAdminModule } from './students-admin/students-admin.module';
+import { InviteModule } from './invite/invite.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { StudentsAdminModule } from './students-admin/students-admin.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    InviteModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
