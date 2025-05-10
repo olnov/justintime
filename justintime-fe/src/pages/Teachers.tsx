@@ -15,7 +15,6 @@ import { Teacher, FlattenedTeacher } from "@/types/teacher.types";
 import { toaster } from "@/components/ui/toaster";
 import { useTranslation } from 'react-i18next';
 import { createTeacherAdmin, generateInvitationLink } from "@/services/AdminServices";
-import { PasswordInput } from "@/components/ui/password-input";
 
 
 const Teachers = () => {
@@ -27,9 +26,6 @@ const Teachers = () => {
   // Form state variables
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
-  // In add mode, we need password fields; in edit mode, these will be hidden.
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [specialization, setSpecialization] = useState("");
   const [bio, setBio] = useState("");
   const [rating, setRating] = useState<string>("0.00");
@@ -54,12 +50,11 @@ const Teachers = () => {
     // Reset form fields and mode
     setFullName("");
     setEmail("");
-    setPassword("");
-    setConfirmPassword("");
     setSpecialization("");
     setBio("");
     setRating("0.00");
     setEditingTeacher(null);
+    setInvitationLink("");
     setIsDialogOpen(false);
   };
 
@@ -73,7 +68,7 @@ const Teachers = () => {
       setInvitationLink(link.data);
       toaster.create({
         title: t('success'),
-        description: t('invitation_link_generated') + `\n ${link}`,
+        description: t('invitation_link_generated'),
         type: "success",
       });
     } catch (error) {
@@ -127,16 +122,7 @@ const Teachers = () => {
       });
       onClose();
     } else {
-      // Add mode: create a new teacher.
-      if (password !== confirmPassword) {
-        toaster.create({
-          title: t('error'),
-          description: t('passwords_do_not_match'),
-          type: "error",
-        });
-        return;
-      }
-      const newTeacher = await createTeacherAdmin(token, fullName, email, password, schoolId, ROLE, specialization, parseFloat(rating), bio);
+      const newTeacher = await createTeacherAdmin(token, fullName, email, schoolId, ROLE, specialization, parseFloat(rating), bio);
       console.log(newTeacher.status)
       if (newTeacher.status === 200 || newTeacher.status === 201) {
         toaster.create({
@@ -286,46 +272,6 @@ const Teachers = () => {
                   onChange={(e) => setEmail(e.target.value)}
                 />
                 </Field.Root>
-                {/* Show password fields only in add mode */}
-                {!editingTeacher && (
-                  <>
-                    {/* <Field.Root required>
-                      <Field.Label>
-                        {t('password')}<Field.RequiredIndicator />
-                      </Field.Label>
-                    <PasswordInput
-                      name="password"
-                      placeholder={t('password')}
-                      value={password}
-                      required
-                      onChange={(e) => setPassword(e.target.value)}
-                      />
-                    </Field.Root>
-                    <Field.Root required>
-                      <Field.Label>
-                        {t('confirm_password')}<Field.RequiredIndicator />
-                      </Field.Label>
-                    <PasswordInput
-                      name="confirmPassword"
-                      placeholder={t('confirm_password')}
-                      value={confirmPassword}
-                      required
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      />
-                    </Field.Root> */}
-                    {/* <Field.Root>
-                      <Field.Label>
-                        {t('invitation_link')}
-                      </Field.Label>
-                      <Textarea
-                        placeholder={t('invitation_link')}
-                        name="invitationLink"
-                        value={invitationLink}
-                        onChange={(e) => setInvitationLink(e.target.value)}
-                      />
-                    </Field.Root> */}
-                  </>
-                )}
                 <Textarea
                   placeholder={t('specialization')}
                   name="specialization"
@@ -356,7 +302,13 @@ const Teachers = () => {
                     <Box mt={4}>
                       <Text mb={1}>{t('give_this_link_to_user')}:</Text>
                       <Input readOnly value={invitationLink} />
-                      <Button onClick={() => navigator.clipboard.writeText(invitationLink)} size="sm" mt={2}>
+                      <Button 
+                        onClick={() => navigator.clipboard.writeText(invitationLink)} 
+                        size="sm" 
+                        mt={2}
+                        variant="outline"
+                        bgColor="blue.300"
+                        >
                         {t('copy_link')}
                       </Button>
                     </Box>
@@ -365,9 +317,14 @@ const Teachers = () => {
               </Stack>
             </DialogBody>
             <DialogFooter>
-              <Button variant="outline" bgColor="blue.300" onClick={handleGenerateInvitationLink}>
-                {t('generate_invitation_link')}
-              </Button>
+              {/* Show generate link button olny in edit mode */}
+              {editingTeacher && (
+                  <>
+                  <Button variant="outline" bgColor="blue.300" onClick={handleGenerateInvitationLink}>
+                    {t('generate_invitation_link')}
+                  </Button>
+                  </>
+                )}
               <Button variant="outline" bgColor="green.300" onClick={handleSaveTeacher}>
                 {t('save')}
               </Button>

@@ -23,24 +23,22 @@ export const createTeacherAdmin = async (
     token:string, 
     name: string, 
     email: string, 
-    password: string, 
     schoolId: string, 
     role: string,
     specialization: string,
     rating: number,
     bio: string,
     ) => {
-    password = password.normalize("NFC");
     const requestOptions = {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json; charset=utf-8'
         },
-        body: JSON.stringify({ name, email, password, schoolId, role, specialization, rating, bio }),
+        body: JSON.stringify({ name, email, schoolId, role, specialization, rating, bio }),
     };
 
-    console.log(requestOptions.body)
+    // console.log("[Admin service:]",requestOptions.body)
 
     const response = await fetch(`${BACKEND_URL}/teachers-admin`, requestOptions);
     console.log(response.status)
@@ -64,7 +62,6 @@ export const createStudentAdmin = async (
     token:string,
     name: string,
     email: string,
-    password: string,
     schoolId: string,
     role: string,
     gradeLevel: string,
@@ -75,7 +72,7 @@ export const createStudentAdmin = async (
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ name, email, password, schoolId, role, gradeLevel }),
+        body: JSON.stringify({ name, email, schoolId, role, gradeLevel }),
     };
 
     const response = await fetch(`${BACKEND_URL}/students-admin`, requestOptions);

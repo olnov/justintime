@@ -71,6 +71,6 @@ export class AuthService {
         'School and user relation mismatch',
       );
     }
-    return this.userService.setInititalPassword(payload.email, password);
+    return this.userService.setInitialPassword(payload.email, password);
   }
 }

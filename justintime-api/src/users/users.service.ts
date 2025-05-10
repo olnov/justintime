@@ -125,7 +125,7 @@ export class UsersService {
     return { data, totalCount };
   }
 
-  async setInititalPassword(email: string, password: string) {
+  async setInitialPassword(email: string, password: string) {
     const user = await this.prismaService.user.findUnique({
       where: { email },
     });

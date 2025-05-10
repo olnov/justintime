@@ -2,7 +2,8 @@ import {
   Body,
   Controller,
   HttpCode,
-  HttpStatus, Logger,
+  HttpStatus,
+  Logger,
   Post,
   Request,
   UseGuards,
@@ -57,7 +58,6 @@ export class AuthController {
   @HttpCode(201)
   async updatePassword(@Body() setInitialPassword: SetInitialPasswordDto) {
     const { inviteToken, newPassword } = setInitialPassword;
-    this.logger.log(`Received data: ${inviteToken}, ${newPassword}`);
     return this.authService.setInitialPasswordByInvite(
       inviteToken,
       newPassword,

@@ -31,7 +31,6 @@ export class InviteService {
     const link =
       `${this.inviteBaseUrl}/invite` +
       `?inviteToken=${encodeURIComponent(token)}`;
-    // return `${this.inviteBaseUrl}/invite?inviteToken=${encodeURIComponent(token)}`;
     return JSON.stringify(link);
   }
 }

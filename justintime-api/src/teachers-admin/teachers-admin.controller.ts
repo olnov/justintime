@@ -1,7 +1,8 @@
 import {
   Body,
   Controller,
-  InternalServerErrorException, Logger,
+  InternalServerErrorException,
+  Logger,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -34,7 +35,6 @@ export class TeachersAdminController {
       const result = await this.teachersAdminService.createTeacherAdmin(
         createTeacherAdminDto,
       );
-      this.logger.debug('Resulted response:', result);
       return result;
     } catch (error) {
       throw new InternalServerErrorException(

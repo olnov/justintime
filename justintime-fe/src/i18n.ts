@@ -92,7 +92,10 @@ const resources = {
       "email_already_exists": "Email already exists",
       "failed_create_student": "Failed to create student",
       "failed_update_student": "Failed to update student",
-      
+      "generate_invitation_link": "Generate Link",
+      "give_this_link_to_user": "Give this link to the user",
+      "copy_link": "Copy Link",
+      "invitation_link_generated": "Link generated successfully",
     }
   },
   ru: {
@@ -183,6 +186,10 @@ const resources = {
       "email_already_exists": "Электронная почта уже существует",
       "failed_create_student": "Не удалось создать студента",
       "failed_update_student": "Не удалось обновить студента",
+      "generate_invitation_link": "Создать ссылку",
+      "give_this_link_to_user": "Отправьте эту ссылку пользователю",
+      "copy_link": "Скопировать ссылку",
+      "invitation_link_generated": "Ссылка успешно создана",
     }
   },
 };

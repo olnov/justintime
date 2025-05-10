@@ -3,7 +3,7 @@ import {
   IsEmail,
   IsNotEmpty,
   IsNumber,
-  IsOptional,
+  IsOptional, IsPhoneNumber,
   IsString,
   IsUUID,
   MaxLength,
@@ -22,12 +22,16 @@ export class CreateTeacherAdminDto {
   @IsNotEmpty()
   email: string;
 
-  @ApiProperty({ description: "User's password", example: 'PaSSw0rd' })
-  @IsString()
-  @IsNotEmpty()
-  @MinLength(5, { message: 'Password must be at least 5 characters long.' })
-  @MaxLength(16, { message: 'Password cannot exceed 16 characters.' })
-  password: string;
+  // @ApiProperty({ description: "User's phone", example: '+7(903)222-22-22' })
+  // @IsPhoneNumber()
+  // phone: string;
+
+  // @ApiProperty({ description: "User's password", example: 'PaSSw0rd' })
+  // @IsString()
+  // @IsNotEmpty()
+  // @MinLength(5, { message: 'Password must be at least 5 characters long.' })
+  // @MaxLength(16, { message: 'Password cannot exceed 16 characters.' })
+  // password: string;
 
   @ApiProperty({ description: 'SchoolId UUID', example: 'UUID' })
   @IsUUID()

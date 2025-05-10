@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateStudentsAdminDto } from './dto/create-students-admin.dto';
 import * as bcrypt from 'bcrypt';
 import { handlePrismaError } from '../common/exceptions/prisma-error.helper';
+import { generateTemporaryPassword} from "../common/helpers/temporary-password-generator.helper";
 
 @Injectable()
 export class StudentsAdminService {
@@ -12,12 +13,12 @@ export class StudentsAdminService {
     const {
       name,
       email,
-      password,
       role = 'student',
       schoolId,
       gradeLevel,
     } = createStudentsAdminDto;
     return this.prismaService.$transaction(async (tx) => {
+      const password = generateTemporaryPassword();
       const salt = await bcrypt.genSalt();
       const hash = await bcrypt.hash(password, salt);
       const newUser = await tx.user
