@@ -796,7 +796,7 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
                   <SelectTrigger bgColor={"white"}>
                     <SelectValueText placeholder={t('select_teacher')} />
                   </SelectTrigger>
-                  <SelectContent portalRef={contentRef}>
+                  <SelectContent portalRef={contentRef as React.RefObject<HTMLElement>}>
                     {teachers.items.map((teacher: { label: string; value: string }) => (
                       <SelectItem
                         item={teacher}
@@ -823,7 +823,7 @@ const CalendarView: React.FC<{ schoolId: string }> = ({ schoolId }) => {
                   <SelectTrigger>
                     <SelectValueText placeholder={t('select_status')} />
                   </SelectTrigger>
-                  <SelectContent portalRef={contentRef}>
+                  <SelectContent portalRef={contentRef as React.RefObject<HTMLElement>}>
                     {statusCollection.items.map((status) => (
                       <SelectItem item={status} key={status.value} onClick={() => handleStatusChange(status)}>
                         <SelectLabel>{status.label}</SelectLabel>
