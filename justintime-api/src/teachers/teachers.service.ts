@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateTeacherDto } from './dto/create-teacher.dto';
 import { UpdateTeacherDto } from './dto/update-teacher.dto';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '@prisma/prisma.service';
 import { handlePrismaError } from '../common/exceptions/prisma-error.helper';
 
 @Injectable()

@@ -1,9 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '@prisma/prisma.service';
 import { CreateTeacherAdminDto } from './dto/teachers-admin-create.dto';
 import * as bcrypt from 'bcrypt';
 import { handlePrismaError } from '../common/exceptions/prisma-error.helper';
-import { generateTemporaryPassword } from '../common/helpers/temporary-password-generator.helper';
+import { generateTemporaryPassword } from '@common/helpers/temporary-password-generator.helper';
 
 @Injectable()
 export class TeachersAdminService {
