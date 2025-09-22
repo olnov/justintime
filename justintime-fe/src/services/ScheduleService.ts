@@ -93,7 +93,6 @@ export const deleteLesson = async (token: string,lessonId: string) => {
         method: 'DELETE',
         headers: {
             Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json'
         }
     };
     const response = await fetch(`${BACKEND_URL}/appointments/${lessonId}`, requestOptions);

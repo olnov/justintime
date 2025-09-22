@@ -1,7 +1,7 @@
 import { parseToken } from "@/services/AuthService";
 import { lazy, Suspense } from "react";
 import { Center, Spinner } from "@chakra-ui/react";
-const CalendarView = lazy(() => import("@/components/CalendarView"));
+const CalendarView = lazy(() => import("@/components/calendar-view/CalendarView"));
 
 
 const Schedule = () => {
