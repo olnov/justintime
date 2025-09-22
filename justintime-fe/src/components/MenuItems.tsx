@@ -1,6 +1,6 @@
 import { Link as ChakraLink } from "@chakra-ui/react";
 import { NavLink } from "react-router-dom";
-import { FaUsers, FaSchool, FaChalkboardTeacher, FaUserGraduate } from "react-icons/fa";
+import { FaUsers, FaSchool, FaChalkboardTeacher, FaUserGraduate, FaCalendar } from "react-icons/fa";
 import { CgUser } from "react-icons/cg";
 import { parseToken } from "@/services/AuthService";
 import { UserSchool } from "@/types/user.types";
@@ -23,15 +23,15 @@ const MenuItems = () => {
     admin: [
       { to: "/school/:schoolId/teachers", label: t('teachers'), icon: FaChalkboardTeacher },
       { to: "/school/:schoolId/students", label: t('students'), icon: FaUserGraduate },
-      { to: "/school/:schoolId/schedule", label: t('schedule'), icon: FaChalkboardTeacher },
+      { to: "/school/:schoolId/schedule", label: t('schedule'), icon: FaCalendar },
     ],
     teacher: [
       { to: "/school/:schoolId/teacher/profile", label: t('profile'), icon: CgUser },
-      { to: "/school/:schoolId/schedule", label: t('schedule'), icon: FaChalkboardTeacher },
+      { to: "/school/:schoolId/schedule", label: t('schedule'), icon: FaCalendar },
     ],
     student: [
       { to: "/school/:schoolId/student/profile", label: t('profile'), icon: CgUser },
-      { to: "/school/:schoolId/schedule", label: t('schedule'), icon: FaChalkboardTeacher },
+      { to: "/school/:schoolId/schedule", label: t('schedule'), icon: FaCalendar },
     ],
   };
 
