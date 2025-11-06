@@ -1,4 +1,4 @@
-FROM node:current-alpine as builder
+FROM node:22-alpine3.21 as builder
 
 # Set working directory
 WORKDIR /justintime-fe

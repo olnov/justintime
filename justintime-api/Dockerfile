@@ -1,5 +1,5 @@
 # Stage 1: Build the application
-FROM node:current-alpine AS builder
+FROM node:22-alpine3.21 AS builder
 WORKDIR /app
 
 COPY package*.json ./
@@ -10,7 +10,7 @@ COPY . .
 RUN npm run build
 
 # Stage 2: Create the production image
-FROM node:current-alpine
+FROM node:22-alpine3.21
 WORKDIR /app
 COPY package*.json ./
 RUN npm install --omit=dev
