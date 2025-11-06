@@ -11,12 +11,13 @@ import LanguageSwitcher  from "./LanguageSwitcher";
 import { useTranslation } from "react-i18next";
 
 const Navbar = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const fullName: string = localStorage.getItem("userName") || "";
   const userRole = parseToken(localStorage.getItem("token") as string).schools.map((schoolRole: { roles: unknown; }) => schoolRole.roles).join(", ");
   const isGlobalAdmin: boolean = parseToken(localStorage.getItem("token") as string).isGlobalAdmin;
-  const Role: string | boolean = String(userRole) || (isGlobalAdmin ? "global_admin" : false);
-  const { t } = useTranslation();
+  const Role: string | boolean = String(userRole) || (isGlobalAdmin ? t('global_admin') : false);
+  
   
   const handleLogout = () => {
     localStorage.removeItem("userName");
