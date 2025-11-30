@@ -7,7 +7,7 @@ import {
   IsNotEmpty,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { Role } from '@prisma/client';
+import { Role } from 'generated/prisma';
 
 export class CreateUserAdminDto {
   @ApiProperty({ description: "User's name", example: 'John Doe' })

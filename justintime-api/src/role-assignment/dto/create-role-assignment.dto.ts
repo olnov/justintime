@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { Role } from '@prisma/client';
+import { Role } from 'generated/prisma';
 
 export class CreateRoleAssignmentDto {
   @IsNotEmpty()
