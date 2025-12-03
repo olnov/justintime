@@ -39,12 +39,12 @@ exports.Prisma = Prisma
 exports.$Enums = {}
 
 /**
- * Prisma Client JS version: 7.0.1
- * Query Engine version: f09f2815f091dbba658cdcd2264306d88bb5bda6
+ * Prisma Client JS version: 7.1.0
+ * Query Engine version: ab635e6b9d606fa5c8fb8b1a7f909c3c3c1c98ba
  */
 Prisma.prismaVersion = {
-  client: "7.0.1",
-  engine: "f09f2815f091dbba658cdcd2264306d88bb5bda6"
+  client: "7.1.0",
+  engine: "ab635e6b9d606fa5c8fb8b1a7f909c3c3c1c98ba"
 }
 
 Prisma.PrismaClientKnownRequestError = PrismaClientKnownRequestError;
@@ -197,8 +197,8 @@ exports.Prisma.ModelName = {
  */
 const config = {
   "previewFeatures": [],
-  "clientVersion": "7.0.1",
-  "engineVersion": "f09f2815f091dbba658cdcd2264306d88bb5bda6",
+  "clientVersion": "7.1.0",
+  "engineVersion": "ab635e6b9d606fa5c8fb8b1a7f909c3c3c1c98ba",
   "activeProvider": "postgresql",
   "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider     = \"prisma-client-js\"\n  output       = \"../generated/prisma\"\n  moduleFormat = \"cjs\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nmodel User {\n  id            String       @id @default(uuid())\n  name          String\n  email         String       @unique\n  password      String\n  isGlobalAdmin Boolean      @default(false)\n  birthDate     DateTime?    @map(\"birth_date\")\n  userPhoto     String?      @map(\"user_photo\")\n  phone         String?\n  telegram      String?\n  otherContacts String?      @map(\"other_contacts\")\n  address       String?\n  createdAt     DateTime     @default(now()) @map(\"created_at\")\n  updatedAt     DateTime     @updatedAt @map(\"updated_at\")\n  UserSchools   UserSchool[] // Relationships with schools\n\n  @@index([phone])\n  @@index([email])\n  @@map(\"users\")\n}\n\nmodel School {\n  id           String        @id @default(uuid())\n  name         String        @unique\n  address      String?\n  phone        String?\n  createdAt    DateTime      @default(now()) @map(\"created_at\")\n  updatedAt    DateTime      @updatedAt @map(\"updated_at\")\n  UserSchools  UserSchool[] // Users belonging to this school\n  Appointments Appointment[] // Appointments in this school\n\n  @@map(\"schools\")\n}\n\nmodel UserSchool {\n  id       String   @id @default(uuid())\n  userId   String   @map(\"user_id\")\n  schoolId String   @map(\"school_id\")\n  joinedAt DateTime @default(now()) @map(\"joined_at\")\n\n  user    User             @relation(fields: [userId], references: [id], onDelete: Cascade)\n  school  School           @relation(fields: [schoolId], references: [id], onDelete: Cascade)\n  roles   RoleAssignment[] // Combined roles for the user in the school\n  Teacher Teacher? // Teacher-specific data\n  Student Student? // Student-specific data\n\n  @@unique([userId, schoolId]) // Ensure a user can belong to a school only once\n  @@map(\"users_schools\")\n}\n\nmodel RoleAssignment {\n  id           String @id @default(uuid())\n  userSchoolId String @map(\"user_school_id\")\n  role         Role\n\n  userSchool UserSchool @relation(fields: [userSchoolId], references: [id], onDelete: Cascade)\n\n  @@map(\"role_assignments\")\n}\n\nenum Role {\n  student\n  teacher\n  admin\n}\n\nmodel Teacher {\n  id             String  @id @default(uuid())\n  userSchoolId   String  @unique @map(\"user_school_id\")\n  specialization String?\n  bio            String?\n  rating         Float   @default(0.0)\n\n  userSchool   UserSchool    @relation(fields: [userSchoolId], references: [id], onDelete: Cascade)\n  Appointments Appointment[] // Appointments associated with this teacher\n\n  @@map(\"teachers\")\n}\n\nmodel Student {\n  id           String @id @default(uuid())\n  userSchoolId String @unique @map(\"user_school_id\")\n  gradeLevel   String @map(\"grade_level\")\n\n  userSchool   UserSchool    @relation(fields: [userSchoolId], references: [id], onDelete: Cascade)\n  Appointments Appointment[] // Appointments associated with this student\n\n  @@map(\"students\")\n}\n\nmodel Appointment {\n  id        String            @id @default(uuid())\n  teacherId String            @map(\"teacher_id\")\n  studentId String            @map(\"student_id\")\n  schoolId  String            @map(\"school_id\")\n  startTime DateTime          @map(\"start_time\")\n  endTime   DateTime          @map(\"end_time\")\n  status    AppointmentStatus\n  notes     String?\n\n  teacher Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)\n  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)\n  school  School  @relation(fields: [schoolId], references: [id], onDelete: Cascade)\n\n  @@map(\"appointments\")\n}\n\nenum AppointmentStatus {\n  planned // planned, but not confirmed\n  scheduled // planned and confirmed\n  completed\n  cancelled\n}\n"
 }
