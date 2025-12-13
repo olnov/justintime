@@ -2,7 +2,7 @@ import {
   ConflictException,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma } from 'generated/prisma';
 
 export function handlePrismaError(error: unknown) {
   if (error instanceof Prisma.PrismaClientKnownRequestError) {

@@ -8,7 +8,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { Role } from '@prisma/client';
+import { Role } from 'generated/prisma';
 
 export class CreateStudentsAdminDto {
   @ApiProperty({ description: "User's name", example: 'John Doe' })
