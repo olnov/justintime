@@ -16,6 +16,7 @@ import { UsersAdminModule } from './users-admin/users-admin.module';
 import { TeachersAdminModule } from './teachers-admin/teachers-admin.module';
 import { StudentsAdminModule } from './students-admin/students-admin.module';
 import { InviteModule } from './invite/invite.module';
+import { TelegramModule } from './telegram/telegram.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { InviteModule } from './invite/invite.module';
       isGlobal: true,
     }),
     InviteModule,
+    TelegramModule,
   ],
   providers: [AppService, PrismaService],
 })
