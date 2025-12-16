@@ -1,12 +1,20 @@
+import { StudentsService } from '@/students/students.service';
+import { TeachersService } from '@/teachers/teachers.service';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config/dist/config.service';
 import { Hears, Help, On, Start, Update } from 'nestjs-telegraf';
 import { Context } from 'telegraf';
 
+const SCHOOL_ID = '531ad0ea-3861-4cbe-b96e-87235c62e8ac'; // VoiceUp Hardcoded for testing
+
 @Update()
 @Injectable()
 export class TelegramService {
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly studentsService: StudentsService,
+    private readonly teachersService: TeachersService,
+  ) {
     const validatedBotToken =
       this.configService.get<string>('TELEGRAM_BOT_TOKEN');
     if (!validatedBotToken) {
@@ -34,6 +42,24 @@ export class TelegramService {
   async onPing(ctx: Context) {
     console.log('Received ping command', ctx.message);
     await ctx.reply('pong');
+  }
+
+  @Hears('студенты')
+  async onMySchedule(ctx: Context) {
+    const students = await this.studentsService.findBySchoolId(SCHOOL_ID);
+    const result = (students.data as any[])
+      .map((s) => `${s.userSchool.user.name}`)
+      .join('\n');
+    await ctx.reply(result);
+  }
+
+  @Hears('преподаватели')
+  async onTeachers(ctx: Context) {
+    const teachers = await this.teachersService.findBySchoolId(SCHOOL_ID);
+    const result = (teachers.data as any[])
+      .map((t) => `${t.userSchool.user.name}`)
+      .join('\n');
+    await ctx.reply(result);
   }
 
   @On('text')
