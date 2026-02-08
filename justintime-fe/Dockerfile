@@ -18,7 +18,7 @@ ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
 RUN npm run build
 
 # Use nginx to serve the built app
-FROM nginx:alpine
+FROM nginx:1.29.5-alpine3.23
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /justintime-fe/dist /usr/share/nginx/html
 
